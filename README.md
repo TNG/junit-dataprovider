@@ -6,10 +6,14 @@ A TestNG like dataprovider runner for JUnit
 Here is an easy usage example:
 
 ```java
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.DataProviderRunner;
+import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 @RunWith(DataProviderRunner.class)
 public class DataProviderTest {
