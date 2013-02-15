@@ -6,9 +6,7 @@ A TestNG like dataprovider runner for JUnit
 Here is an easy usage example:
 
 ```java
-package com.tngtech.java.junit.dataprovider;
-
-import static org.fest.assertions.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +34,7 @@ public class DataProviderTest {
         int result = a + b;
 
         // Then:
-        assertThat(result).isEqualTo(expected);
+        assertEquals(expected, result);
     }
 }
 ```
