@@ -1,6 +1,8 @@
-*.class
-
-# Package Files #
-*.jar
-*.war
-*.ear
+/bin
+/build
+/.classpath
+/.gradle
+/.idea
+/.settings
+/.project
+/junit-dataprovider.iml

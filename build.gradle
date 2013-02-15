@@ -1,0 +1,14 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'junit', name: 'junit-dep', version: '4.11' /* provided scope */
+    testCompile group: 'org.easytesting', name: 'fest-assert-core', version: '2.+'
+}
+
+sourceCompatibility = 1.5
+version = '1.0'
