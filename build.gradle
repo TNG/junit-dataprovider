@@ -1,5 +1,9 @@
-apply plugin: 'java'
+
+// -- default build and publish artifacts -------------------------------------------------------------------------------------
 apply plugin: 'eclipse'
+apply plugin: 'java'
+
+sourceCompatibility = 1.5
 
 repositories {
     mavenCentral()
@@ -10,5 +14,78 @@ dependencies {
     testCompile group: 'org.easytesting', name: 'fest-assert-core', version: '2.+'
 }
 
-sourceCompatibility = 1.5
-version = '1.0'
+
+// -- build and publish artifacts -------------------------------------------------------------------------------------
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = 'com.tngtech.java'
+version = '1.0.0'
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from 'build/docs/javadoc'
+    classifier = 'javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'junit-dataprovider'
+                packaging 'jar'
+                description 'A TestNG like dataprovider runner for JUnit'
+                url 'https://github.com/TNG/junit-dataprovider'
+
+                scm {
+                    url 'scm:git@github.com:TNG/junit-dataprovider.git'
+                    connection 'scm:git@github.com:TNG/junit-dataprovider.git'
+                    developerConnection 'scm:git@github.com:TNG/junit-dataprovider.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'lepokle'
+                        name 'Leo von Klenze'
+                    }
+                    developer {
+                        id 'aaschmid'
+                        name 'Andreas Schmid'
+                    }
+                }
+            }
+        }
+    }
+}
