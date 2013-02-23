@@ -40,6 +40,7 @@ artifacts {
 }
 
 signing {
+    // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
     sign configurations.archives
 }
 
@@ -49,6 +50,7 @@ uploadArchives {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                // username and password from gradle.properties
                 authentication(userName: sonatypeUsername, password: sonatypePassword)
             }
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
