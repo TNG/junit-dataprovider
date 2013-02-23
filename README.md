@@ -1,9 +1,23 @@
 junit-dataprovider
 ==================
 
-A TestNG like dataprovider runner for JUnit
+What is it
+----------
 
-Here is an easy usage example:
+A TestNG like dataprovider runner for JUnit.
+
+
+Download
+--------
+
+All released (= tagged) versions are available at 
+[Maven Central Repository](http://search.maven.org/#search|ga|1|a%3A%22junit-dataprovider%22). 
+Following this link you can choose a version. Now either download it manually or see 
+the **Dependency Information** section howto integrate it with your dependency managenment tool.
+
+
+Usage example
+-------------
 
 ```java
 import static org.junit.Assert.*;
