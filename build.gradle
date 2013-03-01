@@ -1,6 +1,7 @@
 
-// -- default build and publish artifacts -------------------------------------------------------------------------------------
+// -- default build ---------------------------------------------------------------------------------------------------
 apply plugin: 'eclipse'
+apply plugin: 'findbugs'
 apply plugin: 'java'
 
 sourceCompatibility = 1.5
@@ -12,6 +13,7 @@ repositories {
 dependencies {
     compile group: 'junit', name: 'junit-dep', version: '4.11' /* provided scope */
     testCompile group: 'org.easytesting', name: 'fest-assert-core', version: '2.+'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.+'
 }
 
 

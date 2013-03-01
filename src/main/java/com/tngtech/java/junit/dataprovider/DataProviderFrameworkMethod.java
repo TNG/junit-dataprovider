@@ -8,27 +8,41 @@ import org.junit.runners.model.FrameworkMethod;
 /**
  * A special framework method that allows the usage of parameters for the test method.
  */
-class DataProviderFrameworkMethod extends FrameworkMethod {
+public class DataProviderFrameworkMethod extends FrameworkMethod {
 
-    /** parameters to invoke the test method */
-    protected final Object[] parameters;
+    /**
+     * Index of exploded test method such that each get a unique name.
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     */
+    final int idx;
 
-    /** flag if the last parameter is the expected value and should not be included in the name */
-    protected boolean hasExpectedParameter;
+    /**
+     * Parameters to invoke the test method.
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     */
+    final Object[] parameters;
 
-    public DataProviderFrameworkMethod(Method method, Object[] parameters, boolean hasExpectedParameter) {
+    public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters) {
         super(method);
+        this.idx = idx;
+        if (parameters == null) {
+            throw new IllegalArgumentException("parameter must not be null");
+        }
+        if (parameters.length == 0) {
+            throw new IllegalArgumentException("parameter must not be empty");
+        }
         this.parameters = Arrays.copyOf(parameters, parameters.length);
-        this.hasExpectedParameter = hasExpectedParameter;
     }
 
     @Override
     public String getName() {
-        // don't print last value, it is the expected one
-        return super.getName()
-                + ": "
-                + formatParameters(Arrays.copyOf(parameters, hasExpectedParameter ? parameters.length - 1
-                        : parameters.length));
+        // don't print last value, if is the expected one
+        return String.format("%s [%d: %s]", super.getName(), idx,
+                formatParameters(Arrays.copyOf(parameters, parameters.length == 1 ? 1 : parameters.length - 1)));
     }
 
     @Override
@@ -40,28 +54,29 @@ class DataProviderFrameworkMethod extends FrameworkMethod {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (hasExpectedParameter ? 1231 : 1237);
+        result = prime * result + idx;
         result = prime * result + Arrays.hashCode(parameters);
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!DataProviderFrameworkMethod.class.isInstance(obj) || !super.equals(obj)) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
             return false;
         }
-
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
+        if (getClass() != obj.getClass()) {
             return false;
-        if (getClass() != obj.getClass())
-            return false;
+        }
         DataProviderFrameworkMethod other = (DataProviderFrameworkMethod) obj;
-        if (hasExpectedParameter != other.hasExpectedParameter)
+        if (idx != other.idx) {
             return false;
-        if (!Arrays.equals(parameters, other.parameters))
+        }
+        if (!Arrays.equals(parameters, other.parameters)) {
             return false;
+        }
         return true;
     }
 
@@ -77,7 +92,7 @@ class DataProviderFrameworkMethod extends FrameworkMethod {
      * @param parameters the parameters are converted to a comma-separated string
      * @return a string representation of the given parameters
      */
-    protected String formatParameters(Object[] parameters) {
+    private String formatParameters(Object[] parameters) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < parameters.length; i++) {
             if (parameters[i] != null) {

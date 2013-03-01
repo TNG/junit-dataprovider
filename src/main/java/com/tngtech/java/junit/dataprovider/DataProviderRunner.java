@@ -1,6 +1,5 @@
 package com.tngtech.java.junit.dataprovider;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,19 +7,21 @@ import org.junit.Test;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.TestClass;
 
 /**
- * A custom runner for JUnit that allows the usage of TestNG-like data providers. Data providers are public, static
- * methods that return an <code>Object[][]</code>, see {@link DataProvider}.<br/>
- * You test method must be annotated with {@link UseDataProvider} instead of {@link Test}.
+ * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like data providers. Data
+ * providers are public, static methods that return an {@link Object}{@code [][]} (see {@link DataProvider}).
+ * <p>
+ * Your test method must be annotated with {@code @}{@link UseDataProvider}, additionally.
  */
 public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     /**
-     * Creates a DataProviderRunner to run {@code clazz}
+     * Creates a DataProviderRunner to run supplied {@code clazz}.
      *
-     * @param clazz the test class to run
-     * @throws InitializationError if the test class is malformed.
+     * @param clazz the test {@link Class} to run
+     * @throws InitializationError if the test {@link Class} is malformed.
      */
     public DataProviderRunner(Class<?> clazz) throws InitializationError {
         super(clazz);
@@ -28,35 +29,30 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
-        List<FrameworkMethod> testMethods = super.computeTestMethods();
-
-        for (FrameworkMethod testMethod : new ArrayList<FrameworkMethod>(testMethods)) {
-            if (!(testMethod instanceof DataProviderFrameworkMethod)) {
-                FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
-                if (isValidDataProviderMethod(dataProviderMethod)) {
-                    List<FrameworkMethod> explodedTestMethods = explodeTestMethods(testMethod, dataProviderMethod);
-
-                    // remove first, otherwise duplicates are inserted
-                    testMethods.removeAll(explodedTestMethods);
-                    testMethods.addAll(explodedTestMethods);
-                }
-            }
-        }
-
-        return testMethods;
+        return generateExplodedTestMethodsFor(super.computeTestMethods());
     }
 
     @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
         super.collectInitializationErrors(errors);
-        validateDataProvider(errors);
+        validateDataProviderMethods(errors);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalArgumentException if given {@code errors} is {@code null}
+     */
     @Override
     protected void validateTestMethods(List<Throwable> errors) {
-        for (FrameworkMethod method : computeTestMethods()) {
+        if (errors == null) {
+            throw new IllegalArgumentException("errors must not be null");
+        }
+        for (FrameworkMethod method : getTestClassInt().getAnnotatedMethods(Test.class)) {
             if (method.getAnnotation(UseDataProvider.class) == null) {
                 method.validatePublicVoidNoArg(false, errors);
+            } else {
+                method.validatePublicVoid(false, errors);
             }
         }
     }
@@ -64,112 +60,156 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     /**
      * Validates test methods and their data providers. This method cannot use the result of
      * {@link DataProviderRunner#computeTestMethods()} because the method ignores invalid test methods and data
-     * providers silently (except if a data provider method cannot be called). However, The common errors are not raised
+     * providers silently (except if a data provider method cannot be called). However, the common errors are not raised
      * as {@link RuntimeException} to go the JUnit way of detecting errors. This implies that we have to browse the
-     * whole class for test methods and data providers again ;-(.
+     * whole class for test methods and data providers again :-(.
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
      *
-     * @param errors errors are added to this list
+     * @param errors that are added to this list
+     * @throws IllegalArgumentException if given {@code errors} is {@code null}
      */
-    protected void validateDataProvider(List<Throwable> errors) {
-        for (FrameworkMethod testMethod : getTestClass().getAnnotatedMethods(UseDataProvider.class)) {
-            UseDataProvider testWithDataProvider = testMethod.getAnnotation(UseDataProvider.class);
-            String dataProviderName = testWithDataProvider.value();
+    void validateDataProviderMethods(List<Throwable> errors) {
+        if (errors == null) {
+            throw new IllegalArgumentException("errors must not be null");
+        }
+        for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
+            String dataProviderName = testMethod.getAnnotation(UseDataProvider.class).value();
+
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
                 errors.add(new Error("No such data provider: " + dataProviderName));
             } else if (!isValidDataProviderMethod(dataProviderMethod)) {
                 errors.add(new Error("The data provider method '" + dataProviderName + "' is not valid. "
-                        + "A valid method is public, static, receives no parameters and returns the the Object[][]!"));
+                        + "A valid method must be public, static, has no arguments parameters and returns 'Object[][]'"));
             }
         }
     }
 
     /**
-     * Creates a list of test methods out of an existing test method and its data provider method.
+     * Generates the exploded list of test methods for the given {@code testMethods}. Each of the given
+     * {@link FrameworkMethod}s is checked if it uses a {@code @}{@link DataProvider} or not. If yes, for each line of
+     * the {@link DataProvider}s {@link Object}{@code [][]} result a specific test method with its parameters (=
+     * {@link Object}{@code []} will be added. If no, the original test method is added.
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
      *
-     * @param testMethod the original test method
-     * @param dataProviderMethod the data provider method that gives the parameters
-     * @return a list of methods, each method bound to a parameter combination returned by the data provider
+     * @param testMethods the original test methods
+     * @return the exploded list of test methods (never {@code null})
      */
-    protected List<FrameworkMethod> explodeTestMethods(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
-        List<FrameworkMethod> testMethods = new ArrayList<FrameworkMethod>();
-
-        try {
-            Object[][] parameterList = (Object[][]) dataProviderMethod.invokeExplosively(null, new Object[] {});
-            for (Object[] parameters : parameterList) {
-                DataProviderFrameworkMethod dataProviderFrameworkMethod = new DataProviderFrameworkMethod(
-                        testMethod.getMethod(), parameters, dataProviderMethod.getAnnotation(DataProvider.class)
-                                .expectedParameter());
-
-                testMethods.add(dataProviderFrameworkMethod);
-            }
-        } catch (Throwable exception) {
-            throw new RuntimeException(exception);
+    List<FrameworkMethod> generateExplodedTestMethodsFor(List<FrameworkMethod> testMethods) {
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+        if (testMethods == null) {
+            return result;
         }
+        for (FrameworkMethod testMethod : testMethods) {
+            FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
 
-        return testMethods;
-    }
-
-    /**
-     * Checks if a data provider with the given name exists.
-     *
-     * @param dataProviderName name of the data provider
-     * @return true if the provider exists, false otherwise.
-     */
-    protected boolean existsDataProvider(String dataProviderName) {
-        return getDataProviderMethod(dataProviderName) != null;
-    }
-
-    /**
-     * Returns the data provider method with the given name. Returns null if no such provider exists.
-     *
-     * @param dataProviderName name of the data provider
-     * @return the data provider or null if no such data provider exists
-     */
-    protected FrameworkMethod getDataProviderMethod(String dataProviderName) {
-        for (FrameworkMethod method : getTestClass().getAnnotatedMethods(DataProvider.class)) {
-            if (method.getName().equals(dataProviderName)) {
-                return method;
+            if (isValidDataProviderMethod(dataProviderMethod)) {
+                result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
+            } else {
+                result.add(testMethod);
             }
         }
-
-        return null;
+        return result;
     }
 
     /**
-     * Returns the data provider method that belongs to the given test method. Returns null if no such provider exists
-     * or the test method is not marked for usage of a data provider
+     * Returns the data provider method that belongs to the given test method or {@code null} if no such data provider
+     * exists or the test method is not marked for usage of a data provider
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
      *
      * @param testMethod test method that uses a data provider
-     * @return the data provider or null if no such data provider exists
+     * @return the data provider or {@code null} (if data provider does not exist or test method does not use any)
+     * @throws IllegalArgumentException if given {@code testMethod} is {@code null}
      */
-    protected FrameworkMethod getDataProviderMethod(FrameworkMethod testMethod) {
+    FrameworkMethod getDataProviderMethod(FrameworkMethod testMethod) {
+        if (testMethod == null) {
+            throw new IllegalArgumentException("testMethod must not be null");
+        }
         UseDataProvider testUsingDataProvider = testMethod.getAnnotation(UseDataProvider.class);
         if (testUsingDataProvider == null) {
             return null;
         }
-
-        String dataProviderName = testUsingDataProvider.value();
-        return getDataProviderMethod(dataProviderName);
+        for (FrameworkMethod method : getTestClassInt().getAnnotatedMethods(DataProvider.class)) {
+            if (method.getName().equals(testUsingDataProvider.value())) {
+                return method;
+            }
+        }
+        return null;
     }
 
     /**
      * Checks if the given method is a valid data provider. A method is a valid data provider if and only if the method
      * <ul>
-     * <li>is not null</li>
-     * <li>is public</li>
-     * <li>is static</li>
-     * <li>has no parameters</li>
-     * <li>returns an Object[][]</li>
+     * <li>is not null,</li>
+     * <li>is public,</li>
+     * <li>is static,</li>
+     * <li>has no parameters, and</li>
+     * <li>returns an {@link Object}{@code [][]}.</li>
      * </ul>
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
      *
      * @param dataProviderMethod the method to check
      * @return true if the method is a valid data provider, false otherwise
      */
-    protected boolean isValidDataProviderMethod(FrameworkMethod dataProviderMethod) {
-        return dataProviderMethod != null && Modifier.isPublic(dataProviderMethod.getMethod().getModifiers())
-                && Modifier.isStatic(dataProviderMethod.getMethod().getModifiers())
+    boolean isValidDataProviderMethod(FrameworkMethod dataProviderMethod) {
+        // @formatter:off
+        return dataProviderMethod != null
+                && dataProviderMethod.isPublic()
+                && dataProviderMethod.isStatic()
                 && dataProviderMethod.getMethod().getParameterTypes().length == 0
-                && dataProviderMethod.getMethod().getReturnType().equals((new Object[][] { {} }).getClass());
+                && dataProviderMethod.getReturnType().equals(Object[][].class);
+        // @formatter:on
+    }
+
+    /**
+     * Creates a list of test methods out of an existing test method and its data provider method.
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     *
+     * @param testMethod the original test method
+     * @param dataProviderMethod the data provider method that gives the parameters
+     * @return a list of methods, each method bound to a parameter combination returned by the data provider
+     */
+    List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
+        int idx = 0;
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+
+        Object[][] dataProviderMethodResult;
+        try {
+            dataProviderMethodResult = (Object[][]) dataProviderMethod.invokeExplosively(null);
+        } catch (Throwable t) {
+            throw new Error(String.format("Exception while exploding test method using data provider '%s': %s",
+                    dataProviderMethod.getName(), t.getMessage()), t);
+        }
+        if (dataProviderMethodResult == null) {
+            throw new Error(String.format("Data provider method '%s' must not return 'null'.",
+                    dataProviderMethod.getName()));
+        }
+        if (dataProviderMethodResult.length == 0) {
+            throw new Error(String.format("Data provider '%s' must not return an empty object array.",
+                    dataProviderMethod.getName()));
+        }
+
+        for (Object[] parameters : dataProviderMethodResult) {
+            result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
+        }
+        return result;
+    }
+
+    /**
+     * Returns a {@link TestClass} object wrapping the class to be executed. This method is required for testing because
+     * {@link #getTestClass()} is final and therefore cannot be stubbed :(
+     */
+    TestClass getTestClassInt() {
+        return getTestClass();
     }
 }
