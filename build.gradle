@@ -35,6 +35,10 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
+findbugs {
+    ignoreFailures = true
+}
+
 artifacts {
     archives jar
     archives javadocJar
