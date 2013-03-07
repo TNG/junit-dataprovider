@@ -1,5 +1,6 @@
 package com.tngtech.java.junit.dataprovider;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,10 +163,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     boolean isValidDataProviderMethod(FrameworkMethod dataProviderMethod) {
         // @formatter:off
         return dataProviderMethod != null
-                && dataProviderMethod.isPublic()
-                && dataProviderMethod.isStatic()
+                && Modifier.isPublic(dataProviderMethod.getMethod().getModifiers())
+                && Modifier.isStatic(dataProviderMethod.getMethod().getModifiers())
                 && dataProviderMethod.getMethod().getParameterTypes().length == 0
-                && dataProviderMethod.getReturnType().equals(Object[][].class);
+                && dataProviderMethod.getMethod().getReturnType().equals(Object[][].class);
         // @formatter:on
     }
 

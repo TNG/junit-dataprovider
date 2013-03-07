@@ -335,18 +335,13 @@ public class DataProviderRunnerTest {
         // Then:
         assertThat(result).isFalse();
     }
-
     @Test
     public void testIsValidDataProviderMethodShouldReturnFalseIfItIsNotPublic() {
 
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        doReturn(false).when(dataProviderMethod).isPublic();
-        doReturn(true).when(dataProviderMethod).isStatic();
-        // doReturn(new Class<?>[0]).when(dataProviderMethod).getParameterTypes(); // not visible and mockable :(
-        doReturn(anyNoArgMethod()).when(dataProviderMethod).getMethod(); // instead of stubbing getParameterTypes()
-        doReturn(Object[][].class).when(dataProviderMethod).getReturnType();
+        doReturn(getMethod("nonPublicDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
         boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
@@ -361,11 +356,7 @@ public class DataProviderRunnerTest {
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        doReturn(true).when(dataProviderMethod).isPublic();
-        doReturn(false).when(dataProviderMethod).isStatic();
-        // doReturn(new Class<?>[0]).when(dataProviderMethod).getParameterTypes(); // not visible and mockable :(
-        doReturn(anyNoArgMethod()).when(dataProviderMethod).getMethod(); // instead of stubbing getParameterTypes()
-        doReturn(Object[][].class).when(dataProviderMethod).getReturnType();
+        doReturn(getMethod("nonStaticDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
         boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
@@ -377,16 +368,10 @@ public class DataProviderRunnerTest {
     @Test
     public void testIsValidDataProviderMethodShouldReturnFalseIfItRequiresAnyParameter() {
 
-        final Object arg = new Object();
-
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        doReturn(true).when(dataProviderMethod).isPublic();
-        doReturn(true).when(dataProviderMethod).isStatic();
-        // doReturn(new Class<?>[] { String.class }).when(dataProviderMethod).getParameterTypes();
-        doReturn(anyOneArgMethod(arg)).when(dataProviderMethod).getMethod(); // instead of stubbing getParameterTypes()
-        doReturn(Object[][].class).when(dataProviderMethod).getReturnType();
+        doReturn(getMethod("nonNoArgDataProviderMethod", Object.class)).when(dataProviderMethod).getMethod();
 
         // When:
         boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
@@ -401,11 +386,7 @@ public class DataProviderRunnerTest {
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        doReturn(true).when(dataProviderMethod).isPublic();
-        doReturn(true).when(dataProviderMethod).isStatic();
-        // doReturn(new Class<?>[0]).when(dataProviderMethod).getParameterTypes(); // not visible and mockedable :(
-        doReturn(anyNoArgMethod()).when(dataProviderMethod).getMethod(); // instead of stubbing getParameterTypes()
-        doReturn(void.class).when(dataProviderMethod).getReturnType();
+        doReturn(getMethod("nonObjectArrayArrayReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
         boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
@@ -420,11 +401,7 @@ public class DataProviderRunnerTest {
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        doReturn(true).when(dataProviderMethod).isPublic();
-        doReturn(true).when(dataProviderMethod).isStatic();
-        // doReturn(0).when(dataProviderMethod).getParameterTypes();
-        doReturn(anyNoArgMethod()).when(dataProviderMethod).getMethod(); // instead of stubbing getParameterTypes()
-        doReturn(Object[][].class).when(dataProviderMethod).getReturnType();
+        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
         boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
@@ -537,29 +514,35 @@ public class DataProviderRunnerTest {
         assertThat(actual2.parameters).isEqualTo(dataProviderMethodResult[2]);
     }
 
-    private Method anyOneArgMethod(Object arg) {
+    private Method getMethod(String methodName, Class<?>... args) {
         final Class<? extends DataProviderRunnerTest> clazz = this.getClass();
-        final String methodName = "anyOneArgMethod";
-        final Class<? extends Object> argClass = arg.getClass();
-
         try {
-            return clazz.getDeclaredMethod(methodName, argClass);
-        } catch (Exception e) {
-            fail(String.format("No method with name '%s' and arg of class '%s' found in %s", methodName, argClass,
-                    clazz));
-            return null; // fool compiler
-        }
-    }
-
-    private Method anyNoArgMethod() {
-        final Class<? extends DataProviderRunnerTest> clazz = this.getClass();
-        final String methodName = "anyNoArgMethod";
-
-        try {
-            return clazz.getDeclaredMethod(methodName);
+            return clazz.getDeclaredMethod(methodName, args);
         } catch (Exception e) {
             fail(String.format("No method with name '%s' found in %s", methodName, clazz));
             return null; // fool compiler
         }
     }
+
+    // Methods used to test isValidDataProviderMethod
+    static Object[][] nonPublicDataProviderMethod() {
+        return null;
+    }
+
+    public Object[][] nonStaticDataProviderMethod() {
+        return null;
+    }
+
+    public static Object[][] nonNoArgDataProviderMethod(@SuppressWarnings("unused") Object obj) {
+        return null;
+    }
+
+    public static String nonObjectArrayArrayReturningDataProviderMethod() {
+        return null;
+    }
+
+    public static Object[][] validDataProviderMethod() {
+        return null;
+    }
+
 }
