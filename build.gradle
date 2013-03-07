@@ -40,7 +40,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.tngtech.java'
-version = '1.2.0'
+version = '1.2.1-SNAPSHOT'
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     from 'build/docs/javadoc'
@@ -78,7 +78,7 @@ uploadArchives {
                 authentication(userName: { sonatypeUsername }, password: { sonatypePassword } )
             }
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: { sonatypeUsername }, password: { sonatypePassword })
+                authentication(userName: { sonatypeUsername }, password: { sonatypePassword } )
             }
 
             pom.project {
