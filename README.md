@@ -6,6 +6,10 @@ What is it
 
 A TestNG like dataprovider runner for JUnit.
 
+Reqirements
+-----------
+
+This JUnit dataprovider requires JUnit in version 4.10+. If you are using a former version, please let us know opening an issue.
 
 Download
 --------
