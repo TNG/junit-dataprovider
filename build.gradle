@@ -62,11 +62,13 @@ artifacts {
     archives sourcesJar
 }
 
+
 signing {
     // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
-    required { gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
 }
+
+tasks.withType(org.gradle.plugins.signing.Sign)*.onlyIf({ gradle.taskGraph.hasTask("uploadArchives") })
 
 if (!hasProperty('sonatypeUsername')) {
 	ext.sonatypeUsername = ''
