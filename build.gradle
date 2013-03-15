@@ -1,3 +1,5 @@
+import java.util.logging.Logger;
+
 
 // -- default build ---------------------------------------------------------------------------------------------------
 apply plugin: 'eclipse'
@@ -21,7 +23,7 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.4'
 }
 */
-task jenkinsTest{
+task jenkinsTest {
     // required due to jenkins fails if test output is not up to date :(
     // Solution found on http://www.practicalgradle.org/blog/2011/06/incremental-tests-with-jenkins/
     inputs.files test.outputs.files

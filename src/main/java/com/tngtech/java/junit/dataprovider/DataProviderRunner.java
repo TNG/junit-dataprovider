@@ -33,6 +33,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         return generateExplodedTestMethodsFor(super.computeTestMethods());
     }
 
+
     @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
         super.collectInitializationErrors(errors);

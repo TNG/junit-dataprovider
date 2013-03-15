@@ -10,7 +10,7 @@ import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 @RunWith(DataProviderRunner.class)
-public class DataProviderAcceptanceTest {
+public class DataProviderSimpleAcceptanceTest {
 
     @Test
     public void testAddWithoutDataProvider() {
