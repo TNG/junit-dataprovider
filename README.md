@@ -4,7 +4,7 @@ junit-dataprovider
 #### Table of Contents  
 [What is it](#What is it)  
 [Motivation and distinction](#Motivation and distinction)  
-[Reqirements](#Reqirements)  
+[Requirements](#Requirements)  
 [Download](#Download)  
 [Usage example](#Usage example)  
 
@@ -36,8 +36,8 @@ Motivation and distinction
 > Of course, this is also a possible way to get it done using [JUnit Theories][]
 > but this causes a lot [boiler plate](http://en.wikipedia.org/wiki/Boilerplate_%28text%29) 
 > code and inconvenience because it requires a DTO for every single data point. This is AFAIK
-> also the case if you use the ParameterSupplier feature of [JUnit Theories][], 
-> where you additionally need a custom Annotation and a class  ...
+> also the case when you use the ParameterSupplier feature of [JUnit Theories][], 
+> where you additionally need a custom Annotation and a class...
 
 [DTO]: http://en.wikipedia.org/wiki/Data_transfer_object
 
@@ -47,13 +47,13 @@ Motivation and distinction
 > [Parameterized](https://github.com/junit-team/junit/wiki/Parameterized-tests). 
 > The advantage of this concept is surely that it is completely 
 > [typesafe](http://en.wikipedia.org/wiki/Type_safety). Unfortunatly one have to create
-> a class per data provider or parameterized test, respectively, which is IMHO also over 
-> kill. Furthermore the tests of a single unit (= class) have to divided into different classes 
+> a class per data provider or parameterized test, respectively, which is IMHO also overkill.
+> Furthermore the tests of a single unit (= class) have to divided into different classes 
 > which need to be maintained separately (renamed/moved etc.).
 
 [JUnit Theories]: https://github.com/junit-team/junit/wiki/Theories
 
-Reqirements
+Requirements
 -----------
 
 This JUnit dataprovider requires JUnit in version 4.8.2+ (see 
