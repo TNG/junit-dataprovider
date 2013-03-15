@@ -1,7 +1,7 @@
 junit-dataprovider
 ==================
 
-##### Table of Contents  
+#### Table of Contents  
 [What is it](#What is it)  
 [Motivation and distinction](#Motivation and distinction)  
 [Reqirements](#Reqirements)  
@@ -22,7 +22,7 @@ compared to all the existing [JUnit features](https://github.com/junit-team/juni
 Motivation and distinction 
 --------------------------
 
-What is the advantage compared to [JUnit Theories][]?
+#### What is the advantage compared to [JUnit Theories][]?
 
 > The junit-dataprovider is made for another use case. Using 
 > [JUnit Theories](https://github.com/junit-team/junit/wiki/Theories) the test cases 
@@ -31,8 +31,7 @@ What is the advantage compared to [JUnit Theories][]?
 > The junit-dataprovider, however, wants a defined input for each test case using multiple 
 > parameters and one or more expected values to assert the result. 
 
-Why can I not use [JUnit Theories][] and data points containing 
-[DTO](http://en.wikipedia.org/wiki/Data_transfer_object)s for test case?
+#### Why can I not use [JUnit Theories][] and data points containing [DTO][]s for test case?
 
 > Of course, this is also a possible way to get it done using [JUnit Theories][]
 > but this causes a lot [boiler plate](http://en.wikipedia.org/wiki/Boilerplate_%28text%29) 
@@ -40,7 +39,9 @@ Why can I not use [JUnit Theories][] and data points containing
 > also the case if you use the ParameterSupplier feature of [JUnit Theories][], 
 > where you additionally need a custom Annotation and a class  ...
 
-But why [JUnit][] does not support data providers?
+[DTO]: http://en.wikipedia.org/wiki/Data_transfer_object
+
+#### But why [JUnit][] does not support data providers?
 
 > They do having another name it, tough, just see 
 > [Parameterized](https://github.com/junit-team/junit/wiki/Parameterized-tests). 
