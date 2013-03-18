@@ -29,6 +29,9 @@ Motivation and distinction
 > if the method takes several arguments. The junit-dataprovider, however, ddresses 
 > another use case: Its test cases may consist of multiple parameters that belong together, 
 > which may contain test input values and/or expected values to assert the result.
+> Furthermore, a test method using [JUnit Theories][] fails or succeeds entirely (for alle 
+> data points), on the contrary the junit-dataprovider considers each row of the data provider
+> as standalone test case.
 
 
 #### Why can I not use [JUnit Theories][] and data points containing [DTO][]s for test cases?
