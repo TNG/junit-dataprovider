@@ -95,11 +95,12 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     private String formatParameters(Object[] parameters) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < parameters.length; i++) {
-            if (parameters[i] != null) {
-                if (parameters[i] instanceof String && parameters[i].toString().isEmpty()) {
-                    stringBuilder.append("<empty string>");
+            Object param = parameters[i];
+            if (param != null) {
+                if (param instanceof String) {
+                    stringBuilder.append(((String) param).isEmpty() ? "<empty string>" : param);
                 } else {
-                    stringBuilder.append(parameters[i]);
+                    stringBuilder.append(param.toString());
                 }
             } else {
                 stringBuilder.append("<null>");

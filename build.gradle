@@ -16,6 +16,7 @@ dependencies {
     compile group: 'junit', name: 'junit-dep', version: '4.8.2' /* provided scope */
     testCompile group: 'org.easytesting', name: 'fest-assert-core', version: '2.+'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.+'
+    testCompile group: 'joda-time', name: 'joda-time', version: '2.2'
 }
 
 /*
