@@ -7,6 +7,7 @@ junit-dataprovider
 [Requirements](#Requirements)  
 [Download](#Download)  
 [Usage example](#Usage example)  
+[Eclipse template](#Eclipse template)  
 
 
 What is it
@@ -112,5 +113,25 @@ public class DataProviderTest {
         // Then:
         assertEquals(expected, result);
     }
+}
+```
+
+Eclipse template
+----------------
+
+* Name:                     dataProvider
+* Context:                  Java type members
+* Automatically insert:     false
+* Description:              Insert a junit dataprovider method
+* Pattern:
+
+```
+@${dataProviderType:newType(com.tngtech.java.junit.dataprovider.DataProvider)}
+public static Object[][] dataProvider${Name}() {
+    // @formatter:off
+	return new Object[][] {
+		{ ${cursor} },
+	};
+	// @formatter:on
 }
 ```
