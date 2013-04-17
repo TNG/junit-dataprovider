@@ -42,7 +42,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     public String getName() {
         // don't print last value, if is the expected one
         return String.format("%s [%d: %s]", super.getName(), idx,
-                formatParameters(Arrays.copyOf(parameters, parameters.length == 1 ? 1 : parameters.length - 1)));
+                formatParameters(parameters));
     }
 
     @Override

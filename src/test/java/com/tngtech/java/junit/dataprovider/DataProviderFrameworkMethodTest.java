@@ -48,7 +48,7 @@ public class DataProviderFrameworkMethodTest {
     }
 
     @Test
-    public void testGetNameShouldRemoveLastValueFromParametersStringIfMoreThanOneParameterIsGiven() {
+    public void testGetNameShouldShowAllParametersFromParametersString() {
 
         // Given:
         Method method = anyMethod();
@@ -60,7 +60,7 @@ public class DataProviderFrameworkMethodTest {
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + " \\[1: 1024, 32\\]");
+        assertThat(result).matches(method.getName() + " \\[1: 1024, 32, 128\\]");
     }
 
     @Test
