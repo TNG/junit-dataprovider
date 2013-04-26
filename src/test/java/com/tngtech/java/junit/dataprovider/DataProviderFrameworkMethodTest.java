@@ -16,6 +16,7 @@ public class DataProviderFrameworkMethodTest {
 
         // When:
         @SuppressWarnings("unused")
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "DLS_DEAD_LOCAL_STORE")
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, null);
 
         // Then: expect exception
@@ -28,6 +29,7 @@ public class DataProviderFrameworkMethodTest {
 
         // When:
         @SuppressWarnings("unused")
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "DLS_DEAD_LOCAL_STORE")
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, new Object[0]);
 
         // Then: expect exception
