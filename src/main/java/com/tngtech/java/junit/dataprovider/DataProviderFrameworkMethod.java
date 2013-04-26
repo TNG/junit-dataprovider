@@ -97,10 +97,24 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         for (int i = 0; i < parameters.length; i++) {
             Object param = parameters[i];
             if (param != null) {
-                if (param instanceof String) {
-                    stringBuilder.append(((String) param).isEmpty() ? "<empty string>" : param);
+                if (param.getClass().isArray()) {
+                    stringBuilder.append("<array>");
+                } else if (param instanceof String && ((String) param).isEmpty()) {
+                    stringBuilder.append("<empty string>");
                 } else {
-                    stringBuilder.append(param.toString());
+                    // \\p{C} => invisible control characters and unused code points.
+                    stringBuilder.append(param.toString().replaceAll("\\p{C}", "?"));
+
+                    // String toPrint = param.toString();
+                    // for (int j = 0; j < toPrint.length(); j++) {
+                    // char character = toPrint.charAt(j);
+                    //
+                    // if (0x00 <= character && character <= 0x1F) { // no non-printable characters
+                    // stringBuilder.append('?');
+                    // } else {
+                    // stringBuilder.append(character);
+                    // }
+                    // }
                 }
             } else {
                 stringBuilder.append("<null>");
@@ -111,5 +125,18 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         }
 
         return stringBuilder.toString();
+    }
+
+    public static String encodeHTML(String s) {
+        StringBuffer out = new StringBuffer();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c > 127 || c == '"' || c == '<' || c == '>') {
+                out.append("&#" + (int) c + ";");
+            } else {
+                out.append(c);
+            }
+        }
+        return out.toString();
     }
 }
