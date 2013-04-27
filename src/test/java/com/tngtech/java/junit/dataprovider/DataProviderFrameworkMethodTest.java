@@ -9,6 +9,7 @@ import org.junit.Test;
 
 public class DataProviderFrameworkMethodTest {
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = IllegalArgumentException.class)
     public void testDataProviderFrameworkMethodShouldThrowIllegalArgumentExceptionIfParameterIsNull() {
 
@@ -16,12 +17,12 @@ public class DataProviderFrameworkMethodTest {
 
         // When:
         @SuppressWarnings("unused")
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "DLS_DEAD_LOCAL_STORE")
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, null);
 
         // Then: expect exception
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = IllegalArgumentException.class)
     public void testDataProviderFrameworkMethodShouldThrowIllegalArgumentExceptionIfParameterIsEmpty() {
 
@@ -29,7 +30,6 @@ public class DataProviderFrameworkMethodTest {
 
         // When:
         @SuppressWarnings("unused")
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "DLS_DEAD_LOCAL_STORE")
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, new Object[0]);
 
         // Then: expect exception
