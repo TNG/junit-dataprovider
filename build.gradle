@@ -44,7 +44,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.tngtech.java'
-version = '1.2.1-SNAPSHOT'
+version = '1.3.0'
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     from 'build/docs/javadoc'
