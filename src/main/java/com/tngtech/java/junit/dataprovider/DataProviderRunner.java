@@ -38,8 +38,11 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     // -- copied from ParentRunner and adjusted ------------------------------------------------------------------------
-    // * this was done to be able to execute single test method from eclipse junit plugin
-    // due to no possibility to override properly :(
+    // this was done to be able to execute single test method from Eclipse Junit plugin due to no possibility
+    // to override properly :(
+
+    // TODO test this
+    // TODO use a delegate for this part!
 
     private Filter fFilter;
     private Sorter fSorter = Sorter.NULL;
