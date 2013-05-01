@@ -2,21 +2,14 @@ package com.tngtech.java.junit.dataprovider;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runner.manipulation.Sorter;
-import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.RunnerScheduler;
-import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 
 /**
@@ -44,147 +37,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         super(clazz);
     }
 
-    // -- copied from ParentRunner and adjusted ------------------------------------------------------------------------
-    // this was done to be able to execute single test method from Eclipse Junit plugin due to no possibility
-    // to override properly :(
-
-    // TODO test this
-    // TODO use a delegate for this part!
-
-    private Filter fFilter;
-    private Sorter fSorter = Sorter.NULL;
-
-    private RunnerScheduler fScheduler = new RunnerScheduler() {
-        public void schedule(Runnable childStatement) {
-            childStatement.run();
-        }
-
-        public void finished() {
-            // do nothing
-        }
-    };
-
-    // copied to use of own implementation of runChildren(notifier)
     @Override
-    protected Statement childrenInvoker(final RunNotifier notifier) {
-        return new Statement() {
-            @Override
-            public void evaluate() {
-                runChildren(notifier);
-            }
-        };
+    public void filter(final Filter filter) throws NoTestsRemainException {
+        super.filter(new DataProviderFilter(filter));
     }
-
-    // copied to use of own implementation of getFilteredChildren
-    protected void runChildren(final RunNotifier notifier) {
-        for (final FrameworkMethod each : getFilteredChildren()) {
-            fScheduler.schedule(new Runnable() {
-                public void run() {
-                    runChild(each, notifier);
-                }
-            });
-        }
-        fScheduler.finished();
-    }
-
-    @Override
-    protected Description describeChild(FrameworkMethod method) {
-        return super.describeChild(method);
-    }
-
-    @Override
-    protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        super.runChild(method, notifier);
-    }
-
-    // copied to use of own implementation of shouldRun(frameworkMethod)
-    @Override
-    public void filter(Filter filter) throws NoTestsRemainException {
-        fFilter = filter;
-        for (FrameworkMethod frameworkMethod : getChildren()) {
-            if (shouldRun(frameworkMethod)) {
-                return;
-            }
-        }
-        throw new NoTestsRemainException();
-    }
-
-    // copied to call fFilter.shouldRun(description) using special description which ...
-    private boolean shouldRun(FrameworkMethod frameworkMethod) {
-        if (fFilter == null) {
-            return true;
-        }
-        // ... does not use "describeChild(frameworkMethod)" and so "testName(frameworkMethod)" because these add the
-        // data provider parameters for the test method to the description such that filtering does not work properly
-        Description description = Description.createTestDescription(getTestClass().getJavaClass(), frameworkMethod
-                .getMethod().getName(), frameworkMethod.getMethod().getAnnotations());
-        return fFilter.shouldRun(description);
-    }
-
-    // copied to use of own implementation of getFilteredChildren()
-    @Override
-    public Description getDescription() {
-        Description description = Description.createSuiteDescription(getName(), getTestClass().getAnnotations());
-        for (FrameworkMethod child : getFilteredChildren()) {
-            description.addChild(describeChild(child));
-        }
-        return description;
-    }
-
-    // copied to remember custom sorter
-    @Override
-    public void sort(Sorter sorter) {
-        super.sort(sorter);
-        fSorter = sorter;
-    }
-
-    @Override
-    public void setScheduler(RunnerScheduler scheduler) {
-        // super.setScheduler(scheduler);
-        fScheduler = scheduler;
-    }
-
-    // copied to use of own implementation of shouldRun(frameworkMethod)
-    private List<FrameworkMethod> getFilteredChildren() {
-        List<FrameworkMethod> filtered = new ArrayList<FrameworkMethod>();
-        for (FrameworkMethod frameworkMethod : getChildren()) {
-            if (shouldRun(frameworkMethod)) {
-                try {
-                    filterChild(frameworkMethod);
-                    sortChild(frameworkMethod);
-                    filtered.add(frameworkMethod);
-                } catch (NoTestsRemainException e) {
-                    // don't add it
-                }
-            }
-        }
-        Collections.sort(filtered, comparator());
-        return filtered;
-    }
-
-    // copied because it is required by getFilteredChildren()
-    private void filterChild(FrameworkMethod child) throws NoTestsRemainException {
-        if (fFilter != null) {
-            fFilter.apply(child);
-        }
-    }
-
-    // copied because it is required by getFilteredChildren()
-    private void sortChild(FrameworkMethod child) {
-        fSorter.apply(child);
-    }
-
-    // copied because it is required by getFilteredChildren()
-    private Comparator<? super FrameworkMethod> comparator() {
-        final Sorter sorter = fSorter;
-        return new Comparator<FrameworkMethod>() {
-            public int compare(FrameworkMethod o1, FrameworkMethod o2) {
-                return sorter.compare(describeChild(o1), describeChild(o2));
-            }
-        };
-    }
-
-    // -- end of copied form ParentRunner and adjusted -----------------------------------------------------------------
 
     @Override
     protected List<FrameworkMethod> computeTestMethods() {

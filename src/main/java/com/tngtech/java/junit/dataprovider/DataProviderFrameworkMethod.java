@@ -40,9 +40,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
 
     @Override
     public String getName() {
-        // don't print last value, if is the expected one
-        return String.format("%s [%d: %s]", super.getName(), idx,
-                formatParameters(parameters));
+        return String.format("%s[%d: %s]", super.getName(), idx, formatParameters(parameters));
     }
 
     @Override
@@ -85,39 +83,31 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      * rules:
      * <ul>
      * <li>null -&gt; &lt;null&gt;</li>
-     * <li>empty string -&gt; &lt;empty string&gt;</li>
+     * <li>&quot;%quot; (= empty string) -&gt; &lt;empty string&gt;</li>
+     * <li>array (e.g. String[]) -&gt; &lt;array&gt;</li>
      * <li>other -&gt; Object.toString</li>
      * </ul>
      *
      * @param parameters the parameters are converted to a comma-separated string
      * @return a string representation of the given parameters
      */
-    private String formatParameters(Object[] parameters) {
+    private <T> String formatParameters(T[] parameters) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < parameters.length; i++) {
             Object param = parameters[i];
-            if (param != null) {
-                if (param.getClass().isArray()) {
-                    stringBuilder.append("<array>");
-                } else if (param instanceof String && ((String) param).isEmpty()) {
-                    stringBuilder.append("<empty string>");
-                } else {
-                    // \\p{C} => invisible control characters and unused code points.
-                    stringBuilder.append(param.toString().replaceAll("\\p{C}", "?"));
-
-                    // String toPrint = param.toString();
-                    // for (int j = 0; j < toPrint.length(); j++) {
-                    // char character = toPrint.charAt(j);
-                    //
-                    // if (0x00 <= character && character <= 0x1F) { // no non-printable characters
-                    // stringBuilder.append('?');
-                    // } else {
-                    // stringBuilder.append(character);
-                    // }
-                    // }
-                }
-            } else {
+            if (param == null) {
                 stringBuilder.append("<null>");
+                continue;
+            }
+
+            if (param.getClass().isArray()) {
+                stringBuilder.append('[').append(formatParameters(getArray(param))).append(']');
+
+            } else if (param instanceof String && ((String) param).isEmpty()) {
+                stringBuilder.append("<empty string>");
+
+            } else {
+                stringBuilder.append(param.toString());
             }
             if (i < parameters.length - 1) {
                 stringBuilder.append(", ");
@@ -125,6 +115,12 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         }
 
         return stringBuilder.toString();
+    }
+
+    private <T> T[] getArray(Object array) {
+        @SuppressWarnings("unchecked")
+        T[] result = (T[]) array;
+        return result;
     }
 
     public static String encodeHTML(String s) {

@@ -42,11 +42,91 @@ public class DataProviderFrameworkMethodTest {
         final Object[] parameters = new Object[] { null, "1", 2L };
 
         // When:
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 1, parameters);
 
         // Then:
         assertThat(underTest).isNotNull();
         assertThat(underTest.parameters).isEqualTo(parameters);
+    }
+
+    @Test
+    public void testGetNameShouldReturnParametersStringContainingSingleStringValueIfJustOneParameterIsGiven() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { 718 };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 2, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[2: 718]");
+    }
+
+    @Test
+    public void testGetNameShouldReturnSpecialHandlingForNull() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { null };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 3, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[3: <null>]");
+    }
+
+    @Test
+    public void testGetNameShouldReturnSpecialHandlingForEmtpyString() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { "" };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[4: <empty string>]");
+    }
+
+    @Test
+    public void testGetNameShouldReturnSpecialHandlingForArray() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { new String[] { "test" } };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[4: \\[test]]");
+    }
+
+    @Test
+    public void testGetNameShouldReturnSpecialHandlingForArrayInArray() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { new Object[] { 1, new String[] { "a", "b", "c" } } };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[4: \\[1, \\[a, b, c]]]");
     }
 
     @Test
@@ -62,23 +142,7 @@ public class DataProviderFrameworkMethodTest {
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + " \\[1: 1024, 32, 128\\]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnParametersStringContainingSingleValueIfJustOneParameterIsGiven() {
-
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { 718 };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 2, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + " \\[2: 718]");
+        assertThat(result).matches(method.getName() + "\\[1: 1024, 32, 128\\]");
     }
 
     @Test
