@@ -47,15 +47,29 @@ Motivation and distinction
 
 #### But why does [JUnit][] not support data providers?
 
-> They do, having another name for it, tough, just see 
-> [Parameterized](https://github.com/junit-team/junit/wiki/Parameterized-tests). 
+> They do, having another name for it, tough, just see [Parameterized][]. 
 > The advantage of this concept is surely that it is completely 
 > [typesafe](http://en.wikipedia.org/wiki/Type_safety). But unfortunatly one has to create
 > a class per data provider or parameterized test, respectively, which is IMHO also overkill.
-> Furthermore, the tests of a single unit (i.e. class) have to be divided into different classes, 
+> The tests of a single unit (i.e. class) have to be divided into different classes, 
 > which need to be maintained (renamed, moved etc.) separately.
+> Furthermore, [Parameterized][] tests (even if there are more than a single test method within 
+> one test class) can only be executed altoghter for a test class. A junit dataprovider test, though, 
+> can be executed independent on test method level (even if the same data provider is reused for 
+> more than one test method).
+
+[Parameterized]: https://github.com/junit-team/junit/wiki/Parameterized-tests
+
+
+#### Is it possible to execute a junit-dataprovider test method for a single test data row?
+
+> Unfortunately this is not possible directly expect if the other test data rows are uncommented 
+> in the source code. The rerun of a single test data row is working, though, if e.g. in Eclipse 
+> you right click the test to be executed and choose run/debug.
+
 
 [JUnit Theories]: https://github.com/junit-team/junit/wiki/Theories
+
 
 Requirements
 -----------
