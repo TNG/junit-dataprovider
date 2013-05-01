@@ -3,6 +3,7 @@ package com.tngtech.java.junit.dataprovider;
 import static java.util.Arrays.asList;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -52,6 +53,46 @@ public class DataProviderRunnerTest {
         assertThat(underTest).isNotNull();
         assertThat(underTest.getTestClass()).isNotNull();
         assertThat(underTest.getTestClass().getJavaClass()).isEqualTo(clazz);
+    }
+
+    @Test
+    public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
+
+        // Given:
+        underTest.computedTestMethods = null;
+        doReturn(new ArrayList<FrameworkMethod>()).when(underTest).generateExplodedTestMethodsFor(
+                anyListOf(FrameworkMethod.class));
+
+        // When:
+        List<FrameworkMethod> result = underTest.computeTestMethods();
+
+        // Then:
+        assertThat(result).isEqualTo(underTest.computedTestMethods);
+
+        verify(underTest).computeTestMethods();
+        verify(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
+        verifyNoMoreInteractions(underTest);
+    }
+
+    @Test
+    public void testComputeTestMethodsShouldNotCallGenerateExplodedTestMethodsAndUseCachedResultIfCalledTheSecondTime() {
+
+        final List<FrameworkMethod> expected = new ArrayList<FrameworkMethod>();
+
+        // Given:
+        underTest.computedTestMethods = expected;
+
+        doReturn(expected).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
+
+        // When:
+        List<FrameworkMethod> result = underTest.computeTestMethods();
+
+        // Then:
+        assertThat(result).isSameAs(expected);
+        assertThat(underTest.computedTestMethods).isSameAs(expected);
+
+        verify(underTest).computeTestMethods();
+        verifyNoMoreInteractions(underTest);
     }
 
     @Test(expected = IllegalArgumentException.class)

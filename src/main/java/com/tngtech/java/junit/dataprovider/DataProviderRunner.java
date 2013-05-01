@@ -28,6 +28,13 @@ import org.junit.runners.model.TestClass;
 public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     /**
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    List<FrameworkMethod> computedTestMethods;
+
+    /**
      * Creates a DataProviderRunner to run supplied {@code clazz}.
      *
      * @param clazz the test {@link Class} to run
@@ -181,7 +188,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
-        return generateExplodedTestMethodsFor(super.computeTestMethods());
+        if (computedTestMethods == null) {
+            computedTestMethods = generateExplodedTestMethodsFor(super.computeTestMethods());
+        }
+        return computedTestMethods;
     }
 
     @Override
