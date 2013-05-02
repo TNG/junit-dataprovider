@@ -87,7 +87,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      * <li>array (e.g. String[]) -&gt; &lt;array&gt;</li>
      * <li>other -&gt; Object.toString</li>
      * </ul>
-     *
+     * 
      * @param parameters the parameters are converted to a comma-separated string
      * @return a string representation of the given parameters
      */
@@ -101,7 +101,11 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
             }
 
             if (param.getClass().isArray()) {
-                stringBuilder.append('[').append(formatParameters(getArray(param))).append(']');
+                if (param.getClass().getComponentType().isPrimitive()) {
+                    appendTo(stringBuilder, param);
+                } else {
+                    stringBuilder.append('[').append(formatParameters(getArray(param))).append(']');
+                }
 
             } else if (param instanceof String && ((String) param).isEmpty()) {
                 stringBuilder.append("<empty string>");
@@ -117,22 +121,30 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         return stringBuilder.toString();
     }
 
+    private void appendTo(StringBuilder stringBuilder, Object primitiveArray) {
+        Class<?> componentType = primitiveArray.getClass().getComponentType();
+        if (boolean.class.equals(componentType)) {
+            stringBuilder.append(Arrays.toString((boolean[]) primitiveArray));
+        } else if (byte.class.equals(componentType)) {
+            stringBuilder.append(Arrays.toString((byte[]) primitiveArray));
+        } else if (char.class.equals(componentType)) {
+            stringBuilder.append(Arrays.toString((char[]) primitiveArray));
+        } else if (short.class.equals(componentType)) {
+            stringBuilder.append(Arrays.toString((short[]) primitiveArray));
+        } else if (int.class.equals(componentType)) {
+            stringBuilder.append(Arrays.toString((int[]) primitiveArray));
+        } else if (long.class.equals(componentType)) {
+            stringBuilder.append(Arrays.toString((long[]) primitiveArray));
+        } else if (float.class.equals(componentType)) {
+            stringBuilder.append(Arrays.toString((float[]) primitiveArray));
+        } else if (double.class.equals(componentType)) {
+            stringBuilder.append(Arrays.toString((double[]) primitiveArray));
+        }
+    }
+
     private <T> T[] getArray(Object array) {
         @SuppressWarnings("unchecked")
         T[] result = (T[]) array;
         return result;
-    }
-
-    public static String encodeHTML(String s) {
-        StringBuffer out = new StringBuffer();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c > 127 || c == '"' || c == '<' || c == '>') {
-                out.append("&#" + (int) c + ";");
-            } else {
-                out.append(c);
-            }
-        }
-        return out.toString();
     }
 }

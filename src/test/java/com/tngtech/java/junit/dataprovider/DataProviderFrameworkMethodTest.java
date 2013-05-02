@@ -114,6 +114,22 @@ public class DataProviderFrameworkMethodTest {
     }
 
     @Test
+    public void testGetNameShouldReturnSpecialHandlingForPrimitiveTypeArray() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { new int[] { 1, 2 } };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[4: \\[1, 2]]");
+    }
+
+    @Test
     public void testGetNameShouldReturnSpecialHandlingForArrayInArray() {
 
         // Given:
