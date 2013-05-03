@@ -334,6 +334,8 @@ public class DataProviderRunnerTest {
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
         doReturn("notAvailableDataProviderMethod").when(useDataProvider).value();
 
+        doReturn(testClass).when(underTest).findDataProviderLocation(useDataProvider);
+
         // When:
         FrameworkMethod result = underTest.getDataProviderMethod(testMethod);
 
@@ -355,6 +357,8 @@ public class DataProviderRunnerTest {
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
         doReturn(dataProviderMethodName).when(useDataProvider).value();
 
+        doReturn(testClass).when(underTest).findDataProviderLocation(useDataProvider);
+
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
@@ -363,6 +367,38 @@ public class DataProviderRunnerTest {
 
         // Then:
         assertThat(result).isEqualTo(dataProviderMethod);
+    }
+
+    @Test
+    public void testFindDataProviderLocationShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
+
+        // Given:
+        UseDataProvider useDataProvider = mock(UseDataProvider.class);
+        doReturn(new Class<?>[0]).when(useDataProvider).location();
+
+        // When:
+        TestClass result = underTest.findDataProviderLocation(useDataProvider);
+
+        // Then:
+        assertThat(result).isEqualTo(testClass);
+    }
+
+    @Test
+    public void testFindDataProviderLocationShouldReturnTestClassContainingSetLocationInUseDataProviderAnnotation() {
+
+        final Class<?> dataProviderLocation = DataProviderRunnerTest.class;
+
+        // Given:
+        UseDataProvider useDataProvider = mock(UseDataProvider.class);
+        doReturn(new Class<?>[] { dataProviderLocation }).when(useDataProvider).location();
+
+        // When:
+        TestClass result = underTest.findDataProviderLocation(useDataProvider);
+
+        // Then:
+        assertThat(result).isNotNull();
+        // assertThat(result.getJavaClass()).isEqualTo(dataProviderLocation);
+        assertThat(result.getName()).isEqualTo(dataProviderLocation.getName());
     }
 
     @Test
@@ -376,6 +412,7 @@ public class DataProviderRunnerTest {
         // Then:
         assertThat(result).isFalse();
     }
+
     @Test
     public void testIsValidDataProviderMethodShouldReturnFalseIfItIsNotPublic() {
 

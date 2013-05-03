@@ -149,16 +149,30 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         if (testMethod == null) {
             throw new IllegalArgumentException("testMethod must not be null");
         }
-        UseDataProvider testUsingDataProvider = testMethod.getAnnotation(UseDataProvider.class);
-        if (testUsingDataProvider == null) {
+        UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
+        if (useDataProvider == null) {
             return null;
         }
-        for (FrameworkMethod method : getTestClassInt().getAnnotatedMethods(DataProvider.class)) {
-            if (method.getName().equals(testUsingDataProvider.value())) {
+
+        TestClass dataProviderLocation = findDataProviderLocation(useDataProvider);
+        for (FrameworkMethod method : dataProviderLocation.getAnnotatedMethods(DataProvider.class)) {
+            if (method.getName().equals(useDataProvider.value())) {
                 return method;
             }
         }
         return null;
+    }
+
+    /**
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     */
+    TestClass findDataProviderLocation(UseDataProvider useDataProvider) {
+        if (useDataProvider.location().length == 0) {
+            return getTestClassInt();
+        }
+        return new TestClass(useDataProvider.location()[0]);
     }
 
     /**

@@ -43,7 +43,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.tngtech.java'
-version = '1.4.2-SNAPSHOT'
+version = '1.5.0'
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     from 'build/docs/javadoc'

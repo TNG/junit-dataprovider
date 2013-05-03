@@ -47,6 +47,19 @@ public class DataProviderSimpleAcceptanceTest {
         assertThat(isEmpty).isTrue();
     }
 
+    @Test
+    @UseDataProvider(value = "dataProviderIsStringLengthGreaterTwo", location = StringDataProvider.class)
+    public void testIsStringLengthGreaterThanTwo(String str, boolean expected) {
+
+        // Given:
+
+        // When:
+        boolean isGreaterThanTwo = (str == null) ? false : str.length() > 2;
+
+        // Then:
+        assertThat(isGreaterThanTwo).isEqualTo(expected);
+    }
+
     @DataProvider
     public static Object[][] dataProviderAdd() {
         // @formatter:off
