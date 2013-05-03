@@ -137,6 +137,7 @@ Eclipse template
 * Context:                  Java type members
 * Automatically insert:     false
 * Description:              Insert a junit dataprovider method
+* Use code formatter:	    false (unfortunately, this is a global setting for all templates)
 * Pattern:
 
 ```
