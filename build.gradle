@@ -36,15 +36,6 @@ task jenkinsTest {
  
 build.dependsOn(jenkinsTest)
 
-
-// -- build and publish artifacts -------------------------------------------------------------------------------------
-
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-group = 'com.tngtech.java'
-version = '1.5.1-SNAPSHOT'
-
 task javadocJar(type: Jar, dependsOn: javadoc) {
     from 'build/docs/javadoc'
     classifier = 'javadoc'
@@ -57,7 +48,7 @@ task sourcesJar(type: Jar) {
 
 findbugs {
     toolVersion = "2.0.1"
-    ignoreFailures = true
+            ignoreFailures = true
 }
 
 artifacts {
@@ -65,6 +56,15 @@ artifacts {
     archives javadocJar
     archives sourcesJar
 }
+
+// -- build and publish artifacts -------------------------------------------------------------------------------------
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = 'com.tngtech.java'
+version = '1.5.1-SNAPSHOT'
+
 
 signing {
     // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
