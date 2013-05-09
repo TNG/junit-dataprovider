@@ -5,54 +5,39 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 public class DataProviderFilterTest {
 
-    @InjectMocks
     private DataProviderFilter underTest;
 
-    @Mock
     private Filter filter;
 
-    @Before
-    public void setup() {
-        filter = mock(Filter.class);
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
-        underTest = new DataProviderFilter(filter);
-    }
-
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void testDataProviderFilterShouldThrowNullPointerExceptionWhenFilterIsNull() {
 
         // Given:
 
         // When:
         @SuppressWarnings("unused")
-        DataProviderFilter dataProviderFilter = new DataProviderFilter(null);
+        DataProviderFilter result = new DataProviderFilter(null);
 
         // Then: expect exception
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = IllegalArgumentException.class)
     public void testDataProviderFilterShouldThrowIllegalArgumentExceptionWhenFilterDescriptionCannotBeParsed() {
 
         // Given:
-        doReturn("invalid").when(filter).describe();
 
         // When:
-        @SuppressWarnings("unused")
-        DataProviderFilter dataProviderFilter = new DataProviderFilter(filter);
+        setupDataProviderFilterWith("invalid");
 
         // Then: expect exception
     }
@@ -61,9 +46,8 @@ public class DataProviderFilterTest {
     public void testShouldRunShouldThrowIllegalArgumentExceptionWhenDescriptionCannotBeParsed() {
 
         // Given:
-        Description description = mock(Description.class);
-        doReturn(true).when(description).isTest();
-        doReturn("invalid").when(description).getDisplayName();
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        Description description = setupDescription(true, "invalid");
 
         // When:
         underTest.shouldRun(description);
@@ -75,9 +59,8 @@ public class DataProviderFilterTest {
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodName() {
 
         // Given:
-        Description description = mock(Description.class);
-        doReturn(true).when(description).isTest();
-        doReturn("testOther[1: ](Clazz)").when(description).getDisplayName();
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        Description description = setupDescription(true, "testOther[1: ](Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -90,9 +73,8 @@ public class DataProviderFilterTest {
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedClassName() {
 
         // Given:
-        Description description = mock(Description.class);
-        doReturn(true).when(description).isTest();
-        doReturn("testMain[1: ](ClazzOther)").when(description).getDisplayName();
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        Description description = setupDescription(true, "testMain[1: ](ClazzOther)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -105,9 +87,8 @@ public class DataProviderFilterTest {
     public void testShouldRunShouldReturnFalseWhenDescriptionHasNoMethodIdx() {
 
         // Given:
-        Description description = mock(Description.class);
-        doReturn(true).when(description).isTest();
-        doReturn("testMain(Clazz)").when(description).getDisplayName();
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        Description description = setupDescription(true, "testMain(Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -120,9 +101,8 @@ public class DataProviderFilterTest {
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodIdx() {
 
         // Given:
-        Description description = mock(Description.class);
-        doReturn(true).when(description).isTest();
-        doReturn("testMain[2: ](Clazz)").when(description).getDisplayName();
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        Description description = setupDescription(true, "testMain[2: ](Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -132,15 +112,11 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testShouldRunShouldReturnTrueWhenDescriptionEqualsExpectedWithAdditionalMethodParams() {
+    public void testShouldRunShouldReturnTrueWhenDescriptionHaveOnlyMethodNameAndEqualsExactly() {
 
         // Given:
-        doReturn("Method testMain(Clazz)").when(filter).describe();
-        underTest = new DataProviderFilter(filter);
-
-        Description description = mock(Description.class);
-        doReturn(true).when(description).isTest();
-        doReturn("testMain[1: test](Clazz)").when(description).getDisplayName();
+        setupDataProviderFilterWith("Method testMain(Clazz)");
+        Description description = setupDescription(true, "testMain(Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -150,12 +126,11 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testShouldRunShouldReturnTrueWhenDescriptionEqualsExpected() {
+    public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndEqualsMethodNameAndClass() {
 
         // Given:
-        Description description = mock(Description.class);
-        doReturn(true).when(description).isTest();
-        doReturn("testMain[1: ](Clazz)").when(description).getDisplayName();
+        setupDataProviderFilterWith("Method testMain(Clazz)");
+        Description description = setupDescription(true, "testMain[1: ](Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -165,12 +140,25 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testShouldRunShouldReturnTrueWhenDescriptionEqualsExpectedButMethodParamsAreDifferent() {
+    public void testShouldRunShouldReturnTrueWhenDescriptionHaveAddtionalMethodIdxAndEqualsExcatly() {
 
         // Given:
-        Description description = mock(Description.class);
-        doReturn(true).when(description).isTest();
-        doReturn("testMain[1: test](Clazz)").when(description).getDisplayName();
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        Description description = setupDescription(true, "testMain[1: ](Clazz)");
+
+        // When:
+        boolean result = underTest.shouldRun(description);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndMethodParamsAreDifferentButIdxIsEqual() {
+
+        // Given:
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        Description description = setupDescription(true, "testMain[1: test](Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -183,14 +171,9 @@ public class DataProviderFilterTest {
     public void testShouldRunShouldReturnTrueForMatchingChildDescription() {
 
         // Given:
-        Description childDescription = mock(Description.class);
-        doReturn(true).when(childDescription).isTest();
-        doReturn("testMain[1: ](Clazz)").when(childDescription).getDisplayName();
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
 
-        Description description = mock(Description.class);
-        List<Description> children = new ArrayList<Description>();
-        children.add(childDescription);
-        doReturn(children).when(description).getChildren();
+        Description description = setupDescription(false, "", setupDescription(true, "testMain[1: ](Clazz)"));
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -203,19 +186,15 @@ public class DataProviderFilterTest {
     public void testShouldRunShouldReturnTrueForMultipleChildDescriptionWithLastMatching() {
 
         // Given:
-        Description childDescription1 = mock(Description.class);
-        doReturn(true).when(childDescription1).isTest();
-        doReturn("testOther[1: ](ClazzOther)").when(childDescription1).getDisplayName();
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
 
-        Description childDescription2 = mock(Description.class);
-        doReturn(true).when(childDescription2).isTest();
-        doReturn("testMain[1: ](Clazz)").when(childDescription2).getDisplayName();
-
-        Description description = mock(Description.class);
-        List<Description> children = new ArrayList<Description>();
-        children.add(childDescription1);
-        children.add(childDescription2);
-        doReturn(children).when(description).getChildren();
+        // @formatter:off
+        Description description = setupDescription(false, "",
+                setupDescription(true, "testOther[1: ](ClazzOther)"),
+                setupDescription(false, "testOther[1: ](ClazzOther)"),
+                setupDescription(true, "testMain[1: ](Clazz)")
+            );
+        // @formatter:on
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -225,9 +204,35 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribe() {
+    public void testShouldRunShouldReturnFalseForMultipleChildAndFurtherChildDescriptionWithNonMatching() {
 
         // Given:
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+
+        // @formatter:off
+        Description description = setupDescription(false, "testMain[2: ](Clazz)",
+                setupDescription( true, "testOther[1: ](ClazzOther)"),
+                setupDescription( true,  "testMain[1: ](ClazzOther)"),
+                setupDescription(false,  "testMain[1: ](Clazz)",
+                        setupDescription( true,  "testMain[2: ](Clazz)"),
+                        setupDescription( true, "testOther[1: ](ClazzOther)")
+                    ),
+                setupDescription( true, "testOther[1: ](Clazz)")
+            );
+        // @formatter:on
+
+        // When:
+        boolean result = underTest.shouldRun(description);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testDescribeShouldReturnFilterDescripe() {
+
+        // Given:
+        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
 
         // When:
         String result = underTest.describe();
@@ -260,10 +265,7 @@ public class DataProviderFilterTest {
 
         // Then:
         assertThat(result).isTrue();
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_NAME)).isEqualTo("testMain");
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_PARAMS)).isNull();
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_IDX)).isNull();
-        assertThat(matcher.group(DataProviderFilter.GROUP_CLASS)).isEqualTo("Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", null, null, "Clazz");
     }
 
     @Test
@@ -277,44 +279,124 @@ public class DataProviderFilterTest {
 
         // Then:
         assertThat(result).isTrue();
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_NAME)).isEqualTo("testMain");
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_PARAMS)).isEqualTo("[1: test]");
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_IDX)).isEqualTo("1");
-        assertThat(matcher.group(DataProviderFilter.GROUP_CLASS)).isEqualTo("Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: test]", "1", "Clazz");
     }
 
     @Test
-    public void testDescribtionPatternShouldFindDescriptionWithoutParams() {
+    public void testDescribtionPatternShouldMatchescriptionWithParamsContainingParentheses() {
+
+        // Given:
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: (test)](Clazz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isTrue();
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: (test)]", "1", "Clazz");
+    }
+
+    @Test
+    public void testDescribtionPatternShouldNotMatchDescriptionWithoutParamsAndSpaceInMethodName() {
 
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method testMain(Clazz)");
 
         // When:
-        boolean result = matcher.find();
+        boolean result = matcher.matches();
 
         // Then:
-        assertThat(result).isTrue();
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_NAME)).isEqualTo("testMain");
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_PARAMS)).isNull();
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_IDX)).isNull();
-        assertThat(matcher.group(DataProviderFilter.GROUP_CLASS)).isEqualTo("Clazz");
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testDescribtionPatternShouldNotMatchDescriptionWithParamsAndSpaceInMethodName() {
+
+        // Given:
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method testMain[1: test](Clazz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testDescribtionPatternShouldNotMatchDescriptionWithMethodNameContainingBrackets() {
+
+        // Given:
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(Clazz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isFalse();
     }
 
     @Test
     public void testDescribtionPatternShouldFindDescriptionWithParams() {
 
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method testMain[1: test](Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
 
         // When:
         boolean result = matcher.find();
 
         // Then:
         assertThat(result).isTrue();
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_NAME)).isEqualTo("testMain");
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_PARAMS)).isEqualTo("[1: test]");
-        assertThat(matcher.group(DataProviderFilter.GROUP_METHOD_IDX)).isEqualTo("1");
-        assertThat(matcher.group(DataProviderFilter.GROUP_CLASS)).isEqualTo("Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: test]", "1", "Clazz");
     }
 
+    @Test
+    public void testDescribtionPatternShouldFindDescriptionWithoutParams() {
+
+        // Given:
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
+
+        // When:
+        boolean result = matcher.find();
+
+        // Then:
+        assertThat(result).isTrue();
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: test]", "1", "Clazz");
+    }
+
+    @Test
+    public void testDescribtionPatternShouldFindDescriptionWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
+
+        // Given:
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(Clazz)");
+
+        // When:
+        boolean result = matcher.find();
+
+        // Then:
+        assertThat(result).isTrue();
+        assertThatMatcherGroupsAre(matcher, "ain", null, null, "Clazz");
+    }
+
+    private void setupDataProviderFilterWith(String filterDescriptionString) {
+        filter = mock(Filter.class);
+        doReturn(filterDescriptionString).when(filter).describe();
+        underTest = new DataProviderFilter(filter);
+    }
+
+    private Description setupDescription(boolean isTest, String descriptionDisplayName,
+            Description... childDescriptions) {
+
+        Description description = mock(Description.class);
+        doReturn(isTest).when(description).isTest();
+        doReturn(descriptionDisplayName).when(description).getDisplayName();
+        doReturn(new ArrayList<Description>(Arrays.asList(childDescriptions))).when(description).getChildren();
+        return description;
+    }
+
+    private void assertThatMatcherGroupsAre(Matcher matcher, String... expectedGroups) {
+        assertThat(matcher.groupCount()).as("group-count").isEqualTo(expectedGroups.length);
+        for (int idx = 0; idx < expectedGroups.length; idx++) {
+            assertThat(matcher.group(idx + 1)).as("group " + idx).isEqualTo(expectedGroups[idx]);
+        }
+    }
 }

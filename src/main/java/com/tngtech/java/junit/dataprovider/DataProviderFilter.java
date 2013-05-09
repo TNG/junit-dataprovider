@@ -17,12 +17,12 @@ public class DataProviderFilter extends Filter {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final Pattern DESCRIPTION_PATTERN = Pattern.compile("([^\\[ ]+)(\\[(\\d+):.*\\])?\\((.+)\\)$");
+    static final Pattern DESCRIPTION_PATTERN = Pattern.compile("([^\\[\\] ]+)" + "(\\[(\\d+):.*\\])?" + "\\((.+)\\)$");
 
-    static final int GROUP_METHOD_NAME = 1;
-    static final int GROUP_METHOD_PARAMS = 2;
-    static final int GROUP_METHOD_IDX = 3;
-    static final int GROUP_CLASS = 4;
+    private static final int GROUP_METHOD_NAME = 1;
+    private static final int GROUP_METHOD_PARAMS = 2;
+    private static final int GROUP_METHOD_IDX = 3;
+    private static final int GROUP_CLASS = 4;
 
     private final Filter filter;
     private final Matcher filterDescriptionMatcher;
@@ -36,13 +36,13 @@ public class DataProviderFilter extends Filter {
      */
     public DataProviderFilter(Filter filter) {
         if (filter == null) {
-            throw new IllegalArgumentException("supplied filter must not be null");
+            throw new NullPointerException("supplied filter must not be null");
         }
         this.filter = filter;
 
         filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filter.describe());
         if (!filterDescriptionMatcher.find()) {
-            throw new IllegalArgumentException(String.format("Filter description %s is not suppored by %s.",
+            throw new IllegalArgumentException(String.format("Filter description %s is not supported by %s.",
                     filter.describe(), this.getClass().getSimpleName()));
         }
     }
