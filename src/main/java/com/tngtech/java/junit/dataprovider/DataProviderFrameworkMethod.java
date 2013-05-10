@@ -87,7 +87,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      * <li>array (e.g. String[]) -&gt; &lt;array&gt;</li>
      * <li>other -&gt; Object.toString</li>
      * </ul>
-     * 
+     *
      * @param parameters the parameters are converted to a comma-separated string
      * @return a string representation of the given parameters
      */
@@ -97,10 +97,8 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
             Object param = parameters[i];
             if (param == null) {
                 stringBuilder.append("<null>");
-                continue;
-            }
 
-            if (param.getClass().isArray()) {
+            } else if (param.getClass().isArray()) {
                 if (param.getClass().getComponentType().isPrimitive()) {
                     appendTo(stringBuilder, param);
                 } else {
@@ -113,6 +111,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
             } else {
                 stringBuilder.append(param.toString());
             }
+
             if (i < parameters.length - 1) {
                 stringBuilder.append(", ");
             }

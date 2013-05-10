@@ -82,6 +82,22 @@ public class DataProviderFrameworkMethodTest {
     }
 
     @Test
+    public void testGetNameShouldReturnSpecialHandlingForNullNull() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { null, null };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[4: <null>, <null>]");
+    }
+
+    @Test
     public void testGetNameShouldReturnSpecialHandlingForEmtpyString() {
 
         // Given:
