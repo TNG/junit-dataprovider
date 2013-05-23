@@ -40,7 +40,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
 
     @Override
     public String getName() {
-        return String.format("%s[%d: %s]", super.getName(), idx, formatParameters(parameters));
+        return String.format("%s[%d: %s]", super.getName(), idx, format(parameters));
     }
 
     @Override
@@ -91,7 +91,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      * @param parameters the parameters are converted to a comma-separated string
      * @return a string representation of the given parameters
      */
-    private <T> String formatParameters(T[] parameters) {
+    private <T> String format(T[] parameters) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < parameters.length; i++) {
             Object param = parameters[i];
@@ -102,7 +102,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
                 if (param.getClass().getComponentType().isPrimitive()) {
                     appendTo(stringBuilder, param);
                 } else {
-                    stringBuilder.append('[').append(formatParameters(getArray(param))).append(']');
+                    stringBuilder.append('[').append(format(getArray(param))).append(']');
                 }
 
             } else if (param instanceof String && ((String) param).isEmpty()) {

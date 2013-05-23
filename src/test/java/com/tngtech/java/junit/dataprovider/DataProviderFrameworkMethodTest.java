@@ -1,7 +1,7 @@
 package com.tngtech.java.junit.dataprovider;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.reflect.Method;
 

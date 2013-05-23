@@ -16,7 +16,7 @@ dependencies {
     compile group: 'junit', name: 'junit-dep', version: '4.8.2' /* provided scope */
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
     
-    testCompile group: 'org.easytesting', name: 'fest-assert-core', version: '2.+'
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '1.2.0'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.+'
 }
 
