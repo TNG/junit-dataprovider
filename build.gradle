@@ -17,7 +17,7 @@ dependencies {
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
     
     testCompile group: 'org.assertj', name: 'assertj-core', version: '1.2.0'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.+'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
 }
 
 task wrapper(type: Wrapper) {
@@ -46,9 +46,13 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
+test {
+    ignoreFailures = true
+}
+
 findbugs {
     toolVersion = "2.0.1"
-            ignoreFailures = true
+    ignoreFailures = true
 }
 
 artifacts {
