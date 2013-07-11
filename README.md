@@ -2,12 +2,12 @@ junit-dataprovider
 ==================
 
 #### Table of Contents  
-[What is it](#What is it)  
-[Motivation and distinction](#Motivation and distinction)  
-[Requirements](#Requirements)  
-[Download](#Download)  
-[Usage example](#Usage example)  
-[Eclipse template](#Eclipse template)  
+[What is it](#what-is-it)  
+[Motivation and distinction](#motivation-and-distinction)  
+[Requirements](#requirements)  
+[Download](#download)  
+[Usage example](#usage-example)  
+[Eclipse template](#eclipse-template)  
 
 
 What is it
@@ -73,7 +73,7 @@ Motivation and distinction
 #### May I move a junit-dataprovider into a separate class?
 
 > Of course, just move it to any from the test case accessible class and annotate it as usual with 
-> properly and use it with additionally specifying the location, see [Usage example](#Usage example).
+> properly and use it with additionally specifying the location, see [Usage example](#usage-example).
 
 
 Requirements
