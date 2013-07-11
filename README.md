@@ -70,6 +70,11 @@ Motivation and distinction
 
 [JUnit Theories]: https://github.com/junit-team/junit/wiki/Theories
 
+#### May I move a junit-dataprovider into a separate class?
+
+> Of course, just move it to any from the test case accessible class and annotate it as usual with 
+> properly and use it with additionally specifying the location, see [Usage example](#Usage example).
+
 
 Requirements
 -----------
@@ -127,8 +132,42 @@ public class DataProviderTest {
         // Then:
         assertEquals(expected, result);
     }
+    
+    @Test
+    @UseDataProvider(value = "dataProviderIsStringLengthGreaterTwo", location = StringDataProvider.class)
+    public void testIsStringLengthGreaterThanTwo(String str, boolean expected) {
+
+        // Given:
+
+        // When:
+        boolean isGreaterThanTwo = (str == null) ? false : str.length() > 2;
+
+        // Then:
+        assertThat(isGreaterThanTwo).isEqualTo(expected);
+    }
 }
 ```
+
+```java
+import com.tngtech.java.junit.dataprovider.DataProvider;
+
+public class StringDataProvider {
+
+    @DataProvider
+    public static Object[][] dataProviderIsStringLengthGreaterTwo() {
+        // @formatter:off
+        return new Object[][] {
+                { "",       false },
+                { "1",      false },
+                { "12",     false },
+                { "123",    true },
+                { "Test",   true },
+            };
+        // @formatter:on
+    }
+}
+```
+
 
 Eclipse template
 ----------------
