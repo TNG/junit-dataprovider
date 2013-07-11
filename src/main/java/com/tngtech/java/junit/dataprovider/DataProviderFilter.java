@@ -42,8 +42,8 @@ public class DataProviderFilter extends Filter {
 
         filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filter.describe());
         if (!filterDescriptionMatcher.find()) {
-            throw new IllegalArgumentException(String.format("Filter description %s is not supported by %s.",
-                    filter.describe(), this.getClass().getSimpleName()));
+            throw new IllegalArgumentException(String.format("Filter %s with description %s is not supported by %s.",
+                    filter.getClass(), filter.describe(), this.getClass().getSimpleName()));
         }
     }
 
