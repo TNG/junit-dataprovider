@@ -27,7 +27,7 @@ Motivation and distinction
 
 > Test cases for [JUnit Theories][] are built from all data points whose type matches 
 > the method's argument – or even the cross product of all matching data points, 
-> if the method takes several arguments. The junit-dataprovider, however, ddresses 
+> if the method takes several arguments. The junit-dataprovider, however, adresses 
 > another use case: Its test cases may consist of multiple parameters that belong together, 
 > which may contain test input values and/or expected values to assert the result.
 > Furthermore, a test method using [JUnit Theories][] fails or succeeds entirely (for alle 
