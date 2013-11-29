@@ -63,8 +63,8 @@ Motivation and distinction
 
 #### Is it possible to execute a junit-dataprovider test method for a single test data row?
 
-> Unfortunately this is not possible directly expect if the other test data rows are uncommented 
-> in the source code. The rerun of a single test data row is working, though, if e.g. in Eclipse 
+> Unfortunately this is not possible directly expect if the other test data rows are commented out 
+> in the source code. The rerun of a single test data row, though, is working, if e.g. in Eclipse 
 > you right click the test to be executed and choose run/debug.
 
 
