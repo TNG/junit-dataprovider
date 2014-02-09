@@ -2,6 +2,9 @@ apply plugin: 'eclipse'
 apply plugin: 'java'
 apply plugin: 'findbugs'
 
+group = 'com.tngtech.java'
+version = '1.5.1-SNAPSHOT'
+
 sourceCompatibility = 1.5
 
 repositories {
@@ -32,6 +35,21 @@ task jenkinsTest {
  
 build.dependsOn(jenkinsTest)
 
+jar {
+    manifest {
+        attributes (
+            'Built-By': "Gradle ${gradle.gradleVersion}",
+            'Built-Date': new Date(),
+            'Specification-Title': 'JUnit dataprovider',
+            'Specification-Version': version,
+            'Specification-Vendor': 'TNG Technology Consulting GmbH',
+            'Implementation-Title': 'JUnit dataprovider',
+            'Implementation-Version': version,
+            'Implementation-Vendor': 'TNG Technology Consulting GmbH',
+        )
+    }
+}
+
 task javadocJar(type: Jar, dependsOn: javadoc) {
     from 'build/docs/javadoc'
     classifier = 'javadoc'
@@ -61,9 +79,6 @@ artifacts {
 
 apply plugin: 'maven'
 apply plugin: 'signing'
-
-group = 'com.tngtech.java'
-version = '1.5.1-SNAPSHOT'
 
 
 signing {
