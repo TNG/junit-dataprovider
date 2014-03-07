@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'junit', name: 'junit-dep', version: '4.8.2' /* provided scope */
+    compile group: 'junit', name: 'junit-dep', version: '4.8.2'
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
     
     testCompile group: 'org.assertj', name: 'assertj-core', version: '1.2.0'
@@ -27,12 +27,11 @@ task jenkinsTest {
     // required due to jenkins fails if test output is not up to date :(
     // Solution found on http://www.practicalgradle.org/blog/2011/06/incremental-tests-with-jenkins/
     inputs.files test.outputs.files
-    doLast{
+    doLast {
         def timestamp = System.currentTimeMillis()
-        test.testResultsDir.eachFile { it.lastModified = timestamp }
+        test.getReports().getJunitXml().getDestination().eachFile{ it.lastModified = timestamp }
     }
 }
- 
 build.dependsOn(jenkinsTest)
 
 jar {
@@ -83,7 +82,9 @@ apply plugin: 'signing'
 
 signing {
     // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
-    required { gradle.taskGraph.hasTask("uploadArchives") }
+    required {
+        gradle.taskGraph.hasTask("uploadArchives")
+    }
     sign configurations.archives
 }
 
@@ -97,7 +98,9 @@ if (!hasProperty('sonatypePassword')) {
 uploadArchives {
     repositories {
         mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            beforeDeployment {
+                MavenDeployment deployment -> signing.signPom(deployment)
+            }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
                 // username and password from gradle.properties
@@ -140,7 +143,11 @@ uploadArchives {
                     }
                 }
                 whenConfigured { pom ->
-                    pom.dependencies.find{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit-dep' }.scope = 'provided'
+                    pom.dependencies.find{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit-dep' }.with {
+                        version = '[4.8.2,4.11]'
+                        scope = 'provided'
+                    }
+                    pom.dependencies.removeAll(pom.dependencies.findAll{ dep -> dep.scope in [ 'compile', 'test' ] })
                 }
             }
         }
