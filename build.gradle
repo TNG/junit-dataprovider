@@ -107,35 +107,40 @@ uploadArchives {
                 authentication(userName: sonatypeUsername, password: sonatypePassword )
             }
 
-            pom.project {
-                name 'junit-dataprovider'
-                packaging 'jar'
-                description 'A TestNG like dataprovider runner for JUnit'
-                url 'https://github.com/TNG/junit-dataprovider'
+            pom {
+                project {
+                    name 'junit-dataprovider'
+                    packaging 'jar'
+                    description 'A TestNG like dataprovider runner for JUnit'
+                    url 'https://github.com/TNG/junit-dataprovider'
 
-                scm {
-                    url 'scm:git@github.com:TNG/junit-dataprovider.git'
-                    connection 'scm:git@github.com:TNG/junit-dataprovider.git'
-                    developerConnection 'scm:git@github.com:TNG/junit-dataprovider.git'
-                }
+                    scm {
+                        url 'scm:git@github.com:TNG/junit-dataprovider.git'
+                        connection 'scm:git@github.com:TNG/junit-dataprovider.git'
+                        developerConnection 'scm:git@github.com:TNG/junit-dataprovider.git'
+                    }
 
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'lepokle'
+                            name 'Leo von Klenze'
+                        }
+                        developer {
+                            id 'aaschmid'
+                            name 'Andreas Schmid'
+                        }
                     }
                 }
-
-                developers {
-                    developer {
-                        id 'lepokle'
-                        name 'Leo von Klenze'
-                    }
-                    developer {
-                        id 'aaschmid'
-                        name 'Andreas Schmid'
-                    }
+                whenConfigured { pom ->
+                    pom.dependencies.find{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit-dep' }.scope = 'provided'
                 }
             }
         }
