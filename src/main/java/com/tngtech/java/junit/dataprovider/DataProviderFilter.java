@@ -24,7 +24,7 @@ public class DataProviderFilter extends Filter {
     private static final int GROUP_METHOD_IDX = 3;
     private static final int GROUP_CLASS = 4;
 
-    private final Filter filter;
+    private final String filterDescription;
     private final Matcher filterDescriptionMatcher;
 
     /**
@@ -38,12 +38,11 @@ public class DataProviderFilter extends Filter {
         if (filter == null) {
             throw new NullPointerException("supplied filter must not be null");
         }
-        this.filter = filter;
-
-        filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filter.describe());
+        filterDescription = filter.describe();
+        filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filterDescription);
         if (!filterDescriptionMatcher.find()) {
             throw new IllegalArgumentException(String.format("Filter %s with description %s is not supported by %s.",
-                    filter.getClass(), filter.describe(), this.getClass().getSimpleName()));
+                    filter.getClass(), filterDescription, this.getClass().getSimpleName()));
         }
     }
 
@@ -57,7 +56,7 @@ public class DataProviderFilter extends Filter {
             Matcher descriptionMatcher = DESCRIPTION_PATTERN.matcher(description.getDisplayName());
             if (!descriptionMatcher.matches()) {
                 throw new IllegalArgumentException(String.format("Test method description %s is not suppored by %s.",
-                        filter.describe(), this.getClass().getSimpleName()));
+                        filterDescription, this.getClass().getSimpleName()));
             }
             if (!filterDescriptionMatcher.group(GROUP_METHOD_NAME).equals(descriptionMatcher.group(GROUP_METHOD_NAME))
                     || !filterDescriptionMatcher.group(GROUP_CLASS).equals(descriptionMatcher.group(GROUP_CLASS))) {
@@ -80,6 +79,6 @@ public class DataProviderFilter extends Filter {
 
     @Override
     public String describe() {
-        return filter.describe();
+        return filterDescription;
     }
 }
