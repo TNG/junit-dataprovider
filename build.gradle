@@ -64,8 +64,12 @@ test {
     ignoreFailures = true
 }
 
+jacoco {
+    toolVersion = '0.6.5.201403032054'
+}
+
 findbugs {
-    toolVersion = "2.0.1"
+    toolVersion = '2.0.1'
     ignoreFailures = true
 }
 
@@ -84,7 +88,7 @@ apply plugin: 'signing'
 signing {
     // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
     required {
-        gradle.taskGraph.hasTask("uploadArchives")
+        gradle.taskGraph.hasTask('uploadArchives')
     }
     sign configurations.archives
 }
@@ -103,11 +107,11 @@ uploadArchives {
                 MavenDeployment deployment -> signing.signPom(deployment)
             }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
                 // username and password from gradle.properties
                 authentication(userName: sonatypeUsername, password: sonatypePassword )
             }
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
                 authentication(userName: sonatypeUsername, password: sonatypePassword )
             }
 
