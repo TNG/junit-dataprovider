@@ -1,4 +1,5 @@
 apply plugin: 'eclipse'
+apply plugin: 'jacoco'
 apply plugin: 'java'
 apply plugin: 'findbugs'
 
