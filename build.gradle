@@ -3,7 +3,7 @@ apply plugin: 'java'
 apply plugin: 'findbugs'
 
 group = 'com.tngtech.java'
-version = '1.5.1-SNAPSHOT'
+version = '1.5.1'
 
 sourceCompatibility = 1.5
 
