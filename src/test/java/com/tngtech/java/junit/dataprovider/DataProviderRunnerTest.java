@@ -16,11 +16,15 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Categories;
+import org.junit.runner.manipulation.Filter;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+
+import com.tngtech.test.java.junit.dataprovider.category.CategoryOne;
 
 public class DataProviderRunnerTest {
 
@@ -53,6 +57,18 @@ public class DataProviderRunnerTest {
         assertThat(underTest).isNotNull();
         assertThat(underTest.getTestClass()).isNotNull();
         assertThat(underTest.getTestClass().getJavaClass()).isEqualTo(clazz);
+    }
+
+    @Test
+    public void testFilterShouldNotThrowExceptionForCategoryFilter() throws Exception {
+
+        // Given:
+        Filter filter = new Categories.CategoryFilter(null, CategoryOne.class);
+
+        // When:
+        underTest.filter(filter);
+
+        // Then: expect no exception
     }
 
     @Test
