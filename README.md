@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/TNG/junit-dataprovider.png?branch=master)](https://travis-ci.org/TNG/junit-dataprovider)
+
 junit-dataprovider
 ==================
 
