@@ -130,19 +130,67 @@ public class DataProviderFrameworkMethodTest {
     }
 
     @Test
-    public void testGetNameShouldReturnSpecialHandlingForPrimitiveTypeArray() {
+    public void testGetNameShouldReturnSpecialHandlingForPrimitiveBooleanTypeArray() {
 
         // Given:
         Method method = anyMethod();
-        final Object[] parameters = new Object[] { new int[] { 1, 2 } };
+        final Object[] parameters = new Object[] { new boolean[] { true, false } };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 5, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[4: \\[1, 2]]");
+        assertThat(result).matches(method.getName() + "\\[5: \\[true, false]]");
+    }
+
+    @Test
+    public void testGetNameShouldReturnSpecialHandlingForPrimitiveCharTypeArray() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { new char[] { 'a', '0' } };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 6, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[6: \\[a, 0]]");
+    }
+
+    @Test
+    public void testGetNameShouldReturnSpecialHandlingForPrimitiveIntTypeArray() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { new int[] { 11, 2 } };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 7, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[7: \\[11, 2]]");
+    }
+
+    @Test
+    public void testGetNameShouldReturnSpecialHandlingForPrimitiveDoubleTypeArray() {
+
+        // Given:
+        Method method = anyMethod();
+        final Object[] parameters = new Object[] { new double[] { .78, 3.15E2 } };
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 8, parameters);
+
+        // When:
+        String result = underTest.getName();
+
+        // Then:
+        assertThat(result).matches(method.getName() + "\\[8: \\[0.78, 315.0]]");
     }
 
     @Test
