@@ -1,7 +1,18 @@
+apply plugin: 'coveralls'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 apply plugin: 'java'
 apply plugin: 'findbugs'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.2.1'
+    }
+}
 
 group = 'com.tngtech.java'
 version = '1.5.2-SNAPSHOT'
@@ -64,6 +75,11 @@ test {
     ignoreFailures = true
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+    }
+}
 jacoco {
     toolVersion = '0.6.5.201403032054'
 }
