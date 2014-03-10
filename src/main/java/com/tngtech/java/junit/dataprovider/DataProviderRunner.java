@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.experimental.categories.Categories;
+import org.junit.experimental.categories.Categories.CategoryFilter;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -40,7 +40,13 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     @Override
     public void filter(Filter filter) throws NoTestsRemainException {
-        super.filter((filter instanceof Categories.CategoryFilter) ? filter : new DataProviderFilter(filter));
+        Filter useFilter;
+        if (!(filter instanceof CategoryFilter) && filter.getClass().getName().startsWith("org.junit")) {
+            useFilter = new DataProviderFilter(filter);
+        } else {
+            useFilter = filter;
+        }
+        super.filter(useFilter);
     }
 
     @Override

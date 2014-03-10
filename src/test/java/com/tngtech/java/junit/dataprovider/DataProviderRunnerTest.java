@@ -17,6 +17,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Categories;
+import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
@@ -60,10 +61,32 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testFilterShouldNotThrowExceptionForCategoryFilter() throws Exception {
+    public void testFilterShouldNotThrowExceptionForJUnitCategoryFilter() throws Exception {
 
         // Given:
         Filter filter = new Categories.CategoryFilter(null, CategoryOne.class);
+
+        // When:
+        underTest.filter(filter);
+
+        // Then: expect no exception
+    }
+
+    @Test
+    public void testFilterShouldNotThrowExceptionForNonJUnitFilter() throws Exception {
+
+        // Given:
+        Filter filter = new Filter() {
+            @Override
+            public boolean shouldRun(Description description) {
+                return true;
+            }
+
+            @Override
+            public String describe() {
+                return "test filter in package 'com.tngtech.java.dataprovider' which runs all tests";
+            }
+        };
 
         // When:
         underTest.filter(filter);
