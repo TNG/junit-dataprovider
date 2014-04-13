@@ -137,4 +137,58 @@ public class DataProviderTest {
     }
     
     @Test
-    @UseDataProvider(value = "dataProviderIsStrin
+    @UseDataProvider(value = "dataProviderIsStringLengthGreaterTwo", location = StringDataProvider.class)
+    public void testIsStringLengthGreaterThanTwo(String str, boolean expected) {
+
+        // Given:
+
+        // When:
+        boolean isGreaterThanTwo = (str == null) ? false : str.length() > 2;
+
+        // Then:
+        assertThat(isGreaterThanTwo).isEqualTo(expected);
+    }
+}
+```
+
+```java
+import com.tngtech.java.junit.dataprovider.DataProvider;
+
+public class StringDataProvider {
+
+    @DataProvider
+    public static Object[][] dataProviderIsStringLengthGreaterTwo() {
+        // @formatter:off
+        return new Object[][] {
+                { "",       false },
+                { "1",      false },
+                { "12",     false },
+                { "123",    true },
+                { "Test",   true },
+            };
+        // @formatter:on
+    }
+}
+```
+
+
+Eclipse template
+----------------
+
+* Name:                     dataProvider
+* Context:                  Java type members
+* Automatically insert:     false
+* Description:              Insert a junit dataprovider method
+* Use code formatter:	    false (unfortunately, this is a global setting for all templates)
+* Pattern:
+
+```
+@${dataProviderType:newType(com.tngtech.java.junit.dataprovider.DataProvider)}
+public static Object[][] dataProvider${Name}() {
+    // @formatter:off
+	return new Object[][] {
+		{ ${cursor} },
+	};
+	// @formatter:on
+}
+```
