@@ -10,14 +10,15 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.2.1'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.4.0'
     }
 }
 
+description = 'A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit features.'
 group = 'com.tngtech.java'
 version = '1.5.3-SNAPSHOT'
 
-sourceCompatibility = 1.5
+sourceCompatibility = '1.5'
 
 repositories {
     mavenCentral()
@@ -62,13 +63,13 @@ jar {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    from 'build/docs/javadoc'
     classifier = 'javadoc'
+    from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
     classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 test {
@@ -119,10 +120,9 @@ if (!hasProperty('sonatypePassword')) {
 uploadArchives {
     repositories {
         mavenDeployer {
-            beforeDeployment {
-                MavenDeployment deployment -> signing.signPom(deployment)
+            beforeDeployment { deployment ->
+                signing.signPom(deployment)
             }
-
             repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
                 // username and password from gradle.properties
                 authentication(userName: sonatypeUsername, password: sonatypePassword )

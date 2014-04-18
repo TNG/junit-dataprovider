@@ -21,7 +21,6 @@ public class DataProviderFilterTest {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
     public void testDataProviderFilterShouldThrowNullPointerExceptionWhenFilterIsNull() {
-
         // Given:
 
         // When:
@@ -33,7 +32,6 @@ public class DataProviderFilterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testDataProviderFilterShouldThrowIllegalArgumentExceptionWhenFilterDescriptionCannotBeParsed() {
-
         // Given:
 
         // When:
@@ -44,7 +42,6 @@ public class DataProviderFilterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testShouldRunShouldThrowIllegalArgumentExceptionWhenDescriptionCannotBeParsed() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
         Description description = setupDescription(true, "invalid");
@@ -57,7 +54,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodName() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
         Description description = setupDescription(true, "testOther[1: ](Clazz)");
@@ -71,7 +67,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedClassName() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
         Description description = setupDescription(true, "testMain[1: ](ClazzOther)");
@@ -85,7 +80,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHasNoMethodIdx() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
         Description description = setupDescription(true, "testMain(Clazz)");
@@ -99,7 +93,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodIdx() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
         Description description = setupDescription(true, "testMain[2: ](Clazz)");
@@ -113,7 +106,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveOnlyMethodNameAndEqualsExactly() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain(Clazz)");
         Description description = setupDescription(true, "testMain(Clazz)");
@@ -127,7 +119,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndEqualsMethodNameAndClass() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain(Clazz)");
         Description description = setupDescription(true, "testMain[1: ](Clazz)");
@@ -141,7 +132,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAddtionalMethodIdxAndEqualsExcatly() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
         Description description = setupDescription(true, "testMain[1: ](Clazz)");
@@ -155,7 +145,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndMethodParamsAreDifferentButIdxIsEqual() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
         Description description = setupDescription(true, "testMain[1: test](Clazz)");
@@ -169,7 +158,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnTrueForMatchingChildDescription() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
 
@@ -184,7 +172,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnTrueForMultipleChildDescriptionWithLastMatching() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
 
@@ -205,7 +192,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testShouldRunShouldReturnFalseForMultipleChildAndFurtherChildDescriptionWithNonMatching() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
 
@@ -230,7 +216,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribeShouldReturnFilterDescripe() {
-
         // Given:
         setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
 
@@ -243,7 +228,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldNotMatchEmptyString() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("");
 
@@ -256,7 +240,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldMatchDescriptionWithoutParams() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain(Clazz)");
 
@@ -270,7 +253,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldMatchDescriptionWithParams() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
 
@@ -284,7 +266,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldMatchescriptionWithParamsContainingParentheses() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: (test)](Clazz)");
 
@@ -298,7 +279,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldNotMatchDescriptionWithoutParamsAndSpaceInMethodName() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method testMain(Clazz)");
 
@@ -311,7 +291,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldNotMatchDescriptionWithParamsAndSpaceInMethodName() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method testMain[1: test](Clazz)");
 
@@ -324,7 +303,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldNotMatchDescriptionWithMethodNameContainingBrackets() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(Clazz)");
 
@@ -337,7 +315,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldFindDescriptionWithParams() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
 
@@ -351,7 +328,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldFindDescriptionWithoutParams() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
 
@@ -365,7 +341,6 @@ public class DataProviderFilterTest {
 
     @Test
     public void testDescribtionPatternShouldFindDescriptionWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
-
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(Clazz)");
 

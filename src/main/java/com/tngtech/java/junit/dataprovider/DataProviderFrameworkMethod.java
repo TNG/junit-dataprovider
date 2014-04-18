@@ -2,6 +2,7 @@ package com.tngtech.java.junit.dataprovider;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.runners.model.FrameworkMethod;
 
@@ -28,14 +29,20 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
 
     public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters) {
         super(method);
-        this.idx = idx;
+
         if (parameters == null) {
-            throw new IllegalArgumentException("parameter must not be null");
+            throw new NullPointerException("parameter must not be null");
         }
         if (parameters.length == 0) {
             throw new IllegalArgumentException("parameter must not be empty");
         }
+
+        this.idx = idx;
         this.parameters = Arrays.copyOf(parameters, parameters.length);
+    }
+
+    public DataProviderFrameworkMethod(Method method, int idx, List<Object> parameters) {
+        this(method, idx, (parameters == null) ? null : parameters.toArray());
     }
 
     @Override

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +47,6 @@ public class DataProviderRunnerTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testDataProviderRunner() throws Exception {
-
         // Given:
         @SuppressWarnings("rawtypes")
         Class clazz = DataProviderRunnerTest.class;
@@ -62,7 +62,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testFilterShouldNotThrowExceptionForJUnitCategoryFilter() throws Exception {
-
         // Given:
         Filter filter = new Categories.CategoryFilter(null, CategoryOne.class);
 
@@ -74,7 +73,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testFilterShouldNotThrowExceptionForNonJUnitFilter() throws Exception {
-
         // Given:
         Filter filter = new Filter() {
             @Override
@@ -96,7 +94,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
-
         // Given:
         underTest.computedTestMethods = null;
         doReturn(new ArrayList<FrameworkMethod>()).when(underTest).generateExplodedTestMethodsFor(
@@ -115,10 +112,9 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testComputeTestMethodsShouldNotCallGenerateExplodedTestMethodsAndUseCachedResultIfCalledTheSecondTime() {
-
+        // Given:
         final List<FrameworkMethod> expected = new ArrayList<FrameworkMethod>();
 
-        // Given:
         underTest.computedTestMethods = expected;
 
         doReturn(expected).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
@@ -136,7 +132,6 @@ public class DataProviderRunnerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateTestMethodsShouldThrowIllegalArgumentExceptionIfArgumentIsNull() {
-
         // Given:
 
         // When:
@@ -147,7 +142,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testValidateTestMethodsShouldCheckForPublicVoidNoArgIfNormalTestMethod() {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
 
@@ -167,7 +161,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testValidateTestMethodsShouldCheckForPublicVoidIfDataProviderTestMethod() {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         UseDataProvider useDataProvider = mock(UseDataProvider.class);
@@ -188,7 +181,6 @@ public class DataProviderRunnerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateDataProviderMethodsShouldThrowIllegalArgumentExceptionIfArgumentIsNull() {
-
         // Given:
 
         // When:
@@ -199,10 +191,9 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testValidateDataProviderMethodsShouldAddErrorIfDataProviderMethodDoesNotExist() {
-
+        // Given:
         final String dataProviderName = "dataProviderMethodName";
 
-        // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         UseDataProvider useDataProvider = mock(UseDataProvider.class);
 
@@ -223,10 +214,9 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testValidateDataProviderMethodsShouldAddErrorIfDataProviderIsNotValid() {
-
+        // Given:
         final String dataProviderName = "dataProviderMethodName";
 
-        // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
         UseDataProvider useDataProvider = mock(UseDataProvider.class);
@@ -250,10 +240,9 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testValidateDataProviderMethodsShouldNotAddAnyErrorIfDataProviderIsValid() {
-
+        // Given:
         final String dataProviderName = "dataProviderMethodName";
 
-        // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
         UseDataProvider useDataProvider = mock(UseDataProvider.class);
@@ -275,7 +264,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGenerateExplodedTestMethodsForShouldReturnEmptyListIfArgumentIsNull() {
-
         // Given:
 
         // When:
@@ -287,7 +275,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGenerateExplodedTestMethodsForShouldReturnEmptyListIfArgumentIsEmptyList() {
-
         // Given:
         List<FrameworkMethod> testMethods = new ArrayList<FrameworkMethod>();
 
@@ -300,7 +287,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGenerateExplodedTestMethodsForShouldReturnOriginalTestMethodIfDataProviderMethodIsInvalid() {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -317,7 +303,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGenerateExplodedTestMethodsForShouldReturnExplodedTestMethodsForValidDataProvider() {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -339,7 +324,6 @@ public class DataProviderRunnerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetDataProviderMethodShouldThrowIllegalArgumentExceptionIfTestMethodIsNull() {
-
         // Given:
 
         // When:
@@ -350,7 +334,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGetDataProviderMethodShouldReturnNullForNonDataProviderMethod() {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
 
@@ -365,7 +348,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGetDataProviderMethodShouldReturnNullForNotFoundDataProviderMethod() {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         UseDataProvider useDataProvider = mock(UseDataProvider.class);
@@ -384,10 +366,9 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGetDataProviderMethodShouldReturnDataProviderMethodIfItExists() {
-
+        // Given:
         final String dataProviderMethodName = "availableDataProviderMethod";
 
-        // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
@@ -410,7 +391,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testFindDataProviderLocationShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
-
         // Given:
         UseDataProvider useDataProvider = mock(UseDataProvider.class);
         doReturn(new Class<?>[0]).when(useDataProvider).location();
@@ -424,10 +404,9 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testFindDataProviderLocationShouldReturnTestClassContainingSetLocationInUseDataProviderAnnotation() {
-
+        // Given:
         final Class<?> dataProviderLocation = DataProviderRunnerTest.class;
 
-        // Given:
         UseDataProvider useDataProvider = mock(UseDataProvider.class);
         doReturn(new Class<?>[] { dataProviderLocation }).when(useDataProvider).location();
 
@@ -442,7 +421,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testIsValidDataProviderMethodShouldReturnFalseIfDataProviderMethodIsNull() {
-
         // Given:
 
         // When:
@@ -454,7 +432,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testIsValidDataProviderMethodShouldReturnFalseIfItIsNotPublic() {
-
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
@@ -469,7 +446,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testIsValidDataProviderMethodShouldReturnFalseIfItIsNotStatic() {
-
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
@@ -484,7 +460,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testIsValidDataProviderMethodShouldReturnFalseIfItRequiresAnyParameter() {
-
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
@@ -498,12 +473,81 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItDoesNotReturnObjectArrayArray() {
-
+    public void testIsValidDataProviderMethodShouldReturnFalseIfItDoesNotHaveCorrectReturnType() {
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        doReturn(getMethod("nonObjectArrayArrayReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(getMethod("stringReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
+
+        // When:
+        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testIsValidDataProviderMethodShouldReturnFalseIfItDoesNotReturnListOfList() {
+        // Given:
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+
+        doReturn(getMethod("listReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
+
+        // When:
+        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testIsValidDataProviderMethodShouldReturnFalseIfItReturnsListOfIterable() {
+        // Given:
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+
+        doReturn(getMethod("listOfIterableReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
+
+        // When:
+        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testIsValidDataProviderMethodShouldReturnFalseIfItReturnsIterableOfIterable() {
+        // Given:
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+
+        doReturn(getMethod("iterableOfIterableReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
+
+        // When:
+        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testIsValidDataProviderMethodShouldReturnFalseIfItReturnsSetOfSet() {
+        // Given:
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+
+        doReturn(getMethod("setOfSetReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
+
+        // When:
+        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testIsValidDataProviderMethodShouldReturnFalseIfItReturnsListOfListAndList() {
+        // Given:
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+
+        doReturn(getMethod("listOfListAndListReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
         boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
@@ -514,11 +558,38 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testIsValidDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsObjectArrayArray() {
-
         // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(getMethod("validDataProviderMethodArray")).when(dataProviderMethod).getMethod();
+
+        // When:
+        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testIsValidDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsListListObject() {
+        // Given:
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+
+        doReturn(getMethod("validDataProviderMethodList")).when(dataProviderMethod).getMethod();
+
+        // When:
+        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testIsValidDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsSubListSub¥ListObject() {
+        // Given:
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+
+        doReturn(getMethod("validDataProviderMethodSubList")).when(dataProviderMethod).getMethod();
 
         // When:
         boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
@@ -529,7 +600,6 @@ public class DataProviderRunnerTest {
 
     @Test(expected = Error.class)
     public void testExplodeTestMethodsShouldThrowErrorIfDataProviderMethodThrowsException() throws Throwable {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -544,7 +614,6 @@ public class DataProviderRunnerTest {
 
     @Test(expected = Error.class)
     public void testExplodeTestMethodsShouldThrowErrorIfDataProviderMethodReturnsNull() throws Throwable {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -560,7 +629,6 @@ public class DataProviderRunnerTest {
     @Test(expected = Error.class)
     public void testExplodeTestMethodsShouldThrowErrorIfDataProviderMethodReturnsEmptyObjectArrayArray()
             throws Throwable {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -574,9 +642,8 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testExplodeTestMethodsShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodReturnsOneRow()
+    public void testExplodeTestMethodsShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodArrayReturnsOneRow()
             throws Throwable {
-
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -597,9 +664,30 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testExplodeTestMethodsShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodReturnsMultipleRow()
+    public void testExplodeTestMethodsShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodListReturnsOneRow()
             throws Throwable {
+        // Given:
+        FrameworkMethod testMethod = mock(FrameworkMethod.class);
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
+        List<List<Object>> dataProviderMethodResult = toListOfList(new Object[][] { { 10L, 11, "12" } });
+        doReturn(dataProviderMethodResult).when(dataProviderMethod).invokeExplosively(null);
+
+        // When:
+        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
+
+        // Then:
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
+
+        DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) result.get(0);
+        assertThat(actual.idx).isEqualTo(0);
+        assertThat(actual.parameters).isEqualTo(dataProviderMethodResult.get(0).toArray());
+    }
+
+    @Test
+    public void testExplodeTestMethodsShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodArrayReturnsMultipleRow()
+            throws Throwable {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -631,6 +719,40 @@ public class DataProviderRunnerTest {
         assertThat(actual2.parameters).isEqualTo(dataProviderMethodResult[2]);
     }
 
+    @Test
+    public void testExplodeTestMethodsShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodListReturnsMultipleRow()
+            throws Throwable {
+        // Given:
+        FrameworkMethod testMethod = mock(FrameworkMethod.class);
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+
+        List<List<Object>> dataProviderMethodResult = toListOfList(new Object[][] { { 1, "a" }, { 3, "b" }, { 5, "c" } });
+        doReturn(dataProviderMethodResult).when(dataProviderMethod).invokeExplosively(null);
+
+        // When:
+        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
+
+        // Then:
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
+
+        DataProviderFrameworkMethod actual0 = (DataProviderFrameworkMethod) result.get(0);
+        assertThat(actual0.idx).isEqualTo(0);
+        assertThat(actual0.parameters).isEqualTo(dataProviderMethodResult.get(0).toArray());
+
+        assertThat(result.get(1)).isInstanceOf(DataProviderFrameworkMethod.class);
+
+        DataProviderFrameworkMethod actual1 = (DataProviderFrameworkMethod) result.get(1);
+        assertThat(actual1.idx).isEqualTo(1);
+        assertThat(actual1.parameters).isEqualTo(dataProviderMethodResult.get(1).toArray());
+
+        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
+
+        DataProviderFrameworkMethod actual2 = (DataProviderFrameworkMethod) result.get(2);
+        assertThat(actual2.idx).isEqualTo(2);
+        assertThat(actual2.parameters).isEqualTo(dataProviderMethodResult.get(2).toArray());
+    }
+
     private Method getMethod(String methodName, Class<?>... args) {
         final Class<? extends DataProviderRunnerTest> clazz = this.getClass();
         try {
@@ -646,7 +768,7 @@ public class DataProviderRunnerTest {
         return null;
     }
 
-    public Object[][] nonStaticDataProviderMethod() {
+    public List<List<Object>> nonStaticDataProviderMethod() {
         return null;
     }
 
@@ -654,12 +776,61 @@ public class DataProviderRunnerTest {
         return null;
     }
 
-    public static String nonObjectArrayArrayReturningDataProviderMethod() {
+    public static String stringReturningDataProviderMethod() {
         return null;
     }
 
-    public static Object[][] validDataProviderMethod() {
+    public static List<Object> listReturningDataProviderMethod() {
         return null;
     }
 
+    public static List<Iterable<Object>> listOfIterableReturningDataProviderMethod() {
+        return null;
+    }
+
+    public static Set<Set<Object>> iterableOfIterableReturningDataProviderMethod() {
+        return null;
+    }
+
+    public static Set<Set<Object>> setOfSetReturningDataProviderMethod() {
+        return null;
+    }
+
+    @SuppressWarnings("serial")
+    private static class TwoArgList<A, B> extends ArrayList<A> {
+        // not required for now :-)
+    }
+
+    public static TwoArgList<List<Object>, List<Object>> listOfListAndListReturningDataProviderMethod() {
+        return null;
+    }
+
+    public static Object[][] validDataProviderMethodArray() {
+        return null;
+    }
+
+    public static List<List<Object>> validDataProviderMethodList() {
+        return null;
+    }
+
+    @SuppressWarnings("serial")
+    private static class SubList<A> extends ArrayList<A> {
+        // not required for now :-)
+    }
+
+    public static SubList<SubList<Object>> validDataProviderMethodSubList() {
+        return null;
+    }
+
+    private static List<List<Object>> toListOfList(Object[][] objectArrayArray) {
+        List<List<Object>> result = new ArrayList<List<Object>>();
+        for (Object[] objectArray : objectArrayArray) {
+            List<Object> innerList = new ArrayList<Object>();
+            for (Object object : objectArray) {
+                innerList.add(object);
+            }
+            result.add(innerList);
+        }
+        return result;
+    }
 }

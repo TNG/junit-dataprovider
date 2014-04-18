@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/TNG/junit-dataprovider.png?branch=master)](https://travis-ci.org/TNG/junit-dataprovider)
 [![Coverage Status](https://coveralls.io/repos/TNG/junit-dataprovider/badge.png?branch=master)](https://coveralls.io/r/TNG/junit-dataprovider)
 
+
 junit-dataprovider
 ==================
 
@@ -11,6 +12,7 @@ junit-dataprovider
 [Download](#download)  
 [Usage example](#usage-example)  
 [Eclipse template](#eclipse-template)  
+[Contributing](#contributing)
 
 
 What is it
@@ -192,3 +194,8 @@ public static Object[][] dataProvider${Name}() {
 	// @formatter:on
 }
 ```
+
+Contributing
+------------
+
+You are very welcome to contribute by providing a patch/pull request.

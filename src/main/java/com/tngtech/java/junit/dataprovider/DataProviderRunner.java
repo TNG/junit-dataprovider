@@ -1,6 +1,8 @@
 package com.tngtech.java.junit.dataprovider;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,7 +191,11 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * <li>is public,</li>
      * <li>is static,</li>
      * <li>has no parameters, and</li>
-     * <li>returns an {@link Object}{@code [][]}.</li>
+     * <li>returns
+     * <ul>
+     * <li>{@link Object}{@code [][]}, or</li>
+     * <li>{@link List}{@code <}{@link List}{@code <}{@link Object}{@code >>}.</li>
+     * </ul>
      * </ul>
      * <p>
      * This method is package private (= visible) for testing.
@@ -199,13 +205,33 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * @return true if the method is a valid data provider, false otherwise
      */
     boolean isValidDataProviderMethod(FrameworkMethod dataProviderMethod) {
+        if (dataProviderMethod == null) {
+            return false;
+        }
+
+        Method method = dataProviderMethod.getMethod();
+
         // @formatter:off
-        return dataProviderMethod != null
-                && Modifier.isPublic(dataProviderMethod.getMethod().getModifiers())
-                && Modifier.isStatic(dataProviderMethod.getMethod().getModifiers())
-                && dataProviderMethod.getMethod().getParameterTypes().length == 0
-                && dataProviderMethod.getMethod().getReturnType().equals(Object[][].class);
+        boolean result = Modifier.isPublic(method.getModifiers())
+                && Modifier.isStatic(method.getModifiers())
+                && method.getParameterTypes().length == 0;
         // @formatter:on
+
+        if (result) {
+            Class<?> returnClass = method.getReturnType();
+            if (Object[][].class.equals(returnClass)) {
+                return true;
+
+            } else if (List.class.isAssignableFrom(returnClass)) {
+                ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
+                if (returnType.getActualTypeArguments().length == 1
+                        && returnType.getActualTypeArguments()[0] instanceof ParameterizedType) {
+                    ParameterizedType type = (ParameterizedType) returnType.getActualTypeArguments()[0];
+                    return List.class.isAssignableFrom((Class<?>) type.getRawType());
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -222,24 +248,28 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         int idx = 0;
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
 
-        Object[][] dataProviderMethodResult;
         try {
-            dataProviderMethodResult = (Object[][]) dataProviderMethod.invokeExplosively(null);
+            Object dataProvider = dataProviderMethod.invokeExplosively(null);
+            if (dataProvider instanceof Object[][]) {
+                for (Object[] parameters : (Object[][]) dataProvider) {
+                    result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
+                }
+
+            } else if (dataProvider instanceof List) {
+                // must be List<List<Object>>, see #isValidDataProviderMethod
+                @SuppressWarnings("unchecked")
+                List<List<Object>> lists = (List<List<Object>>) dataProvider;
+                for (List<Object> parameters : lists) {
+                    result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
+                }
+            }
         } catch (Throwable t) {
             throw new Error(String.format("Exception while exploding test method using data provider '%s': %s",
                     dataProviderMethod.getName(), t.getMessage()), t);
         }
-        if (dataProviderMethodResult == null) {
-            throw new Error(String.format("Data provider method '%s' must not return 'null'.",
-                    dataProviderMethod.getName()));
-        }
-        if (dataProviderMethodResult.length == 0) {
-            throw new Error(String.format("Data provider '%s' must not return an empty object array.",
-                    dataProviderMethod.getName()));
-        }
 
-        for (Object[] parameters : dataProviderMethodResult) {
-            result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
+        if (result.isEmpty()) {
+            throw new Error(String.format("Data provider '%s' must not be empty.", dataProviderMethod.getName()));
         }
         return result;
     }
