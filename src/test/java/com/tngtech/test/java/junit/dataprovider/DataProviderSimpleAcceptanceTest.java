@@ -2,7 +2,9 @@ package com.tngtech.test.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -125,5 +127,34 @@ public class DataProviderSimpleAcceptanceTest {
 
         // Then:
         assertThat(result).isEqualTo(cal1IsEarlierThenCal2);
+    }
+
+    @DataProvider
+    public static List<List<Object>> dataProviderNumberFormat() {
+
+        List<List<Object>> result = new ArrayList<List<Object>>();
+        List<Object> first = new ArrayList<Object>();
+        first.add(Integer.valueOf(101));
+        first.add("%5d");
+        first.add("  101");
+        result.add(first);
+        List<Object> second = new ArrayList<Object>();
+        second.add(12.5);
+        second.add("%0,10g");
+        second.add("00012,5000");
+        result.add(second);
+        return result;
+    }
+
+    @Test
+    @UseDataProvider("dataProviderNumberFormat")
+    public void testNumberFormat(Number number, String format, String expected) {
+        // Given:
+
+        // When:
+        String result = String.format(format, number);
+
+        // Then:
+        assertThat(result).isEqualTo(expected);
     }
 }
