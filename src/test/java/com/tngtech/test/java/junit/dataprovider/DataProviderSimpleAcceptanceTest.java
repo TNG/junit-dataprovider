@@ -139,9 +139,9 @@ public class DataProviderSimpleAcceptanceTest {
         first.add("  101");
         result.add(first);
         List<Object> second = new ArrayList<Object>();
-        second.add(12.5);
-        second.add("%0,10g");
-        second.add("00012,5000");
+        second.add(125);
+        second.add("%06d");
+        second.add("000125");
         result.add(second);
         return result;
     }
