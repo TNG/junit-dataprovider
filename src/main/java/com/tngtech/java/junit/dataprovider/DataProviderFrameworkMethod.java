@@ -41,6 +41,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         this.parameters = Arrays.copyOf(parameters, parameters.length);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_NULL_PARAM_DEREF")
     public DataProviderFrameworkMethod(Method method, int idx, List<Object> parameters) {
         this(method, idx, (parameters == null) ? null : parameters.toArray());
     }
