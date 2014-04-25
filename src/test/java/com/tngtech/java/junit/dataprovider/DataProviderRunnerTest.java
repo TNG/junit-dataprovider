@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Categories;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
 import org.mockito.Mock;
@@ -71,8 +72,10 @@ public class DataProviderRunnerTest {
         // Then: expect no exception
     }
 
-    @Test
-    public void testFilterShouldNotThrowExceptionForNonJUnitFilter() throws Exception {
+    @Test(expected = NoTestsRemainException.class)
+    public void testFilterShouldThrowNoTestRemainExceptionForNonBlacklistedAndRecognizableFilterHavingNoTestMethods()
+            throws Exception {
+
         // Given:
         Filter filter = new Filter() {
             @Override
@@ -82,7 +85,7 @@ public class DataProviderRunnerTest {
 
             @Override
             public String describe() {
-                return "test filter in package 'com.tngtech.java.dataprovider' which runs all tests";
+                return "testMethod(com.tngtech.java.junit.dataprovider.Test)";
             }
         };
 
@@ -751,6 +754,19 @@ public class DataProviderRunnerTest {
         DataProviderFrameworkMethod actual2 = (DataProviderFrameworkMethod) result.get(2);
         assertThat(actual2.idx).isEqualTo(2);
         assertThat(actual2.parameters).isEqualTo(dataProviderMethodResult.get(2).toArray());
+    }
+
+    @Test
+    public void testIsFilterBlackListedShouldReturnFalseForJunitPackagedFilter() throws Exception {
+
+        // Given:
+        Filter filter = Filter.ALL;
+
+        // When:
+        boolean result = underTest.isFilterBlackListed(filter);
+
+        // Then:
+        assertThat(result).isFalse();
     }
 
     private Method getMethod(String methodName, Class<?>... args) {

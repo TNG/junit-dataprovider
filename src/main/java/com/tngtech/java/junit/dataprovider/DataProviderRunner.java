@@ -25,17 +25,21 @@ import org.junit.runners.model.TestClass;
 public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     /**
+     * A list of filter packages which must not be wrapped by DataProviderRunner (this is a workaround for some plugins,
+     * e.g. the maven-surefire-plugin).
+     */
+    // @formatter:off
+    private static final List<String> BLACKLISTED_FILTER_PACKAGES = Arrays.asList(
+            "org.apache.maven.surefire"
+        );
+    // @formatter:on
+
+    /**
      * <p>
      * This field is package private (= visible) for testing.
      * </p>
      */
     List<FrameworkMethod> computedTestMethods;
-
-    /**
-     * A list of filter packages which must not be wrapped by DataProviderRunner
-     * (this is a workaround for some plugins, e.g. the maven-surefire-plugin).
-     */
-    private static final List<String> BLACKLISTED_FILTER_PACKAGES = Arrays.asList("org.apache.maven.surefire");
 
     /**
      * Creates a DataProviderRunner to run supplied {@code clazz}.
@@ -289,9 +293,14 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         return getTestClass();
     }
 
-    private boolean isFilterBlackListed(Filter filter) {
+    /**
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     */
+    boolean isFilterBlackListed(Filter filter) {
         String className = filter.getClass().getName();
-        for (String blacklistedPackage: BLACKLISTED_FILTER_PACKAGES) {
+        for (String blacklistedPackage : BLACKLISTED_FILTER_PACKAGES) {
             if (className.startsWith(blacklistedPackage)) {
                 return true;
             }
