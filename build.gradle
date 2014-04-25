@@ -3,6 +3,7 @@ apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 apply plugin: 'java'
 apply plugin: 'findbugs'
+apply plugin: 'cpd'
 
 buildscript {
     repositories {
@@ -11,6 +12,7 @@ buildscript {
 
     dependencies {
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.4.0'
+        classpath 'de.aaschmid.gradle.plugins:gradle-cpd-plugin:0.1'
     }
 }
 
@@ -88,6 +90,11 @@ jacoco {
 findbugs {
     toolVersion = '2.0.1'
     ignoreFailures = true
+}
+
+tasks.cpd {
+    minimumTokenCount = 25
+    source = sourceSets.main.java.srcDirs + sourceSets.test.java.srcDirs
 }
 
 artifacts {
