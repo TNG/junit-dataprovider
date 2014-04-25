@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -31,6 +32,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     List<FrameworkMethod> computedTestMethods;
 
     /**
+     * A list of filter packages which must not be wrapped by DataProviderRunner
+     * (this is a workaround for some plugins, e.g. the maven-surefire-plugin).
+     */
+    private static final List<String> BLACKLISTED_FILTER_PACKAGES = Arrays.asList("org.apache.maven.surefire");
+
+    /**
      * Creates a DataProviderRunner to run supplied {@code clazz}.
      *
      * @param clazz the test {@link Class} to run
@@ -43,7 +50,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     @Override
     public void filter(Filter filter) throws NoTestsRemainException {
         Filter useFilter;
-        if (!(filter instanceof CategoryFilter) && filter.getClass().getName().startsWith("org.junit")) {
+        if (!(filter instanceof CategoryFilter) && !isFilterBlackListed(filter)) {
             useFilter = new DataProviderFilter(filter);
         } else {
             useFilter = filter;
@@ -280,5 +287,15 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      */
     TestClass getTestClassInt() {
         return getTestClass();
+    }
+
+    private boolean isFilterBlackListed(Filter filter) {
+        String className = filter.getClass().getName();
+        for (String blacklistedPackage: BLACKLISTED_FILTER_PACKAGES) {
+            if (className.startsWith(blacklistedPackage)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
