@@ -1,5 +1,10 @@
 language: java
 
+script:
+  - gradle build
+  - mvn test
+  - ant test
+
 jdk:
   - oraclejdk7
   - openjdk7
