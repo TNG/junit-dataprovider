@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="junit-dataprovider" basedir=".">
+
+    <!-- Folders and files -->
+    <property name="src.dir" location="${basedir}/src" />
+    <property name="src.main.java.dir" location="${src.dir}/main/java" />
+    <property name="src.test.java.dir" location="${src.dir}/test/java" />
+
+    <property name="libs.dir" location="${user.home}/.gradle/caches/modules-2/" />
+
+    <property name="build.dir" location="${basedir}/build" />
+    <property name="build.classes.dir" location="${build.dir}/classes" />
+    <property name="build.classes.main.dir" location="${build.classes.dir}/main" />
+    <property name="build.classes.test.dir" location="${build.classes.dir}/test" />
+
+    <property name="test.reports.dir" location="${build.dir}/reports/ant-tests" />
+
+    <!-- Libraries -->
+    <fileset id="libs.fileset" dir="${libs.dir}">
+        <include name="**/junit-dep-4.8.2.jar" />
+        <include name="**/hamcrest-core-1.1.jar" />
+        <include name="**/assertj-core-1.2.0.jar" />
+    </fileset>
+
+    <!-- Targets -->
+    <target name="init" />
+
+    <target name="check-libs.fileset-is-not-empty">
+        <pathconvert refid="libs.fileset" property="libs.fileset.notempty" setonempty="false" />
+        <fail unless="libs.fileset.notempty">
+            Run './gradlew build' first due to missing Gradle libraries in ${libs.dir}!
+        </fail>
+
+        <available file="${build.classes.dir}" property="build.classes.dir.exists" />
+        <fail unless="build.classes.dir.exists">
+            Run './gradlew build' first due to missing class files in ${build.classes.dir}.
+        </fail>
+    </target>
+
+    <target name="test" depends="init, check-libs.fileset-is-not-empty">
+
+        <delete dir="${test.reports.dir}" />
+        <mkdir dir="${test.reports.dir}" />
+
+        <junit haltonerror="true" haltonfailure="true">
+            <classpath>
+                <pathelement location="${build.classes.main.dir}" />
+                <pathelement location="${build.classes.test.dir}" />
+
+                <fileset refid="libs.fileset" />
+            </classpath>
+
+            <formatter type="xml" />
+
+            <!-- Categories test -->
+            <batchtest todir="${test.reports.dir}">
+                <fileset dir="${build.classes.test.dir}">
+                    <include name="**/Category*TestSuite.class" />
+                </fileset>
+            </batchtest>
+
+            <!-- Single method of Test class -->
+            <test todir="${test.reports.dir}"
+                  name="com.tngtech.test.java.junit.dataprovider.DataProviderSimpleAcceptanceTest"
+                  methods="testIsStringLengthGreaterThanTwo" />
+
+        </junit>
+    </target>
+</project>
