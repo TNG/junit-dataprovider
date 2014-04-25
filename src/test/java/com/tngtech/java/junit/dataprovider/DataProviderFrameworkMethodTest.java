@@ -32,7 +32,7 @@ public class DataProviderFrameworkMethodTest {
 
         // When:
         @SuppressWarnings("unused")
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, (List<Object>) null);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 1, (List<Object>) null);
 
         // Then: expect exception
     }
@@ -44,7 +44,7 @@ public class DataProviderFrameworkMethodTest {
 
         // When:
         @SuppressWarnings("unused")
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, new Object[0]);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 2, new Object[0]);
 
         // Then: expect exception
     }
@@ -56,7 +56,7 @@ public class DataProviderFrameworkMethodTest {
 
         // When:
         @SuppressWarnings("unused")
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, new ArrayList<Object>());
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 3, new ArrayList<Object>());
 
         // Then: expect exception
     }
@@ -67,7 +67,7 @@ public class DataProviderFrameworkMethodTest {
         final Object[] parameters = new Object[] { null, "1", 2L };
 
         // When:
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 1, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 4, parameters);
 
         // Then:
         assertThat(underTest).isNotNull();
@@ -80,7 +80,7 @@ public class DataProviderFrameworkMethodTest {
         final List<Object> parameters = list(null, "1", 2L);
 
         // When:
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 1, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 5, parameters);
 
         // Then:
         assertThat(underTest).isNotNull();
@@ -93,13 +93,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { 718 };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 2, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 6, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[2: 718]");
+        assertThat(result).matches(method.getName() + "\\[6: 718]");
     }
 
     @Test
@@ -108,13 +108,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { null };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 3, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 7, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[3: <null>]");
+        assertThat(result).matches(method.getName() + "\\[7: <null>]");
     }
 
     @Test
@@ -123,13 +123,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { null, null };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 8, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[4: <null>, <null>]");
+        assertThat(result).matches(method.getName() + "\\[8: <null>, <null>]");
     }
 
     @Test
@@ -138,13 +138,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { "" };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 9, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[4: <empty string>]");
+        assertThat(result).matches(method.getName() + "\\[9: <empty string>]");
     }
 
     @Test
@@ -153,13 +153,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { new String[] { "test" } };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 10, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[4: \\[test]]");
+        assertThat(result).matches(method.getName() + "\\[10: \\[test]]");
     }
 
     @Test
@@ -168,13 +168,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { new boolean[] { true, false } };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 5, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 11, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[5: \\[true, false]]");
+        assertThat(result).matches(method.getName() + "\\[11: \\[true, false]]");
     }
 
     @Test
@@ -183,13 +183,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { new char[] { 'a', '0' } };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 6, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 12, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[6: \\[a, 0]]");
+        assertThat(result).matches(method.getName() + "\\[12: \\[a, 0]]");
     }
 
     @Test
@@ -198,13 +198,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { new int[] { 11, 2 } };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 7, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 13, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[7: \\[11, 2]]");
+        assertThat(result).matches(method.getName() + "\\[13: \\[11, 2]]");
     }
 
     @Test
@@ -213,13 +213,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { new double[] { .78, 3.15E2 } };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 8, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 14, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[8: \\[0.78, 315.0]]");
+        assertThat(result).matches(method.getName() + "\\[14: \\[0.78, 315.0]]");
     }
 
     @Test
@@ -228,13 +228,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { new Object[] { 1, new String[] { "a", "b", "c" } } };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 4, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 15, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[4: \\[1, \\[a, b, c]]]");
+        assertThat(result).matches(method.getName() + "\\[15: \\[1, \\[a, b, c]]]");
     }
 
     @Test
@@ -243,13 +243,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final Object[] parameters = new Object[] { 1024, "32", 128L };
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 1, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 16, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[1: 1024, 32, 128\\]");
+        assertThat(result).matches(method.getName() + "\\[16: 1024, 32, 128\\]");
     }
 
     @Test
@@ -258,13 +258,13 @@ public class DataProviderFrameworkMethodTest {
         Method method = anyMethod();
         final List<Object> parameters = list(Integer.valueOf(44), "foo", BigDecimal.ONE);
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 1, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 17, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[1: 44, foo, 1\\]");
+        assertThat(result).matches(method.getName() + "\\[17: 44, foo, 1\\]");
     }
 
     @Test
@@ -273,8 +273,8 @@ public class DataProviderFrameworkMethodTest {
         final Object[] params1 = new Object[] { "5", 6, 7L };
         final Object[] params2 = new Object[] { "5", 6, 7L };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 3, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 3, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 18, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 18, params2);
 
         // When:
         int result = m1.hashCode();
@@ -289,8 +289,8 @@ public class DataProviderFrameworkMethodTest {
         final List<Object> params1 = list("101", 102, 103L);
         final List<Object> params2 = list("101", 102, 103L);
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 3, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 3, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 19, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 19, params2);
 
         // When:
         int result = m1.hashCode();
@@ -305,8 +305,8 @@ public class DataProviderFrameworkMethodTest {
         final Object[] params1 = new Object[] { null, "8", 9, 10L };
         final Object[] params2 = new Object[] { null, "8", 9, 10L };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 4, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 4, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 20, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 20, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -321,8 +321,8 @@ public class DataProviderFrameworkMethodTest {
         final List<Object> params1 = list(104L, 105, null, "106");
         final List<Object> params2 = list(104L, 105, null, "106");
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 4, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 4, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 21, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 21, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -337,8 +337,8 @@ public class DataProviderFrameworkMethodTest {
         final Object[] params1 = new Object[] { 107L, "108", null };
         final List<Object> params2 = list(107L, "108", null);
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 4, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 4, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 22, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 22, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -353,8 +353,8 @@ public class DataProviderFrameworkMethodTest {
         final Object[] params1 = new Object[] { null, "11", 12, 13L };
         final Object[] params2 = new Object[] { null, "11", 12, 13L };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 5, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 6, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 23, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 24, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -369,8 +369,8 @@ public class DataProviderFrameworkMethodTest {
         final Object[] params1 = new Object[] { "test111", 222L, 333 };
         final Object[] params2 = new Object[] { "test111", 223L, 333 };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 7, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 7, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 25, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 25, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -385,8 +385,8 @@ public class DataProviderFrameworkMethodTest {
         final List<Object> params1 = list("bar5", 123L);
         final List<Object> params2 = list("bar5", 124L);
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 7, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 7, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 26, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 26, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -401,8 +401,8 @@ public class DataProviderFrameworkMethodTest {
         final Object[] params1 = new Object[] { 14, 25L, 36 };
         final Object[] params2 = new Object[] { "14", 25, 36L };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 8, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 8, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 27, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 27, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -417,8 +417,8 @@ public class DataProviderFrameworkMethodTest {
         final List<Object> params1 = list(91, 92L, 93);
         final List<Object> params2 = list("91", 92, 93L);
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 8, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 8, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 28, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 28, params2);
 
         // When:
         boolean result = m1.equals(m2);

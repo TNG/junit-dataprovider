@@ -227,7 +227,7 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribtionPatternShouldNotMatchEmptyString() {
+    public void testDescriptionPatternShouldNotMatchEmptyString() {
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("");
 
@@ -239,7 +239,7 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribtionPatternShouldMatchDescriptionWithoutParams() {
+    public void testDescriptionPatternShouldMatchDescriptionWithoutParams() {
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain(Clazz)");
 
@@ -252,7 +252,7 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribtionPatternShouldMatchDescriptionWithParams() {
+    public void testDescriptionPatternShouldMatchDescriptionWithParams() {
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
 
@@ -265,7 +265,7 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribtionPatternShouldMatchescriptionWithParamsContainingParentheses() {
+    public void testDescriptionPatternShouldMatchescriptionWithParamsContainingParentheses() {
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: (test)](Clazz)");
 
@@ -278,9 +278,9 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribtionPatternShouldNotMatchDescriptionWithoutParamsAndSpaceInMethodName() {
+    public void testDescriptionPatternShouldNotMatchDescriptionWithoutParamsAndSpaceInMethodName() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method testMain(Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test Main(Clazz)");
 
         // When:
         boolean result = matcher.matches();
@@ -290,9 +290,9 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribtionPatternShouldNotMatchDescriptionWithParamsAndSpaceInMethodName() {
+    public void testDescriptionPatternShouldNotMatchDescriptionWithParamsAndSpaceInMethodName() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method testMain[1: test](Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test Main[1: test](Clazz)");
 
         // When:
         boolean result = matcher.matches();
@@ -302,7 +302,7 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribtionPatternShouldNotMatchDescriptionWithMethodNameContainingBrackets() {
+    public void testDescriptionPatternShouldNotMatchDescriptionWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(Clazz)");
 
@@ -314,33 +314,7 @@ public class DataProviderFilterTest {
     }
 
     @Test
-    public void testDescribtionPatternShouldFindDescriptionWithParams() {
-        // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
-
-        // When:
-        boolean result = matcher.find();
-
-        // Then:
-        assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "testMain", "[1: test]", "1", "Clazz");
-    }
-
-    @Test
-    public void testDescribtionPatternShouldFindDescriptionWithoutParams() {
-        // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
-
-        // When:
-        boolean result = matcher.find();
-
-        // Then:
-        assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "testMain", "[1: test]", "1", "Clazz");
-    }
-
-    @Test
-    public void testDescribtionPatternShouldFindDescriptionWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
+    public void testDescriptionPatternShouldFindDescriptionWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(Clazz)");
 
