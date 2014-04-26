@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tngtech.java</groupId>
@@ -15,22 +15,40 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>CategoryOne</id>
-            <properties>
-                <testcase.groups>com.tngtech.test.java.junit.dataprovider.category.CategoryOne</testcase.groups>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
+        <directory>build/maven-target</directory>
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <groups>${testcase.groups}</groups>
-                </configuration>
+                <version>2.17</version>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>single group</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <groups>com.tngtech.test.java.junit.dataprovider.category.CategoryOne</groups>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>single test class</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>com/tngtech/test/java/junit/dataprovider/DataProviderSimpleAcceptanceTest.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -44,7 +62,7 @@
 
         <dependency>
             <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
+            <artifactId>junit</artifactId>
             <version>4.8.2</version>
             <scope>provided</scope>
         </dependency>

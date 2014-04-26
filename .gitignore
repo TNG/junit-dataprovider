@@ -1,7 +1,6 @@
 bin/
 build/
 out/
-target/
 .classpath
 .gradle
 .idea

@@ -50,18 +50,20 @@
                 <fileset refid="libs.fileset" />
             </classpath>
 
-            <formatter type="xml" />
+            <formatter usefile="false" type="brief" />
 
-            <!-- Categories test -->
-            <batchtest todir="${test.reports.dir}">
+            <!-- single category -->
+            <batchtest>
                 <fileset dir="${build.classes.test.dir}">
-                    <include name="**/Category*TestSuite.class" />
+                    <include name="**/CategoryOneTestSuite.class" />
                 </fileset>
             </batchtest>
 
-            <!-- Single method of Test class -->
-            <test todir="${test.reports.dir}"
-                  name="com.tngtech.test.java.junit.dataprovider.DataProviderSimpleAcceptanceTest"
+            <!-- single test class -->
+            <test name="com.tngtech.test.java.junit.dataprovider.DataProviderSimpleAcceptanceTest" />
+
+            <!-- single test method -->
+            <test name="com.tngtech.test.java.junit.dataprovider.DataProviderSimpleAcceptanceTest"
                   methods="testIsStringLengthGreaterThanTwo" />
 
         </junit>
