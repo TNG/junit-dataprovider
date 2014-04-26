@@ -17,10 +17,11 @@
 
     <!-- Libraries -->
     <fileset id="libs.fileset" dir="${libs.dir}">
-        <include name="**/junit-*.jar" />
+        <include name="**/assertj-*.jar" />
+        <include name="**/asm-*.jar" />
         <include name="**/groovy-*.jar" />
         <include name="**/hamcrest-*.jar" />
-        <include name="**/assertj-*.jar" />
+        <include name="**/junit-*.jar" />
     </fileset>
 
     <!-- Targets -->
