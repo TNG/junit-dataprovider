@@ -6,13 +6,15 @@ junit-dataprovider
 ==================
 
 #### Table of Contents  
-[What is it](#what-is-it)  
-[Motivation and distinction](#motivation-and-distinction)  
-[Requirements](#requirements)  
-[Download](#download)  
-[Usage example](#usage-example)  
-[Eclipse template](#eclipse-template)  
-[Contributing](#contributing)
+* [What is it](#what-is-it)  
+* [Motivation and distinction](#motivation-and-distinction) 
+* [Requirements](#requirements)  
+* [Download](#download)  
+* [Usage example](#usage-example)  
+** [Array syntax](#array-syntax)
+** [List syntax](#list-syntax)
+* [Eclipse template](#eclipse-template)  
+* [Contributing](#contributing)
 
 
 What is it
@@ -102,6 +104,11 @@ the **Dependency Information** section how to integrate it with your dependency 
 Usage example
 -------------
 
+### Array syntax 
+
+For example using [Java](https://www.java.com/):
+
+
 ```java
 import static org.junit.Assert.*;
 
@@ -173,6 +180,45 @@ public class StringDataProvider {
 }
 ```
 
+## List syntax
+
+For example using [Groovy](http://groovy.codehaus.org/) (if you are not able 
+to use [Spock](http://spock-framework.readthedocs.org)):
+
+```groovy
+import static org.assertj.core.api.Assertions.assertThat
+
+import org.junit.Test
+import org.junit.runner.RunWith
+
+import com.tngtech.java.junit.dataprovider.DataProvider
+import com.tngtech.java.junit.dataprovider.DataProviderRunner
+import com.tngtech.java.junit.dataprovider.UseDataProvider
+
+@RunWith(DataProviderRunner)
+class DataProviderTest {
+
+    @DataProvider
+    static List<List<Object>> dataProviderBooleanLogicAnd() {
+        // @formatter:off
+        return [
+            [ false,  false,  false ],
+            [ true,   false,  false ],
+            [ false,  true,   false ],
+            [ true,   true,   true ],
+        ]
+        // @formatter:on
+    }
+
+    @Test
+    @UseDataProvider('dataProviderBooleanLogicAnd')
+    void 'test boolean logic for "and"'(op1, op2, expected) {
+        // Expect:
+        assert (op1 && op2) == expected
+    }
+}
+
+```
 
 Eclipse template
 ----------------
