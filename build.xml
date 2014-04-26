@@ -17,9 +17,10 @@
 
     <!-- Libraries -->
     <fileset id="libs.fileset" dir="${libs.dir}">
-        <include name="**/junit-dep-4.8.2.jar" />
-        <include name="**/hamcrest-core-1.1.jar" />
-        <include name="**/assertj-core-1.2.0.jar" />
+        <include name="**/junit-*.jar" />
+        <include name="**/groovy-*.jar" />
+        <include name="**/hamcrest-*.jar" />
+        <include name="**/assertj-*.jar" />
     </fileset>
 
     <!-- Targets -->
@@ -60,10 +61,10 @@
             </batchtest>
 
             <!-- single test class -->
-            <test name="com.tngtech.test.java.junit.dataprovider.DataProviderSimpleAcceptanceTest" />
+            <test name="com.tngtech.test.java.junit.dataprovider.DataProviderGroovyAcceptanceTest" />
 
             <!-- single test method -->
-            <test name="com.tngtech.test.java.junit.dataprovider.DataProviderSimpleAcceptanceTest"
+            <test name="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest"
                   methods="testIsStringLengthGreaterThanTwo" />
 
         </junit>

@@ -44,7 +44,7 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>com/tngtech/test/java/junit/dataprovider/DataProviderSimpleAcceptanceTest.java</include>
+                                <include>com/tngtech/test/java/junit/dataprovider/DataProviderJavaAcceptanceTest.java</include>
                             </includes>
                         </configuration>
                     </execution>

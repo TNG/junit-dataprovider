@@ -1,5 +1,6 @@
 apply plugin: 'coveralls'
 apply plugin: 'eclipse'
+apply plugin: 'groovy'
 apply plugin: 'jacoco'
 apply plugin: 'java'
 apply plugin: 'findbugs'
@@ -30,6 +31,7 @@ dependencies {
     compile group: 'junit', name: 'junit-dep', version: '4.8.2'
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
     
+    testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.2.2'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '1.2.0'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
 }
