@@ -6,14 +6,15 @@ junit-dataprovider
 ==================
 
 #### Table of Contents  
-* [What is it](#what-is-it)  
-* [Motivation and distinction](#motivation-and-distinction) 
-* [Requirements](#requirements)  
-* [Download](#download)  
-* [Usage example](#usage-example)  
-** [Array syntax](#array-syntax)
-** [List syntax](#list-syntax)
-* [Eclipse template](#eclipse-template)  
+* [What is it](#what-is-it)
+* [Motivation and distinction](#motivation-and-distinction)
+* [Requirements](#requirements)
+* [Download](#download)
+* [Usage example](#usage-example) 
+	* [Array syntax](#array-syntax)
+	* [List syntax](#list-syntax)
+* [Release notes](#release-notes)
+* [Eclipse template](#eclipse-template)
 * [Contributing](#contributing)
 
 
@@ -97,7 +98,8 @@ Download
 
 All released (= tagged) versions are available at 
 [Maven Central Repository](http://search.maven.org/#search|ga|1|a%3A%22junit-dataprovider%22). 
-Following this link you can choose a version. Now either download it manually or see 
+Following this link you can choose a version. For more information about a certain version, see
+[release notes](#release-notes). Now either download it manually or see 
 the **Dependency Information** section how to integrate it with your dependency management tool.
 
 
@@ -180,7 +182,7 @@ public class StringDataProvider {
 }
 ```
 
-## List syntax
+### List syntax
 
 For example using [Groovy](http://groovy.codehaus.org/) (if you are not able 
 to use [Spock](http://spock-framework.readthedocs.org)):
@@ -219,6 +221,63 @@ class DataProviderTest {
 }
 
 ```
+
+Release notes
+-------------
+
+### v1.6.0 (26-Apr-2014)
+
+* fixed bug in fix [#16](/../../issues/16) using IntelliJ ([#18](/../../issues/18) with merge [#19](/../../issues/19))
+* added support for ```List<List<Object>>``` besides ```Object[][]``` for languages with native ```List``` support ([#17](/../../issues/17)) 
+
+### v1.5.2 (10-Mar-2014)
+
+* fixed ```IllegalArgumentException``` if using maven with category filter ([#16](/../../issues/16)) 
+
+### v1.5.1 (07-Mar-2014)
+
+* adjusted depedencies of uploaded 'pom.xml' (especially for [JUnit] => 'provided') (#[#15](/../../issues/15))
+* fixed that ```DataProviderRunner``` is incompatible with ```Categories``` ([#14](/../../issues/14))
+* added LICENSE.TXT with Apache License 2.0 ([#13](/../../issues/13))
+* fixed MANIFEST.MF
+* better error message for not parsable filter
+
+### v1.5.0 (03-May-2013)
+
+* added ability that data provider is located in a completely different class
+
+### v1.4.1 (02-May-2013)
+
+* fixed ```ClassCastException``` in ```formatParameter``` if array is of primitive type
+
+### v1.4.0 (01-May-2013)
+
+* fixed issue with ability to run single junit-dataprovider row/method ([#11](/../../issues/11))
+*  fixed appearence of "unrooted test" in JUnit Eclipse plugin ([#7](/../../issues/7)) 
+
+### v1.3.0 (28-Apr-2013)
+
+* ability to run single junit-dataprovider row/method ([#9](/../../issues/9))
+* always show all parameters of junit-dataprovider in test method name ([#8](/../../issues/8))
+* set username/password for MavenCentral conditionally ([#6](/../../issues/6))
+
+### v1.2.0 (07-Mar-2013)
+
+* enabled compatibility to junit v4.8.2
+* added conditional signing [#4](/../../issues/4)
+
+
+### v1.1.0 (02-Mar-2013)
+
+* removed flag whether last parameter is an expected value
+* refactoring that junt-dataprovider is testable and added a lot of tests
+* transfered code from [lepokle](https://github.com/lepokle) to [TNG](https://github.com/TNG) ([#1](/../../issues/1), [#2](/../../issues/2) and [#3](/../../issues/3))
+
+
+### v1.0.0 (22-Feb-2013)
+
+* initial release
+
 
 Eclipse template
 ----------------
