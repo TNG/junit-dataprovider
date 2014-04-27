@@ -236,7 +236,7 @@ Release notes
 
 ### v1.5.1 (07-Mar-2014)
 
-* adjusted depedencies of uploaded 'pom.xml' (especially for [JUnit] => 'provided') (#[#15](/../../issues/15))
+* adjusted depedencies of uploaded 'pom.xml' (especially for JUnit => 'provided') (#[#15](/../../issues/15))
 * fixed that ```DataProviderRunner``` is incompatible with ```Categories``` ([#14](/../../issues/14))
 * added LICENSE.TXT with Apache License 2.0 ([#13](/../../issues/13))
 * fixed MANIFEST.MF
@@ -271,7 +271,7 @@ Release notes
 
 * removed flag whether last parameter is an expected value
 * refactoring that junt-dataprovider is testable and added a lot of tests
-* transfered code from [lepokle](https://github.com/lepokle) to [TNG](https://github.com/TNG) ([#1](/../../issues/1), [#2](/../../issues/2) and [#3](/../../issues/3))
+* transfered code to [TNG](https://github.com/TNG) ([#1](/../../issues/1), [#2](/../../issues/2) and [#3](/../../issues/3))
 
 
 ### v1.0.0 (22-Feb-2013)
