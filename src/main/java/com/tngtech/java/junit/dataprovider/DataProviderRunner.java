@@ -87,7 +87,13 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             throw new IllegalArgumentException("errors must not be null");
         }
         for (FrameworkMethod method : getTestClassInt().getAnnotatedMethods(Test.class)) {
-            if (method.getAnnotation(UseDataProvider.class) == null) {
+            UseDataProvider useDataProviderAnnotation = method.getAnnotation(UseDataProvider.class);
+            DataProvider dataProviderAnnotation = method.getAnnotation(DataProvider.class);
+
+            if (useDataProviderAnnotation != null && dataProviderAnnotation != null) { // TODO Test
+                errors.add(new Exception(String.format("Method %s() should either have %s or %s annotation",
+                        method.getName(), UseDataProvider.class.getSimpleName(), DataProvider.class.getSimpleName())));
+            } else if (useDataProviderAnnotation == null && dataProviderAnnotation == null) {
                 method.validatePublicVoidNoArg(false, errors);
             } else {
                 method.validatePublicVoid(false, errors);
@@ -148,7 +154,13 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             if (isValidDataProviderMethod(dataProviderMethod)) {
                 result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
             } else {
-                result.add(testMethod);
+                DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
+                if (dataProvider == null) {
+                    result.add(testMethod);
+
+                } else {
+                    result.addAll(explodeTestMethod(testMethod, dataProvider));
+                }
             }
         }
         return result;
@@ -260,16 +272,16 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
 
         try {
-            Object dataProvider = dataProviderMethod.invokeExplosively(null);
-            if (dataProvider instanceof Object[][]) {
-                for (Object[] parameters : (Object[][]) dataProvider) {
+            Object data = dataProviderMethod.invokeExplosively(null);
+            if (data instanceof Object[][]) {
+                for (Object[] parameters : (Object[][]) data) {
                     result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
                 }
 
-            } else if (dataProvider instanceof List) {
+            } else if (data instanceof List) {
                 // must be List<List<Object>>, see #isValidDataProviderMethod
                 @SuppressWarnings("unchecked")
-                List<List<Object>> lists = (List<List<Object>>) dataProvider;
+                List<List<Object>> lists = (List<List<Object>>) data;
                 for (List<Object> parameters : lists) {
                     result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
                 }
@@ -283,6 +295,92 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             throw new Error(String.format("Data provider '%s' must not be empty.", dataProviderMethod.getName()));
         }
         return result;
+    }
+
+    /**
+     * TODO Creates a list of test methods out of an existing test method and its data provider method.
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     *
+     * @param testMethod the original test method
+     * @param dataProviderMethod the data provider method that gives the parameters
+     * @return a list of methods, each method bound to a parameter combination returned by the data provider
+     */
+    List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+
+        try {
+            String[] data = dataProvider.value();
+
+            // TODO was ist mit typen der argumente?
+            // TODO könnte man bei den validierungen schon überprüfen?
+            int requiredArguments = testMethod.getMethod().getParameterTypes().length;
+            int methodCount = data.length / requiredArguments;
+            if (data.length % requiredArguments == 0) {
+                for (int idx = 0; idx < methodCount; idx++) {
+                    Object[] parameters = new Object[requiredArguments];
+                    for (int jdx = 0; jdx < parameters.length; jdx++) {
+                        parameters[jdx] = cast(data[idx * requiredArguments + jdx],
+                                testMethod.getMethod().getParameterTypes()[jdx]);
+                    }
+                    result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
+                }
+            } else {
+                // TODO exception
+            }
+
+        } catch (Throwable t) {
+            throw new Error(String.format("Exception while exploding test method using %ss value attribute: %s",
+                    dataProvider.getClass().getSimpleName(), t.getMessage()), t);
+        }
+
+        if (result.isEmpty()) {
+            throw new Error(String.format("%s value must not be an empty array.", dataProvider.getClass()
+                    .getSimpleName()));
+        }
+        return result;
+    }
+
+    /** TODO */
+    private Object cast(String str, Class<?> toClass) {
+        if (String.class.equals(toClass)) {
+            return str;
+        }
+
+        if (boolean.class.equals(toClass)) {
+            return Boolean.valueOf(str);
+        }
+        if (byte.class.equals(toClass)) {
+            return Byte.valueOf(str);
+        }
+        if (char.class.equals(toClass)) {
+            if (str.length() == 1) {
+                return str.charAt(0);
+            }
+            throw new RuntimeException("2");
+        }
+        if (short.class.equals(toClass)) {
+            return Short.valueOf(str);
+        }
+        if (int.class.equals(toClass)) {
+            return Integer.valueOf(str);
+        }
+        if (long.class.equals(toClass)) {
+            return Long.valueOf(str);
+        }
+        if (float.class.equals(toClass)) {
+            return Float.valueOf(str);
+        }
+        if (double.class.equals(toClass)) {
+            return Double.valueOf(str);
+        }
+
+        if (!toClass.isPrimitive()) {
+            throw new RuntimeException("0"); // TODO
+        }
+
+        throw new RuntimeException("1"); // TODO
     }
 
     /**
