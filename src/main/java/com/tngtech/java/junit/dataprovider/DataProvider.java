@@ -20,13 +20,12 @@ import java.lang.annotation.Target;
  * and will not be printed.</li>
  * <li>
  * <p>
- * <i>Use it directly on test method:</i> Provide all the data for the test method parameters. The
- * {@code String[] value()}</li> attribute must contain all the data which is split by the number of arguments of
- * annotated test method.
+ * <i>Use it directly on test method:</i> Provide all the data for the test method parameters as comma-separted
+ * {@link String}s using {@code String[] value()}.
  * <p>
- * <b>Note:</b> Only primitive types (e.g. {@code char}, {@code int}, {@code double}) and {@link String} are supported.
- * Former are transformed using the {@code valueOf(String)} methods of their corresponding wrapper classes. This can
- * cause {@link Exception}s at runtime.</li>
+ * <b>Note:</b> All parameters of the test method must be primitive types (e.g. {@code char}, {@code int},
+ * {@code double} ) or {@link String}s. Former are converted using the {@code valueOf(String)} methods of their
+ * corresponding wrapper classes. This can cause {@link Exception}s at runtime.</li>
  * </ul>
  * <p>
  * Copyright by TNG Technology Consulting GmbH, Germany

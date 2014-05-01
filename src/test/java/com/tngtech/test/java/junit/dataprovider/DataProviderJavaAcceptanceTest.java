@@ -161,13 +161,13 @@ public class DataProviderJavaAcceptanceTest {
     @Test
     // @formatter:off
     @DataProvider({
-            "",                 "0",
-            "a",                "1",
-            "abc",              "3",
-            "veryLongString",   "14"
+            ",                 0",
+            "a,                1",
+            "abc,              3",
+            "veryLongString,  14",
         })
     // @formatter:off
-    public void test(String str, int expectedLength) {
+    public void testStringLength(String str, int expectedLength) {
         // Expect:
         assertThat(str.length()).isEqualTo(expectedLength);
     }

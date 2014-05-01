@@ -86,17 +86,20 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         if (errors == null) {
             throw new IllegalArgumentException("errors must not be null");
         }
-        for (FrameworkMethod method : getTestClassInt().getAnnotatedMethods(Test.class)) {
-            UseDataProvider useDataProviderAnnotation = method.getAnnotation(UseDataProvider.class);
-            DataProvider dataProviderAnnotation = method.getAnnotation(DataProvider.class);
+        for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(Test.class)) {
+            UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
+            DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
 
-            if (useDataProviderAnnotation != null && dataProviderAnnotation != null) { // TODO Test
-                errors.add(new Exception(String.format("Method %s() should either have %s or %s annotation",
-                        method.getName(), UseDataProvider.class.getSimpleName(), DataProvider.class.getSimpleName())));
-            } else if (useDataProviderAnnotation == null && dataProviderAnnotation == null) {
-                method.validatePublicVoidNoArg(false, errors);
+            if (useDataProvider != null && dataProvider != null) { // TODO Test
+                errors.add(new Exception(String.format("Method %s() should either have @%s or @%s annotation",
+                        testMethod.getName(), useDataProvider.getClass().getSimpleName(), dataProvider.getClass()
+                                .getSimpleName())));
+
+            } else if (useDataProvider == null && dataProvider == null) {
+                testMethod.validatePublicVoidNoArg(false, errors);
+
             } else {
-                method.validatePublicVoid(false, errors);
+                testMethod.validatePublicVoid(false, errors);
             }
         }
     }
@@ -124,6 +127,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
                 errors.add(new Error("No such data provider: " + dataProviderName));
+
             } else if (!isValidDataProviderMethod(dataProviderMethod)) {
                 errors.add(new Error("The data provider method '" + dataProviderName + "' is not valid. "
                         + "A valid method must be public, static, has no arguments parameters and returns 'Object[][]'"));
@@ -297,37 +301,27 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         return result;
     }
 
+    // TODO refactor to some other classes in package internal?
     /**
-     * TODO Creates a list of test methods out of an existing test method and its data provider method.
+     * Creates a list of test methods out of an existing test method and its {@link DataProvider#value()} arguments.
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
      *
      * @param testMethod the original test method
-     * @param dataProviderMethod the data provider method that gives the parameters
-     * @return a list of methods, each method bound to a parameter combination returned by the data provider
+     * @param dataProvider the {@link DataProvider} gives the parameters
+     * @return a list of methods, each method bound to a parameter combination returned by the {@link DataProvider}
      */
-    List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
+    List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) { // TODO test
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
 
         try {
             String[] data = dataProvider.value();
+            Class<?>[] testMethodParameterTypes = testMethod.getMethod().getParameterTypes();
 
-            // TODO was ist mit typen der argumente?
-            // TODO könnte man bei den validierungen schon überprüfen?
-            int requiredArguments = testMethod.getMethod().getParameterTypes().length;
-            int methodCount = data.length / requiredArguments;
-            if (data.length % requiredArguments == 0) {
-                for (int idx = 0; idx < methodCount; idx++) {
-                    Object[] parameters = new Object[requiredArguments];
-                    for (int jdx = 0; jdx < parameters.length; jdx++) {
-                        parameters[jdx] = cast(data[idx * requiredArguments + jdx],
-                                testMethod.getMethod().getParameterTypes()[jdx]);
-                    }
-                    result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
-                }
-            } else {
-                // TODO exception
+            for (int idx = 0; idx < data.length; idx++) {
+                Object[] parameters = getParameters(data[idx], testMethodParameterTypes, idx);
+                result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx, parameters));
             }
 
         } catch (Throwable t) {
@@ -340,47 +334,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
                     .getSimpleName()));
         }
         return result;
-    }
-
-    /** TODO */
-    private Object cast(String str, Class<?> toClass) {
-        if (String.class.equals(toClass)) {
-            return str;
-        }
-
-        if (boolean.class.equals(toClass)) {
-            return Boolean.valueOf(str);
-        }
-        if (byte.class.equals(toClass)) {
-            return Byte.valueOf(str);
-        }
-        if (char.class.equals(toClass)) {
-            if (str.length() == 1) {
-                return str.charAt(0);
-            }
-            throw new RuntimeException("2");
-        }
-        if (short.class.equals(toClass)) {
-            return Short.valueOf(str);
-        }
-        if (int.class.equals(toClass)) {
-            return Integer.valueOf(str);
-        }
-        if (long.class.equals(toClass)) {
-            return Long.valueOf(str);
-        }
-        if (float.class.equals(toClass)) {
-            return Float.valueOf(str);
-        }
-        if (double.class.equals(toClass)) {
-            return Double.valueOf(str);
-        }
-
-        if (!toClass.isPrimitive()) {
-            throw new RuntimeException("0"); // TODO
-        }
-
-        throw new RuntimeException("1"); // TODO
     }
 
     /**
@@ -404,5 +357,65 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             }
         }
         return false;
+    }
+
+    /**
+     * @param data comma separated {@link String} of parameters for test method
+     * @param parameterTypes target types of parameters to which corresponding value in comma separated {@code data}
+     *            should be converted
+     * @param rowIdx index of current {@code data} for better error messages
+     * @return split, trimmed and converted {@code Object[]} of supplied comma separated {@code data}
+     */
+    private Object[] getParameters(String data, Class<?>[] parameterTypes, int rowIdx) {
+        Object[] result = new Object[parameterTypes.length];
+
+        String[] splitData = data.split(",");
+        if (parameterTypes.length != splitData.length) {
+            throw new Error(String.format("Test method expected %d parameters but got %d from @DataProvider row %d",
+                    parameterTypes.length, splitData, rowIdx));
+        }
+
+        for (int idx = 0; idx < splitData.length; idx++) {
+            result[idx] = convert(splitData[idx].trim(), parameterTypes[idx]); // TODO what about tabs, nbsp, newline?
+        }
+        return result;
+    }
+
+    private Object convert(String str, Class<?> targetType) {
+
+        if (String.class.equals(targetType)) {
+            return str;
+        }
+
+        if (boolean.class.equals(targetType)) {
+            return Boolean.valueOf(str);
+        }
+        if (byte.class.equals(targetType)) {
+            return Byte.valueOf(str);
+        }
+        if (char.class.equals(targetType)) {
+            if (str.length() == 1) {
+                return str.charAt(0);
+            }
+            throw new Error(String.format("'%s' cannot be converted to %s.", str, targetType.getSimpleName()));
+        }
+        if (short.class.equals(targetType)) {
+            return Short.valueOf(str);
+        }
+        if (int.class.equals(targetType)) {
+            return Integer.valueOf(str);
+        }
+        if (long.class.equals(targetType)) {
+            return Long.valueOf(str);
+        }
+        if (float.class.equals(targetType)) {
+            return Float.valueOf(str);
+        }
+        if (double.class.equals(targetType)) {
+            return Double.valueOf(str);
+        }
+
+        throw new Error(String.format("'%s' is not supported as parameter type of test using @%s.",
+                targetType.getSimpleName(), DataProvider.class.getSimpleName()));
     }
 }
