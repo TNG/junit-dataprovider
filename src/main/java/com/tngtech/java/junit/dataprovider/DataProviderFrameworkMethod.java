@@ -96,8 +96,8 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      * <li>other -&gt; Object.toString</li>
      * </ul>
      *
-     * @param parameters the parameters are converted to a comma-separated string
-     * @return a string representation of the given parameters
+     * @param parameters the parameters are converted to a comma separated {@link String}
+     * @return a {@link String} representation of the given parameters
      */
     private <T> String format(T[] parameters) {
         StringBuilder stringBuilder = new StringBuilder();

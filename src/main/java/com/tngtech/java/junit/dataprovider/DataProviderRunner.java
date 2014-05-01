@@ -86,11 +86,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         if (errors == null) {
             throw new IllegalArgumentException("errors must not be null");
         }
-        for (FrameworkMethod method : getTestClassInt().getAnnotatedMethods(Test.class)) {
-            if (method.getAnnotation(UseDataProvider.class) == null) {
-                method.validatePublicVoidNoArg(false, errors);
+        for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(Test.class)) {
+            if (testMethod.getAnnotation(UseDataProvider.class) == null) {
+                testMethod.validatePublicVoidNoArg(false, errors);
+
             } else {
-                method.validatePublicVoid(false, errors);
+                testMethod.validatePublicVoid(false, errors);
             }
         }
     }
@@ -118,6 +119,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
                 errors.add(new Error("No such data provider: " + dataProviderName));
+
             } else if (!isValidDataProviderMethod(dataProviderMethod)) {
                 errors.add(new Error("The data provider method '" + dataProviderName + "' is not valid. "
                         + "A valid method must be public, static, has no arguments parameters and returns 'Object[][]'"));
@@ -260,16 +262,16 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
 
         try {
-            Object dataProvider = dataProviderMethod.invokeExplosively(null);
-            if (dataProvider instanceof Object[][]) {
-                for (Object[] parameters : (Object[][]) dataProvider) {
+            Object data = dataProviderMethod.invokeExplosively(null);
+            if (data instanceof Object[][]) {
+                for (Object[] parameters : (Object[][]) data) {
                     result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
                 }
 
-            } else if (dataProvider instanceof List) {
+            } else if (data instanceof List) {
                 // must be List<List<Object>>, see #isValidDataProviderMethod
                 @SuppressWarnings("unchecked")
-                List<List<Object>> lists = (List<List<Object>>) dataProvider;
+                List<List<Object>> lists = (List<List<Object>>) data;
                 for (List<Object> parameters : lists) {
                     result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
                 }
