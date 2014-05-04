@@ -20,7 +20,7 @@ import org.junit.runners.model.TestClass;
  * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like data providers. Data
  * providers are public, static methods that return an {@link Object}{@code [][]} (see {@link DataProvider}).
  * <p>
- * Your test method must be annotated with {@code @}{@link UseDataProvider}, additionally.
+ * Your test method must be annotated with {@code @}{@link UseDataProvider} or {@code @}{@link DataProvider}, additionally.
  */
 public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
@@ -90,7 +90,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
             DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
 
-            if (useDataProvider != null && dataProvider != null) { // TODO Test
+            if (useDataProvider != null && dataProvider != null) {
                 errors.add(new Exception(String.format("Method %s() should either have @%s or @%s annotation",
                         testMethod.getName(), useDataProvider.getClass().getSimpleName(), dataProvider.getClass()
                                 .getSimpleName())));
@@ -301,7 +301,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         return result;
     }
 
-    // TODO refactor to some other classes in package internal?
     /**
      * Creates a list of test methods out of an existing test method and its {@link DataProvider#value()} arguments.
      * <p>
@@ -330,8 +329,8 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
 
         if (result.isEmpty()) {
-            throw new Error(String.format("%s value must not be an empty array.", dataProvider.getClass()
-                    .getSimpleName()));
+            throw new Error(String.format("%s.value() must not be initialized (was: empty array).", dataProvider
+                    .getClass().getSimpleName()));
         }
         return result;
     }
@@ -360,23 +359,27 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     *
      * @param data comma separated {@link String} of parameters for test method
      * @param parameterTypes target types of parameters to which corresponding value in comma separated {@code data}
      *            should be converted
      * @param rowIdx index of current {@code data} for better error messages
      * @return split, trimmed and converted {@code Object[]} of supplied comma separated {@code data}
      */
-    private Object[] getParameters(String data, Class<?>[] parameterTypes, int rowIdx) {
+    Object[] getParameters(String data, Class<?>[] parameterTypes, int rowIdx) {
         Object[] result = new Object[parameterTypes.length];
 
-        String[] splitData = data.split(",");
+        String[] splitData = (data + " ").split(","); // add trailing whitespace that split for comma ended data works
         if (parameterTypes.length != splitData.length) {
             throw new Error(String.format("Test method expected %d parameters but got %d from @DataProvider row %d",
-                    parameterTypes.length, splitData, rowIdx));
+                    parameterTypes.length, splitData.length, rowIdx));
         }
 
         for (int idx = 0; idx < splitData.length; idx++) {
-            result[idx] = convert(splitData[idx].trim(), parameterTypes[idx]); // TODO what about tabs, nbsp, newline?
+            result[idx] = convert(splitData[idx].trim(), parameterTypes[idx]);
         }
         return result;
     }
@@ -388,10 +391,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
 
         if (boolean.class.equals(targetType)) {
-            return Boolean.valueOf(str);
+            return Boolean.parseBoolean(str);
         }
         if (byte.class.equals(targetType)) {
-            return Byte.valueOf(str);
+            return Byte.parseByte(str);
         }
         if (char.class.equals(targetType)) {
             if (str.length() == 1) {
@@ -400,19 +403,19 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             throw new Error(String.format("'%s' cannot be converted to %s.", str, targetType.getSimpleName()));
         }
         if (short.class.equals(targetType)) {
-            return Short.valueOf(str);
+            return Short.parseShort(str);
         }
         if (int.class.equals(targetType)) {
-            return Integer.valueOf(str);
+            return Integer.parseInt(str);
         }
         if (long.class.equals(targetType)) {
-            return Long.valueOf(str);
+            return Long.parseLong(str);
         }
         if (float.class.equals(targetType)) {
-            return Float.valueOf(str);
+            return Float.parseFloat(str);
         }
         if (double.class.equals(targetType)) {
-            return Double.valueOf(str);
+            return Double.parseDouble(str);
         }
 
         throw new Error(String.format("'%s' is not supported as parameter type of test using @%s.",

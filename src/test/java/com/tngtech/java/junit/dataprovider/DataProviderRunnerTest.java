@@ -157,13 +157,14 @@ public class DataProviderRunnerTest {
         underTest.validateTestMethods(errors);
 
         // Then:
+        verify(testMethod).getAnnotation(DataProvider.class);
         verify(testMethod).getAnnotation(UseDataProvider.class);
         verify(testMethod).validatePublicVoidNoArg(false, errors);
         verifyNoMoreInteractions(testMethod);
     }
 
     @Test
-    public void testValidateTestMethodsShouldCheckForPublicVoidIfDataProviderTestMethod() {
+    public void testValidateTestMethodsShouldCheckForPublicVoidIfUseDataProviderTestMethod() {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         UseDataProvider useDataProvider = mock(UseDataProvider.class);
@@ -177,8 +178,59 @@ public class DataProviderRunnerTest {
         underTest.validateTestMethods(errors);
 
         // Then:
+        verify(testMethod).getAnnotation(DataProvider.class);
         verify(testMethod).getAnnotation(UseDataProvider.class);
         verify(testMethod).validatePublicVoid(false, errors);
+        verifyNoMoreInteractions(testMethod);
+    }
+
+    @Test
+    public void testValidateTestMethodsShouldCheckForPublicVoidIfDataProviderTestMethod() {
+        // Given:
+        FrameworkMethod testMethod = mock(FrameworkMethod.class);
+        DataProvider dataProvider = mock(DataProvider.class);
+
+        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(Test.class);
+        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        // When:
+        underTest.validateTestMethods(errors);
+
+        // Then:
+        verify(testMethod).getAnnotation(DataProvider.class);
+        verify(testMethod).getAnnotation(UseDataProvider.class);
+        verify(testMethod).validatePublicVoid(false, errors);
+        verifyNoMoreInteractions(testMethod);
+    }
+
+    @Test
+    public void testValidateTestMethodsShouldAddErrorIfDataProviderAndUseDataProviderTestMethod() {
+        // Given:
+        FrameworkMethod testMethod = mock(FrameworkMethod.class);
+        DataProvider dataProvider = mock(DataProvider.class);
+        UseDataProvider useDataProvider = mock(UseDataProvider.class);
+
+        doReturn("test1").when(testMethod).getName();
+        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(Test.class);
+        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
+        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        // When:
+        underTest.validateTestMethods(errors);
+
+        // Then:
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0)).isInstanceOf(Exception.class);
+        assertThat(errors.get(0).getMessage()).matches(
+                "Method test1\\(\\) should either have @UseDataProvider.* or @DataProvider.* annotation");
+
+        verify(testMethod).getAnnotation(DataProvider.class);
+        verify(testMethod).getAnnotation(UseDataProvider.class);
+        verify(testMethod).getName();
         verifyNoMoreInteractions(testMethod);
     }
 
@@ -602,7 +654,8 @@ public class DataProviderRunnerTest {
     }
 
     @Test(expected = Error.class)
-    public void testExplodeTestMethodsShouldThrowErrorIfDataProviderMethodThrowsException() throws Throwable {
+    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataProviderMethodThrowsException()
+            throws Throwable {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -616,7 +669,7 @@ public class DataProviderRunnerTest {
     }
 
     @Test(expected = Error.class)
-    public void testExplodeTestMethodsShouldThrowErrorIfDataProviderMethodReturnsNull() throws Throwable {
+    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataProviderMethodReturnsNull() throws Throwable {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
@@ -630,7 +683,7 @@ public class DataProviderRunnerTest {
     }
 
     @Test(expected = Error.class)
-    public void testExplodeTestMethodsShouldThrowErrorIfDataProviderMethodReturnsEmptyObjectArrayArray()
+    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataProviderMethodReturnsEmptyObjectArrayArray()
             throws Throwable {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
@@ -645,7 +698,7 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testExplodeTestMethodsShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodArrayReturnsOneRow()
+    public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodArrayReturnsOneRow()
             throws Throwable {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
@@ -667,7 +720,7 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testExplodeTestMethodsShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodListReturnsOneRow()
+    public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodListReturnsOneRow()
             throws Throwable {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
@@ -689,7 +742,7 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testExplodeTestMethodsShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodArrayReturnsMultipleRow()
+    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodArrayReturnsMultipleRow()
             throws Throwable {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
@@ -723,7 +776,7 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testExplodeTestMethodsShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodListReturnsMultipleRow()
+    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodListReturnsMultipleRow()
             throws Throwable {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
@@ -756,8 +809,82 @@ public class DataProviderRunnerTest {
         assertThat(actual2.parameters).isEqualTo(dataProviderMethodResult.get(2).toArray());
     }
 
+    @Test(expected = Error.class)
+    public void testExplodeTestMethodsDataProviderShouldThrowErrorIfDataProviderValueReturnsAnEmptyArray() {
+        // Given:
+        FrameworkMethod testMethod = mock(FrameworkMethod.class);
+        DataProvider dataProvider = mock(DataProvider.class);
+
+        doReturn(new String[0]).when(dataProvider).value();
+
+        // When:
+        underTest.explodeTestMethod(testMethod, dataProvider);
+
+        // Then: expect exception
+    }
+
     @Test
-    public void testIsFilterBlackListedShouldReturnFalseForJunitPackagedFilter() throws Exception {
+    public void testExplodeTestMethodsDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataProviderValueArrayReturnsOneRow() {
+        // Given:
+        FrameworkMethod testMethod = mock(FrameworkMethod.class);
+        DataProvider dataProvider = mock(DataProvider.class);
+
+        doReturn(getMethod("testStringString", String.class, String.class)).when(testMethod).getMethod();
+
+        String[] dataProviderValueResult = new String[] { "foo, bar" };
+        doReturn(dataProviderValueResult).when(dataProvider).value();
+
+        // TODO init testMethod for required types
+
+        // When:
+        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
+
+        // Then:
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
+
+        DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) result.get(0);
+        assertThat(actual.idx).isEqualTo(0);
+        assertThat(actual.parameters).isEqualTo(new Object[] { "foo", "bar" });
+    }
+
+    @Test
+    public void testExplodeTestMethodsDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderValueArrayReturnsMultipleRow() {
+        // Given:
+        FrameworkMethod testMethod = mock(FrameworkMethod.class);
+        DataProvider dataProvider = mock(DataProvider.class);
+
+        doReturn(getMethod("testStringString", String.class, String.class)).when(testMethod).getMethod();
+
+        String[] dataProviderValueResult = new String[] { "2a, foo", "3b, bar", "4c, baz" };
+        doReturn(dataProviderValueResult).when(dataProvider).value();
+
+        // When:
+        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
+
+        // Then:
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
+
+        DataProviderFrameworkMethod actual0 = (DataProviderFrameworkMethod) result.get(0);
+        assertThat(actual0.idx).isEqualTo(0);
+        assertThat(actual0.parameters).isEqualTo(new Object[] { "2a", "foo" });
+
+        assertThat(result.get(1)).isInstanceOf(DataProviderFrameworkMethod.class);
+
+        DataProviderFrameworkMethod actual1 = (DataProviderFrameworkMethod) result.get(1);
+        assertThat(actual1.idx).isEqualTo(1);
+        assertThat(actual1.parameters).isEqualTo(new Object[] { "3b", "bar" });
+
+        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
+
+        DataProviderFrameworkMethod actual2 = (DataProviderFrameworkMethod) result.get(2);
+        assertThat(actual2.idx).isEqualTo(2);
+        assertThat(actual2.parameters).isEqualTo(new Object[] { "4c", "baz" });
+    }
+
+    @Test
+    public void testIsFilterBlackListedShouldReturnFalseForJunitPackagedFilter() {
 
         // Given:
         Filter filter = Filter.ALL;
@@ -767,6 +894,141 @@ public class DataProviderRunnerTest {
 
         // Then:
         assertThat(result).isFalse();
+    }
+
+    @Test(expected = Error.class)
+    public void testGetParametersShouldThrowErrorIfLengthOfSplitDataAndTargetTypesDiffer() {
+
+        // Given:
+        String data = "a";
+        Class<?>[] parameterTypes = new Class[] { String.class, String.class };
+        int rowIdx = 0;
+
+        // When:
+        underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypes() {
+
+        // Given:
+        String data = "-2014,-1.234567f,-901e-3";
+        Class<?>[] parameterTypes = new Class[] { long.class, float.class, double.class };
+        int rowIdx = 1;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { -2014L, -1.234567f, -0.901d });
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypesAsJavaString() {
+
+        // Given:
+        String data = "true,1,c,2,3,4,5.5,6.6";
+        Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
+                long.class, float.class, double.class };
+        int rowIdx = 2;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { true, (byte) 1, 'c', (short) 2, 3, 4L, 5.5f, 6.6d });
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypesEvenIfUntrimmed() {
+
+        // Given:
+        String data = "   false   ,    11    ,    z    ,  22       ,   33   ,44      ,   55.55     ,  66.66     ";
+        Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
+                long.class, float.class, double.class };
+        int rowIdx = 3;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { false, (byte) 11, 'z', (short) 22, 33, 44L, 55.55f, 66.66d });
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyHandleLeadingEmptyString() {
+
+        // Given:
+        String data = ",true";
+        Class<?>[] parameterTypes = new Class[] { String.class, boolean.class };
+        int rowIdx = 4;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { "", true });
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyHandleTrailingEmptyString() {
+
+        // Given:
+        String data = "1,";
+        Class<?>[] parameterTypes = new Class[] { int.class, String.class };
+        int rowIdx = 5;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { 1, "" });
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyTrimAllWhitespaceChars() {
+
+        // Given:
+        String data = "\n-1f\n,\t2.0d\t";
+
+        Class<?>[] parameterTypes = new Class[] { float.class, double.class };
+        int rowIdx = 6;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { -1f, 2d });
+    }
+
+    @Test(expected = Error.class)
+    public void testGetParametersShouldThrowErrorIfCharHasNotLengthOne() {
+
+        // Given:
+        String data = "noChar";
+        Class<?>[] parameterTypes = new Class[] { char.class };
+        int rowIdx = 7;
+
+        // When:
+        underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = Error.class)
+    public void testGetParametersShouldThrowErrorForUnsupportedTargetType() {
+
+        // Given:
+        String data = "noObject";
+        Class<?>[] parameterTypes = new Class[] { Object.class };
+        int rowIdx = 8;
+
+        // When:
+        underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then: expect exception
     }
 
     private Method getMethod(String methodName, Class<?>... args) {
@@ -827,6 +1089,11 @@ public class DataProviderRunnerTest {
 
     public static List<List<Object>> validDataProviderMethodList() {
         return null;
+    }
+
+    @SuppressWarnings("unused")
+    public void testStringString(String s1, String s2) {
+        // Method to test @DataProvider simple row parsing
     }
 
     @SuppressWarnings("serial")
