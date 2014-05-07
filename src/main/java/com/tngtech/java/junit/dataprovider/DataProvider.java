@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * {@link String}s using {@code String[] value()}.
  * <p>
  * <b>Note:</b> All parameters of the test method must be primitive types (e.g. {@code char}, {@code int},
- * {@code double} ) or {@link String}s. Former are converted using the {@code parse*(String)} methods of their
+ * {@code double} ) or {@link String}s. Former are converted using the {@code valueOf(String)} methods of their
  * corresponding wrapper classes. This can cause {@link Exception}s at runtime. Latter must not contain commas!</li>
  * </ul>
  * <p>

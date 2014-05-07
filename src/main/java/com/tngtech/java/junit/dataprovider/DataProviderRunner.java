@@ -391,10 +391,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
 
         if (boolean.class.equals(targetType)) {
-            return Boolean.parseBoolean(str);
+            return Boolean.valueOf(str);
         }
         if (byte.class.equals(targetType)) {
-            return Byte.parseByte(str);
+            return Byte.valueOf(str);
         }
         if (char.class.equals(targetType)) {
             if (str.length() == 1) {
@@ -403,19 +403,19 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             throw new Error(String.format("'%s' cannot be converted to %s.", str, targetType.getSimpleName()));
         }
         if (short.class.equals(targetType)) {
-            return Short.parseShort(str);
+            return Short.valueOf(str);
         }
         if (int.class.equals(targetType)) {
-            return Integer.parseInt(str);
+            return Integer.valueOf(str);
         }
         if (long.class.equals(targetType)) {
-            return Long.parseLong(str);
+            return Long.valueOf(str);
         }
         if (float.class.equals(targetType)) {
-            return Float.parseFloat(str);
+            return Float.valueOf(str);
         }
         if (double.class.equals(targetType)) {
-            return Double.parseDouble(str);
+            return Double.valueOf(str);
         }
 
         throw new Error(String.format("'%s' is not supported as parameter type of test using @%s.",
