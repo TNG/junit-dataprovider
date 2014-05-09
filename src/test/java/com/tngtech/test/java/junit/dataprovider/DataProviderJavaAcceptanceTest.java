@@ -158,8 +158,8 @@ public class DataProviderJavaAcceptanceTest {
         assertThat(result).isEqualTo(expected);
     }
 
-    @Test
     // @formatter:off
+    @Test
     @DataProvider({
             ",                 0",
             "a,                1",
