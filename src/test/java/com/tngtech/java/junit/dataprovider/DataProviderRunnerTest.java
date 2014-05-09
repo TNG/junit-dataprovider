@@ -958,12 +958,44 @@ public class DataProviderRunnerTest {
     }
 
     @Test
+    public void testGetParametersShouldCorrectlyTrimNonSpaceWhitespaceChars() {
+
+        // Given:
+        String data = "\n-1f\n,\r-2\r,\t3.0d\t";
+
+        Class<?>[] parameterTypes = new Class[] { float.class, int.class, double.class };
+        int rowIdx = 4;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { -1f, -2, 3d });
+    }
+
+    @Test
+    public void testGetParametersShouldNotTrimNonBreakingSpace() {
+
+        // Given:
+        String data = "\u00A0test\u00A0";
+
+        Class<?>[] parameterTypes = new Class[] { String.class };
+        int rowIdx = 5;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { "\u00A0test\u00A0" });
+    }
+
+    @Test
     public void testGetParametersShouldCorrectlyHandleLeadingEmptyString() {
 
         // Given:
         String data = ",true";
         Class<?>[] parameterTypes = new Class[] { String.class, boolean.class };
-        int rowIdx = 4;
+        int rowIdx = 6;
 
         // When:
         Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
@@ -978,7 +1010,7 @@ public class DataProviderRunnerTest {
         // Given:
         String data = "1,";
         Class<?>[] parameterTypes = new Class[] { int.class, String.class };
-        int rowIdx = 5;
+        int rowIdx = 7;
 
         // When:
         Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
@@ -987,29 +1019,13 @@ public class DataProviderRunnerTest {
         assertThat(result).isEqualTo(new Object[] { 1, "" });
     }
 
-    @Test
-    public void testGetParametersShouldCorrectlyTrimAllWhitespaceChars() {
-
-        // Given:
-        String data = "\n-1f\n,\t2.0d\t";
-
-        Class<?>[] parameterTypes = new Class[] { float.class, double.class };
-        int rowIdx = 6;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { -1f, 2d });
-    }
-
     @Test(expected = Error.class)
     public void testGetParametersShouldThrowErrorIfCharHasNotLengthOne() {
 
         // Given:
         String data = "noChar";
         Class<?>[] parameterTypes = new Class[] { char.class };
-        int rowIdx = 7;
+        int rowIdx = 8;
 
         // When:
         underTest.getParameters(data, parameterTypes, rowIdx);
@@ -1023,7 +1039,7 @@ public class DataProviderRunnerTest {
         // Given:
         String data = "noObject";
         Class<?>[] parameterTypes = new Class[] { Object.class };
-        int rowIdx = 8;
+        int rowIdx = 9;
 
         // When:
         underTest.getParameters(data, parameterTypes, rowIdx);

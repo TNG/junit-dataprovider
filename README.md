@@ -10,9 +10,10 @@ junit-dataprovider
 * [Motivation and distinction](#motivation-and-distinction)
 * [Requirements](#requirements)
 * [Download](#download)
-* [Usage example](#usage-example) 
+* [Usage examples](#usage-examples)
 	* [Array syntax](#array-syntax)
 	* [List syntax](#list-syntax)
+	* [Let ```@DataProvider``` directly providing data](#let-dataprovider-directly-providing-data)
 * [Release notes](#release-notes)
 * [Eclipse template](#eclipse-template)
 * [Contributing](#contributing)
@@ -81,7 +82,7 @@ Motivation and distinction
 #### May I move a junit-dataprovider into a separate class?
 
 > Of course, just move it to any from the test case accessible class and annotate it as usual with 
-> properly and use it with additionally specifying the location, see [Usage example](#usage-example).
+> properly and use it with additionally specifying the location, see [Usage examples](#usage-examples).
 
 
 Requirements
@@ -103,8 +104,8 @@ Following this link you can choose a version. For more information about a certa
 the **Dependency Information** section how to integrate it with your dependency management tool.
 
 
-Usage example
--------------
+Usage examples
+--------------
 
 ### Array syntax 
 
@@ -222,8 +223,36 @@ class DataProviderTest {
 
 ```
 
+### Let ```@DataProvider``` directly providing data
+
+Instead of ```@UseDataProvider``` to point to a method providing the test data, since version 1.7 you directly
+use ```@DataProvider#value()``` to provide an array of comma-separated ```String```, a ```String``` for a test method.
+Each comma-separated String is split and trimmed back by spaces (= "``` ```"), tabs (= "```\t```) and
+line-separator (= "```\n```" or "```\r```") such that you cannot generate test data using leading or trailing
+these whitespaces. The trimming is executed to be able to format the comma-separated ```String```.
+
+```java
+    @Test
+    // @formatter:off
+    @DataProvider({
+            ",                 0",
+            "a,                1",
+            "abc,              3",
+            "veryLongString,  14",
+        })
+    // @formatter:off
+    public void testStringLength(String str, int expectedLength) {
+        // Expect:
+        assertThat(str.length()).isEqualTo(expectedLength);
+    }
+```
+
 Release notes
 -------------
+
+### v1.7.0 (???)
+
+* implemented [#20](/../../issues/20) to use ```@DataProvider``` directly providing test data for test method
 
 ### v1.6.0 (26-Apr-2014)
 
