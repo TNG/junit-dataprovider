@@ -225,15 +225,14 @@ class DataProviderTest {
 
 ### Let ```@DataProvider``` directly providing data
 
-Instead of ```@UseDataProvider``` to point to a method providing the test data, since version 1.7 you directly
-use ```@DataProvider#value()``` to provide an array of comma-separated ```String```, a ```String``` for a test method.
-Each comma-separated String is split and trimmed back by spaces (= "``` ```"), tabs (= "```\t```) and
-line-separator (= "```\n```" or "```\r```") such that you cannot generate test data using leading or trailing
-these whitespaces. The trimming is executed to be able to format the comma-separated ```String```.
+Instead of using ```@UseDataProvider``` to point to a method providing test data, you can directly
+use ```@DataProvider#value()``` to provide an array of comma-separated ```String```s.
+Each comma-separated ```String``` is split and trimmed back by spaces (= "``` ```"), tabs (= "```\t```) and
+line-separator (= "```\n```" or "```\r```"). The resulting ```String``` is then parsed to its corresponding type in the test method signature. All primitive types (e.g. ```char```, ```boolean```, ```int```) and ```String``` are supported.
 
 ```java
-    @Test
     // @formatter:off
+    @Test
     @DataProvider({
             ",                 0",
             "a,                1",
