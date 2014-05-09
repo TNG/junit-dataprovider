@@ -108,7 +108,7 @@ Usage example
 
 ### Array syntax 
 
-For example using [Java](https://www.java.com/):
+For example using [Java](https://www.java.com/) and its array syntax:
 
 
 ```java
@@ -185,7 +185,7 @@ public class StringDataProvider {
 ### List syntax
 
 For example using [Groovy](http://groovy.codehaus.org/) (if you are not able 
-to use [Spock](http://spock-framework.readthedocs.org)):
+to use [Spock](http://spock-framework.readthedocs.org)) and its native ```List``` support:
 
 ```groovy
 import static org.assertj.core.api.Assertions.assertThat
