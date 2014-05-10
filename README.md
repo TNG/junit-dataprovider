@@ -83,6 +83,17 @@ Motivation and distinction
 > Of course, just move it to any from the test case accessible class and annotate it as usual with 
 > properly and use it with additionally specifying the location, see [Usage example](#usage-example).
 
+#### Why must a ```@Dataprovider``` be static while similar [junitparams](https://code.google.com/p/junitparams/) does allow it non-static?
+
+> To answer this question we have to look into the internal implementation of [JUnit][]. Its first step is to determine 
+> all test methodes to run, before validating and filtering it. At this points of execution, though, no instance of the
+> test class is instanciated.
+> Then as a second step [JUnit][] creates a single instance of the class under test for every single test method.
+> One possiblity, for sure, junit-dataprovider could create an instance and invoke the ```@DataProvider``` 
+> as [junitparams][] does interally, but neither ```@Before``` nor ```MethodeRule``` is minded. 
+> Therefore, I decided to disallow a ```@DataProvider``` instance methods that nobody using junit-dataprovider 
+> believes accessing data of a test class instance is possible.
+
 
 Requirements
 -----------
