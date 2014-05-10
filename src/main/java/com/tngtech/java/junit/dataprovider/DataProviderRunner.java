@@ -418,6 +418,19 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             return Double.valueOf(str);
         }
 
+        if (targetType.isEnum()) {
+            try {
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                Enum result = Enum.valueOf((Class<Enum>) targetType, str);
+                return result;
+
+            } catch (IllegalArgumentException e) {
+                throw new Error(String.format(
+                        "'%s' is not a valid value of enum %s used in @%s. Please be aware of case sensitivity.", str,
+                        targetType.getSimpleName(), DataProvider.class.getSimpleName()));
+            }
+        }
+
         throw new Error(String.format("'%s' is not supported as parameter type of test using @%s.",
                 targetType.getSimpleName(), DataProvider.class.getSimpleName()));
     }

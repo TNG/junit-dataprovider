@@ -885,7 +885,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testIsFilterBlackListedShouldReturnFalseForJunitPackagedFilter() {
-
         // Given:
         Filter filter = Filter.ALL;
 
@@ -898,7 +897,6 @@ public class DataProviderRunnerTest {
 
     @Test(expected = Error.class)
     public void testGetParametersShouldThrowErrorIfLengthOfSplitDataAndTargetTypesDiffer() {
-
         // Given:
         String data = "a";
         Class<?>[] parameterTypes = new Class[] { String.class, String.class };
@@ -912,27 +910,11 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGetParametersShouldCorrectlyParseAllPrimitiveTypes() {
-
-        // Given:
-        String data = "-2014,-1.234567f,-901e-3";
-        Class<?>[] parameterTypes = new Class[] { long.class, float.class, double.class };
-        int rowIdx = 1;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { -2014L, -1.234567f, -0.901d });
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypesAsJavaString() {
-
         // Given:
         String data = "true,1,c,2,3,4,5.5,6.6";
         Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
                 long.class, float.class, double.class };
-        int rowIdx = 2;
+        int rowIdx = 1;
 
         // When:
         Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
@@ -942,8 +924,21 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypesEvenIfUntrimmed() {
+    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypesAsJavaString() {
+        // Given:
+        String data = "-2014,-1.234567f,-901e-3";
+        Class<?>[] parameterTypes = new Class[] { long.class, float.class, double.class };
+        int rowIdx = 2;
 
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { -2014L, -1.234567f, -0.901d });
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypesEvenIfUntrimmed() {
         // Given:
         String data = "   false   ,    11    ,    z    ,  22       ,   33   ,44      ,   55.55     ,  66.66     ";
         Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
@@ -959,7 +954,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGetParametersShouldCorrectlyTrimNonSpaceWhitespaceChars() {
-
         // Given:
         String data = "\n-1f\n,\r-2\r,\t3.0d\t";
 
@@ -975,7 +969,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGetParametersShouldNotTrimNonBreakingSpace() {
-
         // Given:
         String data = "\u00A0test\u00A0";
 
@@ -991,7 +984,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGetParametersShouldCorrectlyHandleLeadingEmptyString() {
-
         // Given:
         String data = ",true";
         Class<?>[] parameterTypes = new Class[] { String.class, boolean.class };
@@ -1006,7 +998,6 @@ public class DataProviderRunnerTest {
 
     @Test
     public void testGetParametersShouldCorrectlyHandleTrailingEmptyString() {
-
         // Given:
         String data = "1,";
         Class<?>[] parameterTypes = new Class[] { int.class, String.class };
@@ -1021,7 +1012,6 @@ public class DataProviderRunnerTest {
 
     @Test(expected = Error.class)
     public void testGetParametersShouldThrowErrorIfCharHasNotLengthOne() {
-
         // Given:
         String data = "noChar";
         Class<?>[] parameterTypes = new Class[] { char.class };
@@ -1035,11 +1025,37 @@ public class DataProviderRunnerTest {
 
     @Test(expected = Error.class)
     public void testGetParametersShouldThrowErrorForUnsupportedTargetType() {
-
         // Given:
         String data = "noObject";
         Class<?>[] parameterTypes = new Class[] { Object.class };
         int rowIdx = 9;
+
+        // When:
+        underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyParseEnum() {
+        // Given:
+        String data = " VAL1,  VAL2 ";
+        Class<?>[] parameterTypes = new Class[] { TestEnum.class, TestEnum.class };
+        int rowIdx = 10;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1, TestEnum.VAL2 });
+    }
+
+    @Test(expected = Error.class)
+    public void testGetParametersShouldThrowErrorIfEnumValueIsInvalid() {
+        // Given:
+        String data = "UNKNOW_ENUM_VALUE";
+        Class<?>[] parameterTypes = new Class[] { TestEnum.class };
+        int rowIdx = 11;
 
         // When:
         underTest.getParameters(data, parameterTypes, rowIdx);
@@ -1131,5 +1147,10 @@ public class DataProviderRunnerTest {
             result.add(innerList);
         }
         return result;
+    }
+
+    private static enum TestEnum {
+        VAL1,
+        VAL2;
     }
 }
