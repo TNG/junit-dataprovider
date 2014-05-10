@@ -13,7 +13,7 @@ junit-dataprovider
 * [Usage examples](#usage-examples)
 	* [Array syntax](#array-syntax)
 	* [List syntax](#list-syntax)
-	* [Let ```@DataProvider``` directly providing data](#let-dataprovider-directly-providing-data)
+	* [Let ```@DataProvider``` directly providing test data](#let-dataprovider-directly-providing-test-data)
 * [Release notes](#release-notes)
 * [Eclipse template](#eclipse-template)
 * [Contributing](#contributing)
@@ -223,12 +223,16 @@ class DataProviderTest {
 
 ```
 
-### Let ```@DataProvider``` directly providing data
+### Let ```@DataProvider``` directly providing test data
+
+with a fix to handling primitive wrapper classes (like Integer) for parameters passed in the annotation and the Usage Tutorial test (line below). 
 
 Instead of using ```@UseDataProvider``` to point to a method providing test data, you can directly
-use ```@DataProvider#value()``` to provide an array of comma-separated ```String```s.
-Each comma-separated ```String``` is split and trimmed back by spaces (= "``` ```"), tabs (= "```\t```) and
-line-separator (= "```\n```" or "```\r```"). The resulting ```String``` is then parsed to its corresponding type in the test method signature. All primitive types (e.g. ```char```, ```boolean```, ```int```) and ```String``` are supported.
+pass test data using ```@DataProvider``` annotation and its ```#value()``` method to provide an 
+array of comma-separated ```String```s. Each comma-separated ```String``` is split and trimmed back by 
+spaces (= "``` ```"), tabs (= "```\t```) and line-separator (= "```\n```" or "```\r```"). The 
+resulting ```String``` is then parsed to its corresponding type in the test method signature. All primitive 
+types (e.g. ```char```, ```boolean```, ```int```) and ```String``` are supported.
 
 ```java
     // @formatter:off
