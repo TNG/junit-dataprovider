@@ -94,8 +94,9 @@ Motivation and distinction
 > Therefore, I decided to disallow a ```@DataProvider``` instance methods that nobody using junit-dataprovider 
 > believes accessing data of a test class instance is possible.
 
-*Note*: Even ```@BeforeClass``` and ```@ClassRule``` are not executed before the static ```@DataProvider``` method
-because (validation and) filtering of test methods is done immediately after creation of ```DataProviderRunner``` :-(
+*Note*: Even ```@BeforeClass``` and ```@ClassRule``` are not executed currently (see [#22](/../../issues/22)) 
+before the static ```@DataProvider``` method because (validation and) filtering of test methods is done 
+immediately after creation of ```DataProviderRunner``` :-(
 
 
 Requirements
