@@ -232,7 +232,8 @@ pass test data using ```@DataProvider``` annotation and its ```#value()``` metho
 array of comma-separated ```String```s. Each comma-separated ```String``` is split and trimmed back by 
 spaces (= "``` ```"), tabs (= "```\t```) and line-separator (= "```\n```" or "```\r```"). The 
 resulting ```String``` is then parsed to its corresponding type in the test method signature. All primitive 
-types (e.g. ```char```, ```boolean```, ```int```) and ```String``` are supported.
+types (e.g. ```char```, ```boolean```, ```int```), primitive wrapper types (e.g. ```Long```, ```Double```), ```Enum```s,
+and ```String```s are supported.
 
 ```java
     // @formatter:off
