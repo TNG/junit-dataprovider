@@ -1063,6 +1063,23 @@ public class DataProviderRunnerTest {
         // Then: expect exception
     }
 
+    @Test
+    public void testGetParametersShouldCorrectlyParseAllPrimitiveWrapperTypes() {
+        // Given:
+        String data = "true,1,c,2,3,4,5.5,6.6";
+        Class<?>[] parameterTypes = new Class[] { Boolean.class, Byte.class, Character.class, Short.class,
+                Integer.class, Long.class, Float.class, Double.class };
+        int rowIdx = 1;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(
+                new Object[] { Boolean.TRUE, Byte.valueOf((byte) 1), Character.valueOf('c'), Short.valueOf((short) 2),
+                        Integer.valueOf(3), Long.valueOf(4L), Float.valueOf(5.5f), Double.valueOf(6.6d) });
+    }
+
     private Method getMethod(String methodName, Class<?>... args) {
         final Class<? extends DataProviderRunnerTest> clazz = this.getClass();
         try {

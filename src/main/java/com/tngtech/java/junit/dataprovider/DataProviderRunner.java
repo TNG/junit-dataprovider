@@ -390,31 +390,31 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             return str;
         }
 
-        if (boolean.class.equals(targetType)) {
+        if (boolean.class.equals(targetType) || Boolean.class.equals(targetType)) {
             return Boolean.valueOf(str);
         }
-        if (byte.class.equals(targetType)) {
+        if (byte.class.equals(targetType) || Byte.class.equals(targetType)) {
             return Byte.valueOf(str);
         }
-        if (char.class.equals(targetType)) {
+        if (char.class.equals(targetType) || Character.class.equals(targetType)) {
             if (str.length() == 1) {
                 return str.charAt(0);
             }
             throw new Error(String.format("'%s' cannot be converted to %s.", str, targetType.getSimpleName()));
         }
-        if (short.class.equals(targetType)) {
+        if (short.class.equals(targetType) || Short.class.equals(targetType)) {
             return Short.valueOf(str);
         }
-        if (int.class.equals(targetType)) {
+        if (int.class.equals(targetType) || Integer.class.equals(targetType)) {
             return Integer.valueOf(str);
         }
-        if (long.class.equals(targetType)) {
+        if (long.class.equals(targetType) || Long.class.equals(targetType)) {
             return Long.valueOf(str);
         }
-        if (float.class.equals(targetType)) {
+        if (float.class.equals(targetType) || Float.class.equals(targetType)) {
             return Float.valueOf(str);
         }
-        if (double.class.equals(targetType)) {
+        if (double.class.equals(targetType) || Double.class.equals(targetType)) {
             return Double.valueOf(str);
         }
 
