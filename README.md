@@ -225,8 +225,6 @@ class DataProviderTest {
 
 ### Let ```@DataProvider``` directly providing test data
 
-with a fix to handling primitive wrapper classes (like Integer) for parameters passed in the annotation and the Usage Tutorial test (line below). 
-
 Instead of using ```@UseDataProvider``` to point to a method providing test data, you can directly
 pass test data using ```@DataProvider``` annotation and its ```#value()``` method to provide an 
 array of comma-separated ```String```s. Each comma-separated ```String``` is split and trimmed back by 
@@ -234,6 +232,8 @@ spaces (= "``` ```"), tabs (= "```\t```) and line-separator (= "```\n```" or "``
 resulting ```String``` is then parsed to its corresponding type in the test method signature. All primitive 
 types (e.g. ```char```, ```boolean```, ```int```), primitive wrapper types (e.g. ```Long```, ```Double```), ```Enum```s,
 and ```String```s are supported.
+
+*Note:* The ```String``` "null" will always be passed as ```null```.
 
 ```java
     // @formatter:off
@@ -249,7 +249,23 @@ and ```String```s are supported.
         // Expect:
         assertThat(str.length()).isEqualTo(expectedLength);
     }
+
+    @Test
+    @DataProvider({
+            "null",
+            "",
+        })
+    public void testIsEmptyString2(String str) {
+        // When:
+        boolean isEmpty = (str == null) ? true : str.isEmpty();
+
+        // Then:
+        assertThat(isEmpty).isTrue();
+    }
 ```
+
+Further examples can be found in [DataProviderJavaAcceptanceTest.java](/src/test/java/com/tngtech/test/java/junit/dataprovider/DataProviderJavaAcceptanceTest.java).
+
 
 Release notes
 -------------

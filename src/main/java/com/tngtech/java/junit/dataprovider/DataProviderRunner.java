@@ -386,6 +386,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     private Object convert(String str, Class<?> targetType) {
 
+        if ("null".equals(str)) {
+            return null;
+        }
+
         if (String.class.equals(targetType)) {
             return str;
         }

@@ -188,4 +188,17 @@ public class DataProviderJavaAcceptanceTest {
         // Then:
         assertThat(result).isEqualTo(expected);
     }
+
+    @Test
+    @DataProvider({
+            "null",
+            "",
+        })
+    public void testIsEmptyString2(String str) {
+        // When:
+        boolean isEmpty = (str == null) ? true : str.isEmpty();
+
+        // Then:
+        assertThat(isEmpty).isTrue();
+    }
 }

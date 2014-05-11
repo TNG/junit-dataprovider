@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * {@code double}), primitive wrapper types (e.g. {@link Boolean}, {@link Long}), case-sensitive {@link Enum} values, or
  * {@link String}s. The former two are converted using the {@code valueOf(String)} methods of their corresponding
  * wrapper classes or {@code valueOf(Class<? extends Enum<?>>, String)}, respectively. This can cause {@link Exception}s
- * at runtime. Latter must not contain commas!</li>
+ * at runtime. Latter must not contain commas! The {@link String} "null" will always be passed as {@code null}.</li>
  * </ul>
  * <p>
  * Copyright by TNG Technology Consulting GmbH, Germany

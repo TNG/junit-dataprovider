@@ -1069,7 +1069,7 @@ public class DataProviderRunnerTest {
         String data = "true,1,c,2,3,4,5.5,6.6";
         Class<?>[] parameterTypes = new Class[] { Boolean.class, Byte.class, Character.class, Short.class,
                 Integer.class, Long.class, Float.class, Double.class };
-        int rowIdx = 1;
+        int rowIdx = 12;
 
         // When:
         Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
@@ -1078,6 +1078,20 @@ public class DataProviderRunnerTest {
         assertThat(result).isEqualTo(
                 new Object[] { Boolean.TRUE, Byte.valueOf((byte) 1), Character.valueOf('c'), Short.valueOf((short) 2),
                         Integer.valueOf(3), Long.valueOf(4L), Float.valueOf(5.5f), Double.valueOf(6.6d) });
+    }
+
+    @Test
+    public void testGetParametersShouldCorrectlyParseNullValue() {
+        // Given:
+        String data = "null, null  ";
+        Class<?>[] parameterTypes = new Class[] { Boolean.class, String.class };
+        int rowIdx = 13;
+
+        // When:
+        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { null, null });
     }
 
     private Method getMethod(String methodName, Class<?>... args) {
