@@ -89,7 +89,7 @@ Motivation and distinction
 > all test methodes to run, before validating and filtering it. At this points of execution, though, no instance of the
 > test class is instanciated.
 > Then as a second step [JUnit][] creates a single instance of the class under test for every single test method.
-> One possiblity, for sure, junit-dataprovider could create an instance and invoke the ```@DataProvider``` 
+> One possiblity, for sure, is that junit-dataprovider could create an instance and invoke the ```@DataProvider``` 
 > as [junitparams][] does interally, but neither ```@Before``` nor ```MethodeRule``` is minded. 
 > Therefore, I decided to disallow a ```@DataProvider``` instance methods that nobody using junit-dataprovider 
 > believes accessing data of a test class instance is possible.
