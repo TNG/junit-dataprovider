@@ -273,7 +273,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
                 @SuppressWarnings("unchecked")
                 List<List<Object>> lists = (List<List<Object>>) data;
                 for (List<Object> parameters : lists) {
-                    result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
+                    result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters.toArray()));
                 }
             }
         } catch (Throwable t) {

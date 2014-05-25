@@ -2,7 +2,6 @@ package com.tngtech.java.junit.dataprovider;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.runners.model.FrameworkMethod;
 
@@ -39,11 +38,6 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
 
         this.idx = idx;
         this.parameters = Arrays.copyOf(parameters, parameters.length);
-    }
-
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_NULL_PARAM_DEREF")
-    public DataProviderFrameworkMethod(Method method, int idx, List<Object> parameters) {
-        this(method, idx, (parameters == null) ? null : parameters.toArray());
     }
 
     @Override
