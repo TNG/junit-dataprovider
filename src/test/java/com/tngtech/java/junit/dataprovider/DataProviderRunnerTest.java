@@ -809,7 +809,7 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testIsFilterBlackListedShouldReturnFalseForJunitPackagedFilter() throws Exception {
+    public void testIsFilterBlackListedShouldReturnFalseForJUnitPackagedFilter() {
 
         // Given:
         Filter filter = Filter.ALL;
