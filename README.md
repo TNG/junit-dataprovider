@@ -240,6 +240,10 @@ class DataProviderTest {
 Release notes
 -------------
 
+### tbd. (???)
+
+* removed some internal debts by refactoring ([#23](/../../issues/23))
+
 ### v1.6.0 (26-Apr-2014)
 
 * fixed bug in fix [#16](/../../issues/16) using IntelliJ ([#18](/../../issues/18) with merge [#19](/../../issues/19))
