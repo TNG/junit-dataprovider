@@ -20,7 +20,8 @@ import org.junit.runners.model.TestClass;
  * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like data providers. Data
  * providers are public, static methods that return an {@link Object}{@code [][]} (see {@link DataProvider}).
  * <p>
- * Your test method must be annotated with {@code @}{@link UseDataProvider}, additionally.
+ * Your test method must be annotated with {@code @}{@link UseDataProvider} or {@code @}{@link DataProvider},
+ * additionally.
  */
 public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
@@ -87,7 +88,15 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             throw new IllegalArgumentException("errors must not be null");
         }
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(Test.class)) {
-            if (testMethod.getAnnotation(UseDataProvider.class) == null) {
+            UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
+            DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
+
+            if (useDataProvider != null && dataProvider != null) {
+                errors.add(new Exception(String.format("Method %s() should either have @%s or @%s annotation",
+                        testMethod.getName(), useDataProvider.getClass().getSimpleName(), dataProvider.getClass()
+                                .getSimpleName())));
+
+            } else if (useDataProvider == null && dataProvider == null) {
                 testMethod.validatePublicVoidNoArg(false, errors);
 
             } else {
@@ -116,7 +125,8 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
-                errors.add(new Error("No such data provider: " +  testMethod.getAnnotation(UseDataProvider.class).value()));
+                errors.add(new Exception("No such data provider: "
+                        + testMethod.getAnnotation(UseDataProvider.class).value()));
 
             } else {
                 validateDataProviderMethod(dataProviderMethod, errors);
@@ -144,9 +154,13 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         for (FrameworkMethod testMethod : testMethods) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
-                result.add(testMethod);
-            } else {
-                result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
+                DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
+                if (dataProvider == null) {
+                    result.add(testMethod);
+
+                } else {
+                    result.addAll(explodeTestMethod(testMethod, dataProvider));
+                }
             }
         }
         return result;
@@ -285,6 +299,40 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
+     * Creates a list of test methods out of an existing test method and its {@link DataProvider#value()} arguments.
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     *
+     * @param testMethod the original test method
+     * @param dataProvider the {@link DataProvider} gives the parameters
+     * @return a list of methods, each method bound to a parameter combination returned by the {@link DataProvider}
+     */
+    List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+
+        try {
+            String[] data = dataProvider.value();
+            Class<?>[] testMethodParameterTypes = testMethod.getMethod().getParameterTypes();
+
+            for (int idx = 0; idx < data.length; idx++) {
+                Object[] parameters = getParameters(data[idx], testMethodParameterTypes, idx);
+                result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx, parameters));
+            }
+
+        } catch (Throwable t) {
+            throw new Error(String.format("Exception while exploding test method using %ss value attribute: %s",
+                    dataProvider.getClass().getSimpleName(), t.getMessage()), t);
+        }
+
+        if (result.isEmpty()) {
+            throw new Error(String.format("%s.value() must not be initialized (was: empty array).", dataProvider
+                    .getClass().getSimpleName()));
+        }
+        return result;
+    }
+
+    /**
      * Returns a {@link TestClass} object wrapping the class to be executed. This method is required for testing because
      * {@link #getTestClass()} is final and therefore cannot be stubbed :(
      */
@@ -305,5 +353,86 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             }
         }
         return false;
+    }
+
+    /**
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     *
+     * @param data comma separated {@link String} of parameters for test method
+     * @param parameterTypes target types of parameters to which corresponding value in comma separated {@code data}
+     *            should be converted
+     * @param rowIdx index of current {@code data} for better error messages
+     * @return split, trimmed and converted {@code Object[]} of supplied comma separated {@code data}
+     */
+    Object[] getParameters(String data, Class<?>[] parameterTypes, int rowIdx) {
+        Object[] result = new Object[parameterTypes.length];
+
+        String[] splitData = (data + " ").split(","); // add trailing whitespace that split for comma ended data works
+        if (parameterTypes.length != splitData.length) {
+            throw new Error(String.format("Test method expected %d parameters but got %d from @DataProvider row %d",
+                    parameterTypes.length, splitData.length, rowIdx));
+        }
+
+        for (int idx = 0; idx < splitData.length; idx++) {
+            result[idx] = convert(splitData[idx].trim(), parameterTypes[idx]);
+        }
+        return result;
+    }
+
+    private Object convert(String str, Class<?> targetType) {
+
+        if ("null".equals(str)) {
+            return null;
+        }
+
+        if (String.class.equals(targetType)) {
+            return str;
+        }
+
+        if (boolean.class.equals(targetType) || Boolean.class.equals(targetType)) {
+            return Boolean.valueOf(str);
+        }
+        if (byte.class.equals(targetType) || Byte.class.equals(targetType)) {
+            return Byte.valueOf(str);
+        }
+        if (char.class.equals(targetType) || Character.class.equals(targetType)) {
+            if (str.length() == 1) {
+                return str.charAt(0);
+            }
+            throw new Error(String.format("'%s' cannot be converted to %s.", str, targetType.getSimpleName()));
+        }
+        if (short.class.equals(targetType) || Short.class.equals(targetType)) {
+            return Short.valueOf(str);
+        }
+        if (int.class.equals(targetType) || Integer.class.equals(targetType)) {
+            return Integer.valueOf(str);
+        }
+        if (long.class.equals(targetType) || Long.class.equals(targetType)) {
+            return Long.valueOf(str);
+        }
+        if (float.class.equals(targetType) || Float.class.equals(targetType)) {
+            return Float.valueOf(str);
+        }
+        if (double.class.equals(targetType) || Double.class.equals(targetType)) {
+            return Double.valueOf(str);
+        }
+
+        if (targetType.isEnum()) {
+            try {
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                Enum result = Enum.valueOf((Class<Enum>) targetType, str);
+                return result;
+
+            } catch (IllegalArgumentException e) {
+                throw new Error(String.format(
+                        "'%s' is not a valid value of enum %s used in @%s. Please be aware of case sensitivity.", str,
+                        targetType.getSimpleName(), DataProvider.class.getSimpleName()));
+            }
+        }
+
+        throw new Error(String.format("'%s' is not supported as parameter type of test using @%s.",
+                targetType.getSimpleName(), DataProvider.class.getSimpleName()));
     }
 }

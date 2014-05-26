@@ -10,9 +10,10 @@ junit-dataprovider
 * [Motivation and distinction](#motivation-and-distinction)
 * [Requirements](#requirements)
 * [Download](#download)
-* [Usage example](#usage-example) 
+* [Usage examples](#usage-examples)
 	* [Array syntax](#array-syntax)
 	* [List syntax](#list-syntax)
+	* [Let ```@DataProvider``` directly providing test data](#let-dataprovider-directly-providing-test-data)
 * [Release notes](#release-notes)
 * [Eclipse template](#eclipse-template)
 * [Contributing](#contributing)
@@ -81,7 +82,7 @@ Motivation and distinction
 #### May I move a junit-dataprovider into a separate class?
 
 > Of course, just move it to any from the test case accessible class and annotate it as usual with 
-> properly and use it with additionally specifying the location, see [Usage example](#usage-example).
+> properly and use it with additionally specifying the location, see [Usage examples](#usage-examples).
 
 #### Why must a ```@Dataprovider``` be static while similar [junitparams](https://code.google.com/p/junitparams/) does allow it non-static?
 
@@ -118,8 +119,8 @@ Following this link you can choose a version. For more information about a certa
 the **Dependency Information** section how to integrate it with your dependency management tool.
 
 
-Usage example
--------------
+Usage examples
+--------------
 
 ### Array syntax 
 
@@ -237,12 +238,57 @@ class DataProviderTest {
 
 ```
 
+### Let ```@DataProvider``` directly providing test data
+
+Instead of using ```@UseDataProvider``` to point to a method providing test data, you can directly
+pass test data using ```@DataProvider``` annotation and its ```#value()``` method to provide an
+array of comma-separated ```String```s. Each comma-separated ```String``` is split and trimmed back by
+spaces (= "``` ```"), tabs (= "```\t```) and line-separator (= "```\n```" or "```\r```"). The
+resulting ```String``` is then parsed to its corresponding type in the test method signature. All primitive
+types (e.g. ```char```, ```boolean```, ```int```), primitive wrapper types (e.g. ```Long```, ```Double```), ```Enum```s,
+and ```String```s are supported.
+
+*Note:* The ```String``` "null" will always be passed as ```null```.
+
+```java
+    // @formatter:off
+    @Test
+    @DataProvider({
+            ",                 0",
+            "a,                1",
+            "abc,              3",
+            "veryLongString,  14",
+        })
+    // @formatter:off
+    public void testStringLength(String str, int expectedLength) {
+        // Expect:
+        assertThat(str.length()).isEqualTo(expectedLength);
+    }
+
+    @Test
+    @DataProvider({
+            "null",
+            "",
+        })
+    public void testIsEmptyString2(String str) {
+        // When:
+        boolean isEmpty = (str == null) ? true : str.isEmpty();
+
+        // Then:
+        assertThat(isEmpty).isTrue();
+    }
+```
+
+Further examples can be found in [DataProviderJavaAcceptanceTest.java](/src/test/java/com/tngtech/test/java/junit/dataprovider/DataProviderJavaAcceptanceTest.java).
+
+
 Release notes
 -------------
 
 ### tbd. (???)
 
-* removed some internal debts by refactoring ([#23](/../../issues/23))
+* implemented [#20](/../../issues/20) to use ```@DataProvider``` directly providing test data for test method
+* removed some internal technical debts by refactoring ([#23](/../../issues/23))
 
 ### v1.6.0 (26-Apr-2014)
 

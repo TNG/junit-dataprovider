@@ -2,6 +2,7 @@ package com.tngtech.test.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -156,5 +157,48 @@ public class DataProviderJavaAcceptanceTest {
 
         // Then:
         assertThat(result).isEqualTo(expected);
+    }
+
+    // @formatter:off
+    @Test
+    @DataProvider({
+            ",                 0",
+            "a,                1",
+            "abc,              3",
+            "veryLongString,  14",
+        })
+    // @formatter:off
+    public void testStringLength(String str, int expectedLength) {
+        // Expect:
+        assertThat(str.length()).isEqualTo(expectedLength);
+    }
+
+    // @formatter:off
+    @Test
+    @DataProvider({
+        "0, UP",
+        "1, DOWN",
+        "3, FLOOR",
+    })
+    // @formatter:off
+    public void testOldModeToRoundingMode(int oldMode, RoundingMode expected) {
+        // When:
+        RoundingMode result = RoundingMode.valueOf(oldMode);
+
+        // Then:
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    @DataProvider({
+            "null",
+            "",
+        })
+    public void testIsEmptyString2(String str) {
+        // When:
+        boolean isEmpty = (str == null) ? true : str.isEmpty();
+
+        // Then:
+        assertThat(isEmpty).isTrue();
     }
 }
