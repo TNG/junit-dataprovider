@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 import org.junit.runners.model.FrameworkMethod;
 
+import com.tngtech.java.junit.dataprovider.internal.ParametersFormatter;
+
 /**
  * A special framework method that allows the usage of parameters for the test method.
  */
@@ -26,6 +28,11 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      */
     final Object[] parameters;
 
+    /**
+     * Formatter to format parameters for this test method properly.
+     */
+    private ParametersFormatter formatter;
+
     public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters) {
         super(method);
 
@@ -38,11 +45,12 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
 
         this.idx = idx;
         this.parameters = Arrays.copyOf(parameters, parameters.length);
+        this.formatter = new ParametersFormatter(); // set default formatter
     }
 
     @Override
     public String getName() {
-        return String.format("%s[%d: %s]", super.getName(), idx, format(parameters));
+        return String.format("%s[%d: %s]", super.getName(), idx, formatter.format(parameters));
     }
 
     @Override
@@ -81,71 +89,12 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     }
 
     /**
-     * Returns a string representation of the given parameters. The parameters are converted to string by the following
-     * rules:
-     * <ul>
-     * <li>null -&gt; &lt;null&gt;</li>
-     * <li>&quot;%quot; (= empty string) -&gt; &lt;empty string&gt;</li>
-     * <li>array (e.g. String[]) -&gt; &lt;array&gt;</li>
-     * <li>other -&gt; Object.toString</li>
-     * </ul>
-     *
-     * @param parameters the parameters are converted to a comma separated {@link String}
-     * @return a {@link String} representation of the given parameters
+     * Parameters formatter to format parameters of the test method.
+     * <p>
+     * This method exists and is package private (= visible) only for testing.
+     * </p>
      */
-    private <T> String format(T[] parameters) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < parameters.length; i++) {
-            Object param = parameters[i];
-            if (param == null) {
-                stringBuilder.append("<null>");
-
-            } else if (param.getClass().isArray()) {
-                if (param.getClass().getComponentType().isPrimitive()) {
-                    appendTo(stringBuilder, param);
-                } else {
-                    stringBuilder.append('[').append(format(getArray(param))).append(']');
-                }
-
-            } else if (param instanceof String && ((String) param).isEmpty()) {
-                stringBuilder.append("<empty string>");
-
-            } else {
-                stringBuilder.append(param.toString());
-            }
-
-            if (i < parameters.length - 1) {
-                stringBuilder.append(", ");
-            }
-        }
-
-        return stringBuilder.toString();
-    }
-
-    private void appendTo(StringBuilder stringBuilder, Object primitiveArray) {
-        Class<?> componentType = primitiveArray.getClass().getComponentType();
-        if (boolean.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((boolean[]) primitiveArray));
-        } else if (byte.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((byte[]) primitiveArray));
-        } else if (char.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((char[]) primitiveArray));
-        } else if (short.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((short[]) primitiveArray));
-        } else if (int.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((int[]) primitiveArray));
-        } else if (long.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((long[]) primitiveArray));
-        } else if (float.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((float[]) primitiveArray));
-        } else if (double.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((double[]) primitiveArray));
-        }
-    }
-
-    private <T> T[] getArray(Object array) {
-        @SuppressWarnings("unchecked")
-        T[] result = (T[]) array;
-        return result;
+    void setFormatter(ParametersFormatter formatter) {
+        this.formatter = formatter;
     }
 }

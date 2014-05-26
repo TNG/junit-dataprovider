@@ -2,12 +2,23 @@ package com.tngtech.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.lang.reflect.Method;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import com.tngtech.java.junit.dataprovider.internal.ParametersFormatter;
+
+@RunWith(MockitoJUnitRunner.class)
 public class DataProviderFrameworkMethodTest {
+
+    @Mock
+    private ParametersFormatter formatter;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
@@ -47,168 +58,22 @@ public class DataProviderFrameworkMethodTest {
     }
 
     @Test
-    public void testGetNameShouldReturnParametersStringContainingSingleStringValueIfJustOneParameterIsGiven() {
+    public void testGetNameShouldReturnStringContainingMethodNameAndCallParametersFormatter() {
         // Given:
         Method method = anyMethod();
-        final Object[] parameters = new Object[] { 718 };
+        final Object[] parameters = new Object[] { 718, "718" };
 
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 20, parameters);
+        underTest.setFormatter(formatter);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[20: 718]");
-    }
+        assertThat(result).matches(method.getName() + "\\[20: .*\\]");
 
-    @Test
-    public void testGetNameShouldReturnParamtersStringContainingMultipleValuesIfMultipleParametersAreGiven() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { 1024, "32", 128L };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 21, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[21: 1024, 32, 128\\]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForNull() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { null };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 30, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[30: <null>]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForNullNull() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { null, null };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 31, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[31: <null>, <null>]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForEmtpyString() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { "" };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 40, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[40: <empty string>]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForStringArray() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { new String[] { "test" } };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 50, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[50: \\[test]]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForPrimitiveBooleanTypeArray() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { new boolean[] { true, false } };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 52, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[52: \\[true, false]]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForPrimitiveCharTypeArray() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { new char[] { 'a', '0' } };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 54, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[54: \\[a, 0]]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForPrimitiveIntTypeArray() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { new int[] { 11, 2 } };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 56, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[56: \\[11, 2]]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForPrimitiveDoubleTypeArray() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { new double[] { .78, 3.15E2 } };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 58, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[58: \\[0.78, 315.0]]");
-    }
-
-    @Test
-    public void testGetNameShouldReturnSpecialHandlingForFurtherNestedArrays() {
-        // Given:
-        Method method = anyMethod();
-        final Object[] parameters = new Object[] { new Object[] { 1, new String[] { "a", "b", "c" } } };
-
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 60, parameters);
-
-        // When:
-        String result = underTest.getName();
-
-        // Then:
-        assertThat(result).matches(method.getName() + "\\[60: \\[1, \\[a, b, c]]]");
+        verify(formatter).format(parameters);
+        verifyNoMoreInteractions(formatter);
     }
 
     @Test
