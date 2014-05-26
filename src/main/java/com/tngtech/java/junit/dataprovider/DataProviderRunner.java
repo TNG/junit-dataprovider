@@ -130,8 +130,8 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     /**
      * Generates the exploded list of test methods for the given {@code testMethods}. Each of the given
      * {@link FrameworkMethod}s is checked if it uses a {@code @}{@link DataProvider} or not. If yes, for each line of
-     * the {@link DataProvider}s {@link Object}{@code [][]} result a specific test method with its parameters (=
-     * {@link Object}{@code []} will be added. If no, the original test method is added.
+     * the {@link DataProvider}s result a specific, parameterized test method will be added. If no, the original test
+     * method is added.
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
@@ -198,13 +198,13 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * Checks if the given method is a valid data provider. A method is a valid data provider if and only if the method
+     * Checks if the given {@code dataProviderMethod} is a valid data provider and adds a {@link Throwable} to
+     * {@code errors} if it
      * <ul>
-     * <li>is not null,</li>
-     * <li>is public,</li>
-     * <li>is static,</li>
-     * <li>has no parameters, and</li>
-     * <li>returns
+     * <li>is not public,</li>
+     * <li>is not static,</li>
+     * <li>takes parameters, or</li>
+     * <li>does return something other than
      * <ul>
      * <li>{@link Object}{@code [][]}, or</li>
      * <li>{@link List}{@code <}{@link List}{@code <}{@link Object}{@code >>}.</li>

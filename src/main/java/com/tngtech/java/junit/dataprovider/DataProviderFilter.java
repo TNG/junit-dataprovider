@@ -68,7 +68,7 @@ public class DataProviderFilter extends Filter {
                             descriptionMatcher.group(GROUP_METHOD_IDX));
         }
 
-        // explicitly check if any children want to run
+        // explicitly check if any children should to run
         for (Description each : description.getChildren()) {
             if (shouldRun(each)) {
                 return true;
