@@ -3,7 +3,9 @@ package com.tngtech.java.junit.dataprovider;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -216,19 +218,20 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testValidateDataProviderMethodsShouldAddErrorIfDataProviderIsNotValid() {
+    public void testValidateDataProviderMethodsShouldCallValidateDataProviderMethodForEachDataProvider() {
         // Given:
-        final String dataProviderName = "dataProviderMethodName";
+        FrameworkMethod testMethod1 = mock(FrameworkMethod.class);
+        FrameworkMethod testMethod2 = mock(FrameworkMethod.class);
+        FrameworkMethod dataProviderMethod1 = mock(FrameworkMethod.class);
+        FrameworkMethod dataProviderMethod2 = mock(FrameworkMethod.class);
 
-        FrameworkMethod testMethod = mock(FrameworkMethod.class);
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
-        UseDataProvider useDataProvider = mock(UseDataProvider.class);
+        doReturn(asList(testMethod1, testMethod2)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
+        doReturn(dataProviderMethod1).when(underTest).getDataProviderMethod(testMethod1);
+        doReturn(dataProviderMethod2).when(underTest).getDataProviderMethod(testMethod2);
+        doReturn(mock(UseDataProvider.class)).when(testMethod1).getAnnotation(UseDataProvider.class);
+        doReturn(mock(UseDataProvider.class)).when(testMethod2).getAnnotation(UseDataProvider.class);
 
-        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
-        doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(dataProviderName).when(useDataProvider).value();
-        doReturn(false).when(underTest).isValidDataProviderMethod(dataProviderMethod);
+        doNothing().when(underTest).validateDataProviderMethod(any(FrameworkMethod.class), anyListOf(Throwable.class));
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -236,33 +239,8 @@ public class DataProviderRunnerTest {
         underTest.validateDataProviderMethods(errors);
 
         // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must be public, static, has no arguments parameters and returns 'Object[][]'");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodsShouldNotAddAnyErrorIfDataProviderIsValid() {
-        // Given:
-        final String dataProviderName = "dataProviderMethodName";
-
-        FrameworkMethod testMethod = mock(FrameworkMethod.class);
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
-        UseDataProvider useDataProvider = mock(UseDataProvider.class);
-
-        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
-        doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(dataProviderName).when(useDataProvider).value();
-        doReturn(true).when(underTest).isValidDataProviderMethod(dataProviderMethod);
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        // When:
-        underTest.validateDataProviderMethods(errors);
-
-        // Then:
-        assertThat(errors).isEmpty();
+        verify(underTest).validateDataProviderMethod(dataProviderMethod1, errors);
+        verify(underTest).validateDataProviderMethod(dataProviderMethod2, errors);
     }
 
     @Test
@@ -289,13 +267,11 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testGenerateExplodedTestMethodsForShouldReturnOriginalTestMethodIfDataProviderMethodIsInvalid() {
+    public void testGenerateExplodedTestMethodsForShouldReturnOriginalTestMethodIfNoDataProviderMethod() {
         // Given:
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
-        doReturn(false).when(underTest).isValidDataProviderMethod(dataProviderMethod);
+        doReturn(null).when(underTest).getDataProviderMethod(testMethod);
 
         // When:
         List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(asList(testMethod));
@@ -311,7 +287,6 @@ public class DataProviderRunnerTest {
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
         doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
-        doReturn(true).when(underTest).isValidDataProviderMethod(dataProviderMethod);
 
         List<FrameworkMethod> explodedMethods = new ArrayList<FrameworkMethod>();
         explodedMethods.add(mock(FrameworkMethod.class));
@@ -423,182 +398,259 @@ public class DataProviderRunnerTest {
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfDataProviderMethodIsNull() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItIsNotPublic() {
+
         // Given:
+        String dataProviderName = "dataProviderNotPublic";
 
-        // When:
-        boolean result = underTest.isValidDataProviderMethod(null);
-
-        // Then:
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItIsNotPublic() {
-        // Given:
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
 
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonPublicDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be public");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItIsNotStatic() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItIsNotStatic() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderNotStatic";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonStaticDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be static");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItRequiresAnyParameter() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItRequiresParameters() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderNonNoArg";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonNoArgDataProviderMethod", Object.class)).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must have no parameters");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItDoesNotHaveCorrectReturnType() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsString() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderReturningString";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("stringReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must either return Object[][] or List<List<Object>>");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItDoesNotReturnListOfList() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsListOfObject() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderReturningListOfObject";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("listReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must either return Object[][] or List<List<Object>>");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItReturnsListOfIterable() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsListOfIterable() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderReturningListOfIterable";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("listOfIterableReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must either return Object[][] or List<List<Object>>");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItReturnsIterableOfIterable() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsIterableOfIterable() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderIterableOfIterable";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("iterableOfIterableReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must either return Object[][] or List<List<Object>>");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItReturnsSetOfSet() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsSetOfSet() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderReturningSetOfSet";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("setOfSetReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must either return Object[][] or List<List<Object>>");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnFalseIfItReturnsListOfListAndList() {
+    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsTwoArgList() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderReturningTwoArgList";
 
-        doReturn(getMethod("listOfListAndListReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
+        doReturn(getMethod("twoArgListReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must either return Object[][] or List<List<Object>>");
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsObjectArrayArray() {
+    public void testValidateDataProviderMethodShouldAddErrorsIfItNonStaticAndNonPublicAndNonNoArg() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderNonPublicNonStaticNonNoArg";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
+        doReturn(getMethod("nonPublicNonStaticNonNoArgDataProviderMethod", String.class)).when(dataProviderMethod)
+                .getMethod();
+
+        // When:
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
+
+        // Then:
+        assertThat(errors).hasSize(3);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be public");
+        assertThat(errors.get(1).getMessage()).contains(dataProviderName).containsIgnoringCase("must be static");
+        assertThat(errors.get(2).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must have no parameters");
+    }
+
+    @Test
+    public void testValidateDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsObjectArrayArray() {
+        // Given:
+        String dataProviderName = "dataProviderObjectArrayArray";
+
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("validDataProviderMethodArray")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isTrue();
+        assertThat(errors).isEmpty();
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsListListObject() {
+    public void testValidateDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsListListObject() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderListOfListOfObject";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("validDataProviderMethodList")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isTrue();
+        assertThat(errors).isEmpty();
     }
 
     @Test
-    public void testIsValidDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsSubListSub¥ListObject() {
+    public void testValidateDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsSubListSubListObject() {
         // Given:
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        String dataProviderName = "dataProviderSubListOfSubListOfObject";
 
+        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("validDataProviderMethodSubList")).when(dataProviderMethod).getMethod();
 
         // When:
-        boolean result = underTest.isValidDataProviderMethod(dataProviderMethod);
+        underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(result).isTrue();
+        assertThat(errors).isEmpty();
     }
 
     @Test(expected = Error.class)
@@ -817,8 +869,12 @@ public class DataProviderRunnerTest {
         // not required for now :-)
     }
 
-    public static TwoArgList<List<Object>, List<Object>> listOfListAndListReturningDataProviderMethod() {
+    public static TwoArgList<List<Object>, List<Object>> twoArgListReturningDataProviderMethod() {
         return null;
+    }
+
+    Object[][] nonPublicNonStaticNonNoArgDataProviderMethod(String arg1) {
+        return new Object[][] { { arg1 } };
     }
 
     public static Object[][] validDataProviderMethodArray() {

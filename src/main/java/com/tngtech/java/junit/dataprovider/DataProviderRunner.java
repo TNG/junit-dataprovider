@@ -114,15 +114,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             throw new IllegalArgumentException("errors must not be null");
         }
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
-            String dataProviderName = testMethod.getAnnotation(UseDataProvider.class).value();
-
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
-                errors.add(new Error("No such data provider: " + dataProviderName));
+                errors.add(new Error("No such data provider: " +  testMethod.getAnnotation(UseDataProvider.class).value()));
 
-            } else if (!isValidDataProviderMethod(dataProviderMethod)) {
-                errors.add(new Error("The data provider method '" + dataProviderName + "' is not valid. "
-                        + "A valid method must be public, static, has no arguments parameters and returns 'Object[][]'"));
+            } else {
+                validateDataProviderMethod(dataProviderMethod, errors);
             }
         }
     }
@@ -146,11 +143,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
         for (FrameworkMethod testMethod : testMethods) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
-
-            if (isValidDataProviderMethod(dataProviderMethod)) {
-                result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
-            } else {
+            if (dataProviderMethod == null) {
                 result.add(testMethod);
+            } else {
+                result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
             }
         }
         return result;
@@ -213,38 +209,39 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
+     * <ul>
      *
      * @param dataProviderMethod the method to check
-     * @return true if the method is a valid data provider, false otherwise
+     * @param errors to be "returned" and thrown as {@link InitializationError}
      */
-    boolean isValidDataProviderMethod(FrameworkMethod dataProviderMethod) {
-        if (dataProviderMethod == null) {
-            return false;
-        }
-
+    void validateDataProviderMethod(FrameworkMethod dataProviderMethod, List<Throwable> errors) {
         Method method = dataProviderMethod.getMethod();
 
-        // @formatter:off
-        boolean result = Modifier.isPublic(method.getModifiers())
-                && Modifier.isStatic(method.getModifiers())
-                && method.getParameterTypes().length == 0;
-        // @formatter:on
+        String messageBasePart = "Data provider method '" + dataProviderMethod.getName() + "' must";
+        if (!Modifier.isPublic(method.getModifiers())) {
+            errors.add(new Exception(messageBasePart + " be public"));
+        }
+        if (!Modifier.isStatic(method.getModifiers())) {
+            errors.add(new Exception(messageBasePart + " be static"));
+        }
+        if (method.getParameterTypes().length != 0) {
+            errors.add(new Exception(messageBasePart + " have no parameters"));
+        }
 
-        if (result) {
-            Class<?> returnClass = method.getReturnType();
-            if (Object[][].class.equals(returnClass)) {
-                return true;
-
-            } else if (List.class.isAssignableFrom(returnClass)) {
-                ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
-                if (returnType.getActualTypeArguments().length == 1
-                        && returnType.getActualTypeArguments()[0] instanceof ParameterizedType) {
-                    ParameterizedType type = (ParameterizedType) returnType.getActualTypeArguments()[0];
-                    return List.class.isAssignableFrom((Class<?>) type.getRawType());
+        Class<?> returnClass = method.getReturnType();
+        if (Object[][].class.equals(returnClass)) {
+            return;
+        } else if (List.class.isAssignableFrom(returnClass)) {
+            ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
+            if (returnType.getActualTypeArguments().length == 1
+                    && returnType.getActualTypeArguments()[0] instanceof ParameterizedType) {
+                ParameterizedType type = (ParameterizedType) returnType.getActualTypeArguments()[0];
+                if (List.class.isAssignableFrom((Class<?>) type.getRawType())) {
+                    return;
                 }
             }
         }
-        return false;
+        errors.add(new Exception(messageBasePart + " either return Object[][] or List<List<Object>>"));
     }
 
     /**
