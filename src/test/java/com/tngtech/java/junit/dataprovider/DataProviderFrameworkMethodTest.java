@@ -19,6 +19,8 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
     @Mock
     private ParametersFormatter formatter;
 
+    private final Method method = anyMethod();
+
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
     public void testDataProviderFrameworkMethodShouldThrowIllegalArgumentExceptionIfParameterIsNull() {
@@ -26,7 +28,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
 
         // When:
         @SuppressWarnings("unused")
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 0, null);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 0, null);
 
         // Then: expect exception
     }
@@ -38,7 +40,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
 
         // When:
         @SuppressWarnings("unused")
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 1, new Object[0]);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 1, new Object[0]);
 
         // Then: expect exception
     }
@@ -49,7 +51,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         final Object[] parameters = new Object[] { null, "1", 2L };
 
         // When:
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(anyMethod(), 10, parameters);
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 10, parameters);
 
         // Then:
         assertThat(underTest).isNotNull();
@@ -59,7 +61,6 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
     @Test
     public void testGetNameShouldReturnStringContainingMethodNameAndCallParametersFormatter() {
         // Given:
-        Method method = anyMethod();
         final Object[] parameters = new Object[] { 718, "718" };
 
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 20, parameters);
@@ -81,8 +82,8 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         final Object[] params1 = new Object[] { "str", 3, true };
         final Object[] params2 = new Object[] { "str", 3, true };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 70, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 70, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(method, 70, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(method, 70, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -97,8 +98,8 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         final Object[] params1 = new Object[] { null, 'a', false };
         final Object[] params2 = new Object[] { null, 'a', false };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 81, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 82, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(method, 81, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(method, 82, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -113,8 +114,8 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         final Object[] params1 = new Object[] { "test", 4L, true };
         final Object[] params2 = new Object[] { "test", 5L, false };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 83, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 83, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(method, 83, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(method, 83, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -129,8 +130,8 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         final Object[] params1 = new Object[] { 1, 22L, 333 };
         final Object[] params2 = new Object[] { "1", 22, 333L };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 84, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 84, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(method, 84, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(method, 84, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -145,8 +146,8 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         final Object[] params1 = new Object[] { 4.2, 't', false };
         final Object[] params2 = new Object[] { 4.2, 't', false };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(anyMethod(), 90, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(anyMethod(), 90, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(method, 90, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(method, 90, params2);
 
         // When:
         int result = m1.hashCode();
