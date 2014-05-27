@@ -2,7 +2,6 @@ package com.tngtech.java.junit.dataprovider;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doNothing;
@@ -12,7 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +29,7 @@ import org.mockito.Spy;
 
 import com.tngtech.test.java.junit.dataprovider.category.CategoryOne;
 
-public class DataProviderRunnerTest {
+public class DataProviderRunnerTest extends BaseTest {
 
     @Spy
     private DataProviderRunner underTest;
@@ -497,7 +495,7 @@ public class DataProviderRunnerTest {
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonNoArgDataProviderMethod", Object.class)).when(dataProviderMethod).getMethod();
+        doReturn(getMethod("nonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, errors);
@@ -637,8 +635,7 @@ public class DataProviderRunnerTest {
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonPublicNonStaticNonNoArgDataProviderMethod", String.class)).when(dataProviderMethod)
-                .getMethod();
+        doReturn(getMethod("nonPublicNonStaticNonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, errors);
@@ -778,7 +775,8 @@ public class DataProviderRunnerTest {
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        List<List<Object>> dataProviderMethodResult = toListOfList(new Object[][] { { 10L, 11, "12" } });
+        @SuppressWarnings("unchecked")
+        List<List<Object>> dataProviderMethodResult = list(this.<Object> list(10L, 11, "12"));
         doReturn(dataProviderMethodResult).when(dataProviderMethod).invokeExplosively(null);
 
         // When:
@@ -834,7 +832,8 @@ public class DataProviderRunnerTest {
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
 
-        List<List<Object>> dataProviderMethodResult = toListOfList(new Object[][] { { 1, "a" }, { 3, "b" }, { 5, "c" } });
+        @SuppressWarnings("unchecked")
+        List<List<?>> dataProviderMethodResult = list(this.<Object> list(1, "a"), list(3, "b"), list(5, "c"));
         doReturn(dataProviderMethodResult).when(dataProviderMethod).invokeExplosively(null);
 
         // When:
@@ -881,7 +880,7 @@ public class DataProviderRunnerTest {
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         DataProvider dataProvider = mock(DataProvider.class);
 
-        doReturn(getMethod("testStringString", String.class, String.class)).when(testMethod).getMethod();
+        doReturn(getMethod("testStringString")).when(testMethod).getMethod();
 
         String[] dataProviderValueResult = new String[] { "foo, bar" };
         doReturn(dataProviderValueResult).when(dataProvider).value();
@@ -906,7 +905,7 @@ public class DataProviderRunnerTest {
         FrameworkMethod testMethod = mock(FrameworkMethod.class);
         DataProvider dataProvider = mock(DataProvider.class);
 
-        doReturn(getMethod("testStringString", String.class, String.class)).when(testMethod).getMethod();
+        doReturn(getMethod("testStringString")).when(testMethod).getMethod();
 
         String[] dataProviderValueResult = new String[] { "2a, foo", "3b, bar", "4c, baz" };
         doReturn(dataProviderValueResult).when(dataProvider).value();
@@ -1146,15 +1145,7 @@ public class DataProviderRunnerTest {
         assertThat(result).isEqualTo(new Object[] { null, null });
     }
 
-    private Method getMethod(String methodName, Class<?>... args) {
-        final Class<? extends DataProviderRunnerTest> clazz = this.getClass();
-        try {
-            return clazz.getDeclaredMethod(methodName, args);
-        } catch (Exception e) {
-            fail(String.format("No method with name '%s' found in %s", methodName, clazz));
-            return null; // fool compiler
-        }
-    }
+    // -- helper methods -----------------------------------------------------------------------------------------------
 
     // Methods used to test isValidDataProviderMethod
     static Object[][] nonPublicDataProviderMethod() {
@@ -1222,22 +1213,5 @@ public class DataProviderRunnerTest {
 
     public static SubList<SubList<Object>> validDataProviderMethodSubList() {
         return null;
-    }
-
-    private static List<List<Object>> toListOfList(Object[][] objectArrayArray) {
-        List<List<Object>> result = new ArrayList<List<Object>>();
-        for (Object[] objectArray : objectArrayArray) {
-            List<Object> innerList = new ArrayList<Object>();
-            for (Object object : objectArray) {
-                innerList.add(object);
-            }
-            result.add(innerList);
-        }
-        return result;
-    }
-
-    private static enum TestEnum {
-        VAL1,
-        VAL2;
     }
 }

@@ -11,8 +11,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.tngtech.java.junit.dataprovider.BaseTest;
+
 @RunWith(MockitoJUnitRunner.class)
-public class ParametersFormatterTest {
+public class ParametersFormatterTest extends BaseTest {
 
     @InjectMocks
     private ParametersFormatter underTest;

@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 
-public class DataProviderFilterTest {
+public class DataProviderFilterTest extends BaseTest {
 
     private DataProviderFilter underTest;
 

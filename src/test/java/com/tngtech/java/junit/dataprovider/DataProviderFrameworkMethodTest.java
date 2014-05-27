@@ -1,7 +1,6 @@
 package com.tngtech.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -15,7 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.tngtech.java.junit.dataprovider.internal.ParametersFormatter;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DataProviderFrameworkMethodTest {
+public class DataProviderFrameworkMethodTest extends BaseTest {
 
     @Mock
     private ParametersFormatter formatter;
@@ -154,17 +153,5 @@ public class DataProviderFrameworkMethodTest {
 
         // Then:
         assertThat(result).isEqualTo(m2.hashCode());
-    }
-
-    private static Method anyMethod() {
-        final Class<DataProviderFrameworkMethodTest> clazz = DataProviderFrameworkMethodTest.class;
-        final String methodName = "anyMethod";
-
-        try {
-            return clazz.getDeclaredMethod(methodName);
-        } catch (Exception e) {
-            fail(String.format("No method with name '%s' found in %s", methodName, clazz));
-            return null; // fool compiler
-        }
     }
 }
