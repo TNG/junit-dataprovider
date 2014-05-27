@@ -2,7 +2,6 @@ package com.tngtech.java.junit.dataprovider;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +14,8 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
+
+import com.tngtech.java.junit.dataprovider.internal.DataConverter;
 
 /**
  * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like data providers. Data
@@ -34,6 +35,15 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             "org.apache.maven.surefire"
         );
     // @formatter:on
+
+    /**
+     * The {@link DataConverter} to be used to convert from supported return types of any data provider to
+     * {@link List}{@code <}{@link Object}{@code []>} such that data can be further handled.
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    DataConverter dataConverter;
 
     /**
      * <p>
@@ -73,6 +83,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
+        // initialize dataConverter here because "super" in constructor already calls this, i.e.
+        // fields are not initialized yet but required in super.collectInitializationErrors(errors) ...
+        dataConverter = new DataConverter();
         super.collectInitializationErrors(errors);
         validateDataProviderMethods(errors);
     }
@@ -217,11 +230,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * <li>is not public,</li>
      * <li>is not static,</li>
      * <li>takes parameters, or</li>
-     * <li>does return something other than
-     * <ul>
-     * <li>{@link Object}{@code [][]}, or</li>
-     * <li>{@link List}{@code <}{@link List}{@code <}{@link Object}{@code >>}.</li>
-     * </ul>
+     * <li>does return a convertable type, see {@link DataConverter#canConvert(Type)}
      * </ul>
      * <p>
      * This method is package private (= visible) for testing.
@@ -244,21 +253,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         if (method.getParameterTypes().length != 0) {
             errors.add(new Exception(messageBasePart + " have no parameters"));
         }
-
-        Class<?> returnClass = method.getReturnType();
-        if (Object[][].class.equals(returnClass)) {
-            return;
-        } else if (List.class.isAssignableFrom(returnClass)) {
-            ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
-            if (returnType.getActualTypeArguments().length == 1
-                    && returnType.getActualTypeArguments()[0] instanceof ParameterizedType) {
-                ParameterizedType type = (ParameterizedType) returnType.getActualTypeArguments()[0];
-                if (List.class.isAssignableFrom((Class<?>) type.getRawType())) {
-                    return;
-                }
-            }
+        if (!dataConverter.canConvert(method.getGenericReturnType())) {
+            errors.add(new Exception(messageBasePart + " either return Object[][] or List<List<Object>>"));
         }
-        errors.add(new Exception(messageBasePart + " either return Object[][] or List<List<Object>>"));
     }
 
     /**
@@ -272,31 +269,18 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * @return a list of methods, each method bound to a parameter combination returned by the data provider
      */
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
-        int idx = 0;
-        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
-
+        Object dataProviderParameters;
         try {
-            Object data = dataProviderMethod.invokeExplosively(null);
-            if (data instanceof Object[][]) {
-                for (Object[] parameters : (Object[][]) data) {
-                    result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
-                }
-
-            } else if (data instanceof List) {
-                // must be List<List<Object>>, see #isValidDataProviderMethod
-                @SuppressWarnings("unchecked")
-                List<List<Object>> lists = (List<List<Object>>) data;
-                for (List<Object> parameters : lists) {
-                    result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters.toArray()));
-                }
-            }
+            dataProviderParameters = dataProviderMethod.invokeExplosively(null);
         } catch (Throwable t) {
-            throw new Error(String.format("Exception while exploding test method using data provider '%s': %s",
+            throw new Error(String.format("Exception while invoking data provider method '%s': %s",
                     dataProviderMethod.getName(), t.getMessage()), t);
         }
 
+        List<FrameworkMethod> result = explodeTestMethod(testMethod, dataProviderParameters);
         if (result.isEmpty()) {
-            throw new Error(String.format("Data provider '%s' must not be empty.", dataProviderMethod.getName()));
+            throw new Error(String.format("Data provider '%s' must neither be null nor empty but was: %s.",
+                    dataProviderMethod.getName(), dataProviderParameters));
         }
         return result;
     }
@@ -312,25 +296,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * @return a list of methods, each method bound to a parameter combination returned by the {@link DataProvider}
      */
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
-        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+        String[] dataProviderParameters = dataProvider.value();
 
-        try {
-            String[] data = dataProvider.value();
-            Class<?>[] testMethodParameterTypes = testMethod.getMethod().getParameterTypes();
-
-            for (int idx = 0; idx < data.length; idx++) {
-                Object[] parameters = getParameters(data[idx], testMethodParameterTypes, idx);
-                result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx, parameters));
-            }
-
-        } catch (Throwable t) {
-            throw new Error(String.format("Exception while exploding test method using %ss value attribute: %s",
-                    dataProvider.getClass().getSimpleName(), t.getMessage()), t);
-        }
-
+        List<FrameworkMethod> result = explodeTestMethod(testMethod, dataProviderParameters);
         if (result.isEmpty()) {
-            throw new Error(String.format("%s.value() must not be initialized (was: empty array).", dataProvider
-                    .getClass().getSimpleName()));
+            throw new Error(String.format("%s.value() must be set but was: %s.", dataProvider.getClass()
+                    .getSimpleName(), dataProviderParameters));
         }
         return result;
     }
@@ -358,84 +329,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         return false;
     }
 
-    /**
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     *
-     * @param data comma separated {@link String} of parameters for test method
-     * @param parameterTypes target types of parameters to which corresponding value in comma separated {@code data}
-     *            should be converted
-     * @param rowIdx index of current {@code data} for better error messages
-     * @return split, trimmed and converted {@code Object[]} of supplied comma separated {@code data}
-     */
-    Object[] getParameters(String data, Class<?>[] parameterTypes, int rowIdx) {
-        Object[] result = new Object[parameterTypes.length];
-
-        String[] splitData = (data + " ").split(","); // add trailing whitespace that split for comma ended data works
-        if (parameterTypes.length != splitData.length) {
-            throw new Error(String.format("Test method expected %d parameters but got %d from @DataProvider row %d",
-                    parameterTypes.length, splitData.length, rowIdx));
-        }
-
-        for (int idx = 0; idx < splitData.length; idx++) {
-            result[idx] = convert(splitData[idx].trim(), parameterTypes[idx]);
+    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data) {
+        int idx = 0;
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+        for (Object[] parameters : dataConverter.convert(data, testMethod.getMethod().getParameterTypes())) {
+            result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
         }
         return result;
-    }
-
-    private Object convert(String str, Class<?> targetType) {
-
-        if ("null".equals(str)) {
-            return null;
-        }
-
-        if (String.class.equals(targetType)) {
-            return str;
-        }
-
-        if (boolean.class.equals(targetType) || Boolean.class.equals(targetType)) {
-            return Boolean.valueOf(str);
-        }
-        if (byte.class.equals(targetType) || Byte.class.equals(targetType)) {
-            return Byte.valueOf(str);
-        }
-        if (char.class.equals(targetType) || Character.class.equals(targetType)) {
-            if (str.length() == 1) {
-                return str.charAt(0);
-            }
-            throw new Error(String.format("'%s' cannot be converted to %s.", str, targetType.getSimpleName()));
-        }
-        if (short.class.equals(targetType) || Short.class.equals(targetType)) {
-            return Short.valueOf(str);
-        }
-        if (int.class.equals(targetType) || Integer.class.equals(targetType)) {
-            return Integer.valueOf(str);
-        }
-        if (long.class.equals(targetType) || Long.class.equals(targetType)) {
-            return Long.valueOf(str);
-        }
-        if (float.class.equals(targetType) || Float.class.equals(targetType)) {
-            return Float.valueOf(str);
-        }
-        if (double.class.equals(targetType) || Double.class.equals(targetType)) {
-            return Double.valueOf(str);
-        }
-
-        if (targetType.isEnum()) {
-            try {
-                @SuppressWarnings({ "rawtypes", "unchecked" })
-                Enum result = Enum.valueOf((Class<Enum>) targetType, str);
-                return result;
-
-            } catch (IllegalArgumentException e) {
-                throw new Error(String.format(
-                        "'%s' is not a valid value of enum %s used in @%s. Please be aware of case sensitivity.", str,
-                        targetType.getSimpleName(), DataProvider.class.getSimpleName()));
-            }
-        }
-
-        throw new Error(String.format("'%s' is not supported as parameter type of test using @%s.",
-                targetType.getSimpleName(), DataProvider.class.getSimpleName()));
     }
 }

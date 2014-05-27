@@ -11,9 +11,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
+import com.tngtech.java.junit.dataprovider.internal.DataConverter;
 import com.tngtech.test.java.junit.dataprovider.category.CategoryOne;
 
 public class DataProviderRunnerTest extends BaseTest {
@@ -34,6 +35,8 @@ public class DataProviderRunnerTest extends BaseTest {
     @Spy
     private DataProviderRunner underTest;
 
+    @Mock
+    private DataConverter dataConverter;
     @Mock
     private TestClass testClass;
     @Mock
@@ -50,13 +53,13 @@ public class DataProviderRunnerTest extends BaseTest {
         underTest = new DataProviderRunner(DataProviderRunnerTest.class);
 
         MockitoAnnotations.initMocks(this);
+        underTest.dataConverter = dataConverter; // override default dataConverter
         doReturn(testClass).when(underTest).getTestClassInt();
 
         doReturn(anyMethod()).when(testMethod).getMethod();
         doReturn(anyMethod()).when(dataProviderMethod).getMethod();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testDataProviderRunner() throws Exception {
         // Given:
@@ -426,13 +429,13 @@ public class DataProviderRunnerTest extends BaseTest {
 
     @Test
     public void testValidateDataProviderMethodShouldAddErrorIfItIsNotPublic() {
-        // Given:
         String dataProviderName = "dataProviderNotPublic";
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonPublicDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(true).when(dataConverter).canConvert(any(Type.class));
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, errors);
@@ -451,6 +454,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonStaticDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(true).when(dataConverter).canConvert(any(Type.class));
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, errors);
@@ -469,6 +473,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(true).when(dataConverter).canConvert(any(Type.class));
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, errors);
@@ -480,14 +485,15 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsString() {
+    public void testValidateDataProviderMethodShouldAddErrorIfNonConvertableReturnType() {
         // Given:
-        String dataProviderName = "dataProviderReturningString";
+        String dataProviderName = "dataProviderNonConvertableReturnType";
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("stringReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(false).when(dataConverter).canConvert(any(Type.class));
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, errors);
@@ -499,166 +505,39 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsListOfObject() {
+    public void testValidateDataProviderMethodShouldAddErrorsIfItIsNotPublicAndNotStaticAndNonNoArgAndNonConvertableReturnType() {
         // Given:
-        String dataProviderName = "dataProviderReturningListOfObject";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("listReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsListOfIterable() {
-        // Given:
-        String dataProviderName = "dataProviderReturningListOfIterable";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("listOfIterableReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsIterableOfIterable() {
-        // Given:
-        String dataProviderName = "dataProviderIterableOfIterable";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("iterableOfIterableReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsSetOfSet() {
-        // Given:
-        String dataProviderName = "dataProviderReturningSetOfSet";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("setOfSetReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItReturnsTwoArgList() {
-        // Given:
-        String dataProviderName = "dataProviderReturningTwoArgList";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("twoArgListReturningDataProviderMethod")).when(dataProviderMethod).getMethod();
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorsIfItNonStaticAndNonPublicAndNonNoArg() {
-        // Given:
-        String dataProviderName = "dataProviderNonPublicNonStaticNonNoArg";
+        String dataProviderName = "dataProviderNotPublicNotStaticNonNoArg";
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonPublicNonStaticNonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(false).when(dataConverter).canConvert(any(Type.class));
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, errors);
 
         // Then:
-        assertThat(errors).hasSize(3);
+        assertThat(errors).hasSize(4);
         assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be public");
         assertThat(errors.get(1).getMessage()).contains(dataProviderName).containsIgnoringCase("must be static");
         assertThat(errors.get(2).getMessage()).contains(dataProviderName).containsIgnoringCase(
                 "must have no parameters");
+        assertThat(errors.get(3).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must either return Object[][] or List<List<Object>>");
     }
 
     @Test
-    public void testValidateDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsObjectArrayArray() {
+    public void testValidateDataProviderMethodShouldAddNoErrorIfItIsValid() {
         // Given:
-        String dataProviderName = "dataProviderObjectArrayArray";
-
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethodArray")).when(dataProviderMethod).getMethod();
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsListListObject() {
-        // Given:
-        String dataProviderName = "dataProviderListOfListOfObject";
-
-        FrameworkMethod dataProviderMethod = mock(FrameworkMethod.class);
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethodList")).when(dataProviderMethod).getMethod();
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldReturnTrueIfItIsPublicStaticNoArgAndReturnsSubListSubListObject() {
-        // Given:
-        String dataProviderName = "dataProviderSubListOfSubListOfObject";
+        String dataProviderName = "validDataProvider";
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethodSubList")).when(dataProviderMethod).getMethod();
+        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(true).when(dataConverter).canConvert(any(Type.class));
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, errors);
@@ -680,21 +559,9 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test(expected = Error.class)
-    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataProviderMethodReturnsNull() throws Throwable {
+    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataConverterReturnsEmpty() {
         // Given:
-        doReturn(null).when(dataProviderMethod).invokeExplosively(null);
-
-        // When:
-        underTest.explodeTestMethod(testMethod, dataProviderMethod);
-
-        // Then: expect exception
-    }
-
-    @Test(expected = Error.class)
-    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataProviderMethodReturnsEmptyObjectArrayArray()
-            throws Throwable {
-        // Given:
-        doReturn(new Object[0][0]).when(dataProviderMethod).invokeExplosively(null);
+        doReturn(new ArrayList<Object[]>()).when(dataConverter).convert(any(), any(Class[].class));
 
         // When:
         underTest.explodeTestMethod(testMethod, dataProviderMethod);
@@ -703,112 +570,39 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodArrayReturnsOneRow()
-            throws Throwable {
-        // Given:
-        Object[][] dataProviderMethodResult = new Object[][] { { 1, 2, 3 } };
-        doReturn(dataProviderMethodResult).when(dataProviderMethod).invokeExplosively(null);
-
-        // When:
-        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
-
-        // Then:
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) result.get(0);
-        assertThat(actual.idx).isEqualTo(0);
-        assertThat(actual.parameters).isEqualTo(dataProviderMethodResult[0]);
-    }
-
-    @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataProviderMethodListReturnsOneRow()
-            throws Throwable {
-        // Given:
-        @SuppressWarnings("unchecked")
+    public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() {
         List<List<Object>> dataProviderMethodResult = list(this.<Object> list(10L, 11, "12"));
-        doReturn(dataProviderMethodResult).when(dataProviderMethod).invokeExplosively(null);
+        // Given:
+        List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, 2, 3 });
+        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) result.get(0);
-        assertThat(actual.idx).isEqualTo(0);
-        assertThat(actual.parameters).isEqualTo(dataProviderMethodResult.get(0).toArray());
+        assertDataProviderFrameworkMethods(result, dataConverterResult);
     }
 
     @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodArrayReturnsMultipleRow()
-            throws Throwable {
+    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataConverterReturnsMultipleRows() {
         // Given:
-
-        Object[][] dataProviderMethodResult = new Object[][] { { 1, "2", 3L }, { 4, "5", 6L }, { 7, "8", 9L } };
-        doReturn(dataProviderMethodResult).when(dataProviderMethod).invokeExplosively(null);
-
-        // When:
-        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
-
-        // Then:
-        assertThat(result).hasSize(3);
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual0 = (DataProviderFrameworkMethod) result.get(0);
-        assertThat(actual0.idx).isEqualTo(0);
-        assertThat(actual0.parameters).isEqualTo(dataProviderMethodResult[0]);
-
-        assertThat(result.get(1)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual1 = (DataProviderFrameworkMethod) result.get(1);
-        assertThat(actual1.idx).isEqualTo(1);
-        assertThat(actual1.parameters).isEqualTo(dataProviderMethodResult[1]);
-
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual2 = (DataProviderFrameworkMethod) result.get(2);
-        assertThat(actual2.idx).isEqualTo(2);
-        assertThat(actual2.parameters).isEqualTo(dataProviderMethodResult[2]);
-    }
-
-    @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderMethodListReturnsMultipleRow()
-            throws Throwable {
-        // Given:
-        @SuppressWarnings("unchecked")
+        List<Object[]> dataConverterResult = listOfArrays(new Object[] { 11, "22", 33L },
+                new Object[] { 44, "55",
+                66L }, new Object[] { 77, "88", 99L });
+        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
         List<List<?>> dataProviderMethodResult = list(this.<Object> list(1, "a"), list(3, "b"), list(5, "c"));
-        doReturn(dataProviderMethodResult).when(dataProviderMethod).invokeExplosively(null);
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
-        assertThat(result).hasSize(3);
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual0 = (DataProviderFrameworkMethod) result.get(0);
-        assertThat(actual0.idx).isEqualTo(0);
-        assertThat(actual0.parameters).isEqualTo(dataProviderMethodResult.get(0).toArray());
-
-        assertThat(result.get(1)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual1 = (DataProviderFrameworkMethod) result.get(1);
-        assertThat(actual1.idx).isEqualTo(1);
-        assertThat(actual1.parameters).isEqualTo(dataProviderMethodResult.get(1).toArray());
-
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual2 = (DataProviderFrameworkMethod) result.get(2);
-        assertThat(actual2.idx).isEqualTo(2);
-        assertThat(actual2.parameters).isEqualTo(dataProviderMethodResult.get(2).toArray());
+        assertDataProviderFrameworkMethods(result, dataConverterResult);
     }
 
     @Test(expected = Error.class)
-    public void testExplodeTestMethodsDataProviderShouldThrowErrorIfDataProviderValueReturnsAnEmptyArray() {
+    public void testExplodeTestMethodsDataProviderShouldThrowErrorIfDataConverterReturnsAnEmptyList() {
         // Given:
-        doReturn(new String[0]).when(dataProvider).value();
+        doReturn(new ArrayList<Object[]>()).when(dataConverter).convert(any(), any(Class[].class));
 
         // When:
         underTest.explodeTestMethod(testMethod, dataProvider);
@@ -817,57 +611,30 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testIsFilterBlackListedShouldReturnFalseForJUnitPackagedFilter() {
+    public void testExplodeTestMethodsDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() {
         // Given:
-        doReturn(getMethod("testStringString")).when(testMethod).getMethod();
-
-        String[] dataProviderValueResult = new String[] { "foo, bar" };
-        doReturn(dataProviderValueResult).when(dataProvider).value();
-
-        // TODO init testMethod for required types
+        List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, "test1" });
+        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) result.get(0);
-        assertThat(actual.idx).isEqualTo(0);
-        assertThat(actual.parameters).isEqualTo(new Object[] { "foo", "bar" });
+        assertDataProviderFrameworkMethods(result, dataConverterResult);
     }
 
     @Test
-    public void testExplodeTestMethodsDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderValueArrayReturnsMultipleRow() {
+    public void testExplodeTestMethodsDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderValueArrayReturnsMultipleRows() {
         // Given:
-        doReturn(getMethod("testStringString")).when(testMethod).getMethod();
-
-        String[] dataProviderValueResult = new String[] { "2a, foo", "3b, bar", "4c, baz" };
-        doReturn(dataProviderValueResult).when(dataProvider).value();
+        List<Object[]> dataConverterResult = listOfArrays(new Object[] { "2a", "foo" }, new Object[] { "3b", "bar" },
+                new Object[] { "4c", "baz" });
+        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(3);
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual0 = (DataProviderFrameworkMethod) result.get(0);
-        assertThat(actual0.idx).isEqualTo(0);
-        assertThat(actual0.parameters).isEqualTo(new Object[] { "2a", "foo" });
-
-        assertThat(result.get(1)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual1 = (DataProviderFrameworkMethod) result.get(1);
-        assertThat(actual1.idx).isEqualTo(1);
-        assertThat(actual1.parameters).isEqualTo(new Object[] { "3b", "bar" });
-
-        assertThat(result.get(0)).isInstanceOf(DataProviderFrameworkMethod.class);
-
-        DataProviderFrameworkMethod actual2 = (DataProviderFrameworkMethod) result.get(2);
-        assertThat(actual2.idx).isEqualTo(2);
-        assertThat(actual2.parameters).isEqualTo(new Object[] { "4c", "baz" });
+        assertDataProviderFrameworkMethods(result, dataConverterResult);
     }
 
     @Test
@@ -882,205 +649,6 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(result).isFalse();
     }
 
-    @Test(expected = Error.class)
-    public void testGetParametersShouldThrowErrorIfLengthOfSplitDataAndTargetTypesDiffer() {
-        // Given:
-        String data = "a";
-        Class<?>[] parameterTypes = new Class[] { String.class, String.class };
-        int rowIdx = 0;
-
-        // When:
-        underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then: expect exception
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypes() {
-        // Given:
-        String data = "true,1,c,2,3,4,5.5,6.6";
-        Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
-                long.class, float.class, double.class };
-        int rowIdx = 1;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { true, (byte) 1, 'c', (short) 2, 3, 4L, 5.5f, 6.6d });
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypesAsJavaString() {
-        // Given:
-        String data = "-2014,-1.234567f,-901e-3";
-        Class<?>[] parameterTypes = new Class[] { long.class, float.class, double.class };
-        int rowIdx = 2;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { -2014L, -1.234567f, -0.901d });
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyParseAllPrimitiveTypesEvenIfUntrimmed() {
-        // Given:
-        String data = "   false   ,    11    ,    z    ,  22       ,   33   ,44      ,   55.55     ,  66.66     ";
-        Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
-                long.class, float.class, double.class };
-        int rowIdx = 3;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { false, (byte) 11, 'z', (short) 22, 33, 44L, 55.55f, 66.66d });
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyTrimNonSpaceWhitespaceChars() {
-        // Given:
-        String data = "\n-1f\n,\r-2\r,\t3.0d\t";
-
-        Class<?>[] parameterTypes = new Class[] { float.class, int.class, double.class };
-        int rowIdx = 4;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { -1f, -2, 3d });
-    }
-
-    @Test
-    public void testGetParametersShouldNotTrimNonBreakingSpace() {
-        // Given:
-        String data = "\u00A0test\u00A0";
-
-        Class<?>[] parameterTypes = new Class[] { String.class };
-        int rowIdx = 5;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { "\u00A0test\u00A0" });
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyHandleLeadingEmptyString() {
-        // Given:
-        String data = ",true";
-        Class<?>[] parameterTypes = new Class[] { String.class, boolean.class };
-        int rowIdx = 6;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { "", true });
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyHandleTrailingEmptyString() {
-        // Given:
-        String data = "1,";
-        Class<?>[] parameterTypes = new Class[] { int.class, String.class };
-        int rowIdx = 7;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { 1, "" });
-    }
-
-    @Test(expected = Error.class)
-    public void testGetParametersShouldThrowErrorIfCharHasNotLengthOne() {
-        // Given:
-        String data = "noChar";
-        Class<?>[] parameterTypes = new Class[] { char.class };
-        int rowIdx = 8;
-
-        // When:
-        underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then: expect exception
-    }
-
-    @Test(expected = Error.class)
-    public void testGetParametersShouldThrowErrorForUnsupportedTargetType() {
-        // Given:
-        String data = "noObject";
-        Class<?>[] parameterTypes = new Class[] { Object.class };
-        int rowIdx = 9;
-
-        // When:
-        underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then: expect exception
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyParseEnum() {
-        // Given:
-        String data = " VAL1,  VAL2 ";
-        Class<?>[] parameterTypes = new Class[] { TestEnum.class, TestEnum.class };
-        int rowIdx = 10;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1, TestEnum.VAL2 });
-    }
-
-    @Test(expected = Error.class)
-    public void testGetParametersShouldThrowErrorIfEnumValueIsInvalid() {
-        // Given:
-        String data = "UNKNOW_ENUM_VALUE";
-        Class<?>[] parameterTypes = new Class[] { TestEnum.class };
-        int rowIdx = 11;
-
-        // When:
-        underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then: expect exception
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyParseAllPrimitiveWrapperTypes() {
-        // Given:
-        String data = "true,1,c,2,3,4,5.5,6.6";
-        Class<?>[] parameterTypes = new Class[] { Boolean.class, Byte.class, Character.class, Short.class,
-                Integer.class, Long.class, Float.class, Double.class };
-        int rowIdx = 12;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(
-                new Object[] { Boolean.TRUE, Byte.valueOf((byte) 1), Character.valueOf('c'), Short.valueOf((short) 2),
-                        Integer.valueOf(3), Long.valueOf(4L), Float.valueOf(5.5f), Double.valueOf(6.6d) });
-    }
-
-    @Test
-    public void testGetParametersShouldCorrectlyParseNullValue() {
-        // Given:
-        String data = "null, null  ";
-        Class<?>[] parameterTypes = new Class[] { Boolean.class, String.class };
-        int rowIdx = 13;
-
-        // When:
-        Object[] result = underTest.getParameters(data, parameterTypes, rowIdx);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[] { null, null });
-    }
-
     // -- helper methods -----------------------------------------------------------------------------------------------
 
     // Methods used to test isValidDataProviderMethod
@@ -1092,62 +660,26 @@ public class DataProviderRunnerTest extends BaseTest {
         return null;
     }
 
-    public static Object[][] nonNoArgDataProviderMethod(@SuppressWarnings("unused") Object obj) {
+    public static Object[][] nonNoArgDataProviderMethod(Object obj) {
+        return new Object[][] { { obj } };
+    }
+
+    String nonPublicNonStaticNonNoArgDataProviderMethod(String arg1) {
+        return arg1;
+    }
+
+    public static Object[][] validDataProviderMethod() {
         return null;
     }
 
-    public static String stringReturningDataProviderMethod() {
-        return null;
-    }
+    private void assertDataProviderFrameworkMethods(List<FrameworkMethod> actuals, List<Object[]> expecteds) {
+        assertThat(actuals).hasSameSizeAs(expecteds);
+        for (int idx = 0; idx < actuals.size(); idx++) {
+            assertThat(actuals.get(idx)).describedAs("at index " + idx).isInstanceOf(DataProviderFrameworkMethod.class);
 
-    public static List<Object> listReturningDataProviderMethod() {
-        return null;
-    }
-
-    public static List<Iterable<Object>> listOfIterableReturningDataProviderMethod() {
-        return null;
-    }
-
-    public static Set<Set<Object>> iterableOfIterableReturningDataProviderMethod() {
-        return null;
-    }
-
-    public static Set<Set<Object>> setOfSetReturningDataProviderMethod() {
-        return null;
-    }
-
-    @SuppressWarnings("serial")
-    private static class TwoArgList<A, B> extends ArrayList<A> {
-        // not required for now :-)
-    }
-
-    public static TwoArgList<List<Object>, List<Object>> twoArgListReturningDataProviderMethod() {
-        return null;
-    }
-
-    Object[][] nonPublicNonStaticNonNoArgDataProviderMethod(String arg1) {
-        return new Object[][] { { arg1 } };
-    }
-
-    public static Object[][] validDataProviderMethodArray() {
-        return null;
-    }
-
-    public static List<List<Object>> validDataProviderMethodList() {
-        return null;
-    }
-
-    @SuppressWarnings("unused")
-    public void testStringString(String s1, String s2) {
-        // Method to test @DataProvider simple row parsing
-    }
-
-    @SuppressWarnings("serial")
-    private static class SubList<A> extends ArrayList<A> {
-        // not required for now :-)
-    }
-
-    public static SubList<SubList<Object>> validDataProviderMethodSubList() {
-        return null;
+            DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) actuals.get(idx);
+            assertThat(actual.idx).describedAs("at index " + idx).isEqualTo(idx);
+            assertThat(actual.parameters).describedAs("at index " + idx).isEqualTo(expecteds.get(idx));
+        }
     }
 }
