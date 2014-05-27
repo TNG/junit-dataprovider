@@ -153,16 +153,17 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
         for (FrameworkMethod testMethod : testMethods) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
-            if (dataProviderMethod == null) {
+            if (dataProviderMethod != null) {
+                result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
+
+            } else {
                 DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
-                if (dataProvider == null) {
-                    result.add(testMethod);
+                if (dataProvider != null) {
+                    result.addAll(explodeTestMethod(testMethod, dataProvider));
 
                 } else {
-                    result.addAll(explodeTestMethod(testMethod, dataProvider));
+                    result.add(testMethod);
                 }
-            } else {
-                result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
             }
         }
         return result;
