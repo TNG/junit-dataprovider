@@ -125,7 +125,6 @@ public class DataConverterTest extends BaseTest {
         assertThat(result).isFalse();
     }
 
-
     @Test
     public void testCanConvertShouldReturnTrueIfTypeIsObjectArrayArray() {
         // Given:

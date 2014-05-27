@@ -89,7 +89,6 @@ public class DataProviderRunnerTest extends BaseTest {
     @Test(expected = NoTestsRemainException.class)
     public void testFilterShouldThrowNoTestRemainExceptionForNonBlacklistedAndRecognizableFilterHavingNoTestMethods()
             throws Exception {
-
         // Given:
         Filter filter = new Filter() {
             @Override
@@ -429,6 +428,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
     @Test
     public void testValidateDataProviderMethodShouldAddErrorIfItIsNotPublic() {
+        // Given:
         String dataProviderName = "dataProviderNotPublic";
 
         List<Throwable> errors = new ArrayList<Throwable>();
@@ -571,7 +571,6 @@ public class DataProviderRunnerTest extends BaseTest {
 
     @Test
     public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() {
-        List<List<Object>> dataProviderMethodResult = list(this.<Object> list(10L, 11, "12"));
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, 2, 3 });
         doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
@@ -587,10 +586,8 @@ public class DataProviderRunnerTest extends BaseTest {
     public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataConverterReturnsMultipleRows() {
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 11, "22", 33L },
-                new Object[] { 44, "55",
-                66L }, new Object[] { 77, "88", 99L });
+                new Object[] { 44, "55", 66L }, new Object[] { 77, "88", 99L });
         doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
-        List<List<?>> dataProviderMethodResult = list(this.<Object> list(1, "a"), list(3, "b"), list(5, "c"));
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);

@@ -53,7 +53,6 @@ public class DataProviderJavaAcceptanceTest {
     @Test
     @UseDataProvider(value = "dataProviderIsStringLengthGreaterTwo", location = StringDataProvider.class)
     public void testIsStringLengthGreaterThanTwo(String str, boolean expected) {
-
         // Given:
 
         // When:
@@ -92,7 +91,6 @@ public class DataProviderJavaAcceptanceTest {
 
     @DataProvider
     public static Object[][] dataProviderWithNonConstantObjects() {
-
         Calendar yesterday = Calendar.getInstance();
         yesterday.add(Calendar.DAY_OF_MONTH, -1);
 
@@ -132,7 +130,6 @@ public class DataProviderJavaAcceptanceTest {
 
     @DataProvider
     public static List<List<Object>> dataProviderNumberFormat() {
-
         List<List<Object>> result = new ArrayList<List<Object>>();
         List<Object> first = new ArrayList<Object>();
         first.add(Integer.valueOf(101));
@@ -182,11 +179,8 @@ public class DataProviderJavaAcceptanceTest {
     })
     // @formatter:off
     public void testOldModeToRoundingMode(int oldMode, RoundingMode expected) {
-        // When:
-        RoundingMode result = RoundingMode.valueOf(oldMode);
-
-        // Then:
-        assertThat(result).isEqualTo(expected);
+        // Expect:
+        assertThat(RoundingMode.valueOf(oldMode)).isEqualTo(expected);
     }
 
     @Test

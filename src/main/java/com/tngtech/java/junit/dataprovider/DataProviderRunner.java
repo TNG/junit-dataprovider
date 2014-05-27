@@ -37,8 +37,8 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     // @formatter:on
 
     /**
-     * The {@link DataConverter} to be used to convert from supported return types of any data provider to
-     * {@link List}{@code <}{@link Object}{@code []>} such that data can be further handled.
+     * The {@link DataConverter} to be used to convert from supported return types of any data provider to {@link List}
+     * {@code <}{@link Object}{@code []>} such that data can be further handled.
      * <p>
      * This field is package private (= visible) for testing.
      * </p>

@@ -59,7 +59,6 @@ public class DataConverter {
      * @throws ClassCastException iif {@code data} is not a compatible type
      */
     public List<Object[]> convert(Object data, Class<?>[] parameterTypes) {
-        // FIXME check parameters for Object[][] and List
         if (parameterTypes == null) {
             throw new NullPointerException("parameterTypes must not be null");
         }
