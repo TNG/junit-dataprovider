@@ -63,25 +63,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     @Override
-    public void filter(Filter filter) throws NoTestsRemainException {
-        Filter useFilter;
-        if (!(filter instanceof CategoryFilter) && !isFilterBlackListed(filter)) {
-            useFilter = new DataProviderFilter(filter);
-        } else {
-            useFilter = filter;
-        }
-        super.filter(useFilter);
-    }
-
-    @Override
-    protected List<FrameworkMethod> computeTestMethods() {
-        if (computedTestMethods == null) {
-            computedTestMethods = generateExplodedTestMethodsFor(super.computeTestMethods());
-        }
-        return computedTestMethods;
-    }
-
-    @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
         // initialize dataConverter here because "super" in constructor already calls this, i.e.
         // fields are not initialized yet but required in super.collectInitializationErrors(errors) ...
@@ -118,6 +99,25 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
     }
 
+    @Override
+    protected List<FrameworkMethod> computeTestMethods() {
+        if (computedTestMethods == null) {
+            computedTestMethods = generateExplodedTestMethodsFor(super.computeTestMethods());
+        }
+        return computedTestMethods;
+    }
+
+    @Override
+    public void filter(Filter filter) throws NoTestsRemainException {
+        Filter useFilter;
+        if (!(filter instanceof CategoryFilter) && !isFilterBlackListed(filter)) {
+            useFilter = new DataProviderFilter(filter);
+        } else {
+            useFilter = filter;
+        }
+        super.filter(useFilter);
+    }
+
     /**
      * Validates test methods and their data providers. This method cannot use the result of
      * {@link DataProviderRunner#computeTestMethods()} because the method ignores invalid test methods and data
@@ -145,6 +145,14 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
                 validateDataProviderMethod(dataProviderMethod, errors);
             }
         }
+    }
+
+    /**
+     * Returns a {@link TestClass} object wrapping the class to be executed. This method is required for testing because
+     * {@link #getTestClass()} is final and therefore cannot be stubbed :(
+     */
+    TestClass getTestClassInt() {
+        return getTestClass();
     }
 
     /**
@@ -183,6 +191,21 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
+     */
+    boolean isFilterBlackListed(Filter filter) {
+        String className = filter.getClass().getName();
+        for (String blacklistedPackage : BLACKLISTED_FILTER_PACKAGES) {
+            if (className.startsWith(blacklistedPackage)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns the data provider method that belongs to the given test method or {@code null} if no such data provider
      * exists or the test method is not marked for usage of a data provider
      * <p>
@@ -209,18 +232,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             }
         }
         return null;
-    }
-
-    /**
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     */
-    TestClass findDataProviderLocation(UseDataProvider useDataProvider) {
-        if (useDataProvider.location().length == 0) {
-            return getTestClassInt();
-        }
-        return new TestClass(useDataProvider.location()[0]);
     }
 
     /**
@@ -307,26 +318,15 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * Returns a {@link TestClass} object wrapping the class to be executed. This method is required for testing because
-     * {@link #getTestClass()} is final and therefore cannot be stubbed :(
-     */
-    TestClass getTestClassInt() {
-        return getTestClass();
-    }
-
-    /**
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
      */
-    boolean isFilterBlackListed(Filter filter) {
-        String className = filter.getClass().getName();
-        for (String blacklistedPackage : BLACKLISTED_FILTER_PACKAGES) {
-            if (className.startsWith(blacklistedPackage)) {
-                return true;
-            }
+    TestClass findDataProviderLocation(UseDataProvider useDataProvider) {
+        if (useDataProvider.location().length == 0) {
+            return getTestClassInt();
         }
-        return false;
+        return new TestClass(useDataProvider.location()[0]);
     }
 
     private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data) {

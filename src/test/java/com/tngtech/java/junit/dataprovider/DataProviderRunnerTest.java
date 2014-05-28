@@ -75,77 +75,6 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(underTest.getTestClass().getJavaClass()).isEqualTo(clazz);
     }
 
-    @Test
-    public void testFilterShouldNotThrowExceptionForJUnitCategoryFilter() throws Exception {
-        // Given:
-        Filter filter = new Categories.CategoryFilter(null, CategoryOne.class);
-
-        // When:
-        underTest.filter(filter);
-
-        // Then: expect no exception
-    }
-
-    @Test(expected = NoTestsRemainException.class)
-    public void testFilterShouldThrowNoTestRemainExceptionForNonBlacklistedAndRecognizableFilterHavingNoTestMethods()
-            throws Exception {
-        // Given:
-        Filter filter = new Filter() {
-            @Override
-            public boolean shouldRun(Description description) {
-                return true;
-            }
-
-            @Override
-            public String describe() {
-                return "testMethod(com.tngtech.java.junit.dataprovider.Test)";
-            }
-        };
-
-        // When:
-        underTest.filter(filter);
-
-        // Then: expect no exception
-    }
-
-    @Test
-    public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
-        // Given:
-        underTest.computedTestMethods = null;
-        doReturn(new ArrayList<FrameworkMethod>()).when(underTest).generateExplodedTestMethodsFor(
-                anyListOf(FrameworkMethod.class));
-
-        // When:
-        List<FrameworkMethod> result = underTest.computeTestMethods();
-
-        // Then:
-        assertThat(result).isEqualTo(underTest.computedTestMethods);
-
-        verify(underTest).computeTestMethods();
-        verify(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
-        verifyNoMoreInteractions(underTest);
-    }
-
-    @Test
-    public void testComputeTestMethodsShouldNotCallGenerateExplodedTestMethodsAndUseCachedResultIfCalledTheSecondTime() {
-        // Given:
-        final List<FrameworkMethod> expected = new ArrayList<FrameworkMethod>();
-
-        underTest.computedTestMethods = expected;
-
-        doReturn(expected).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
-
-        // When:
-        List<FrameworkMethod> result = underTest.computeTestMethods();
-
-        // Then:
-        assertThat(result).isSameAs(expected);
-        assertThat(underTest.computedTestMethods).isSameAs(expected);
-
-        verify(underTest).computeTestMethods();
-        verifyNoMoreInteractions(underTest);
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testValidateTestMethodsShouldThrowIllegalArgumentExceptionIfArgumentIsNull() {
         // Given:
@@ -233,6 +162,77 @@ public class DataProviderRunnerTest extends BaseTest {
         verify(testMethod).getAnnotation(UseDataProvider.class);
         verify(testMethod).getName();
         verifyNoMoreInteractions(testMethod);
+    }
+
+    @Test
+    public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
+        // Given:
+        underTest.computedTestMethods = null;
+        doReturn(new ArrayList<FrameworkMethod>()).when(underTest).generateExplodedTestMethodsFor(
+                anyListOf(FrameworkMethod.class));
+
+        // When:
+        List<FrameworkMethod> result = underTest.computeTestMethods();
+
+        // Then:
+        assertThat(result).isEqualTo(underTest.computedTestMethods);
+
+        verify(underTest).computeTestMethods();
+        verify(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
+        verifyNoMoreInteractions(underTest);
+    }
+
+    @Test
+    public void testComputeTestMethodsShouldNotCallGenerateExplodedTestMethodsAndUseCachedResultIfCalledTheSecondTime() {
+        // Given:
+        final List<FrameworkMethod> expected = new ArrayList<FrameworkMethod>();
+
+        underTest.computedTestMethods = expected;
+
+        doReturn(expected).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
+
+        // When:
+        List<FrameworkMethod> result = underTest.computeTestMethods();
+
+        // Then:
+        assertThat(result).isSameAs(expected);
+        assertThat(underTest.computedTestMethods).isSameAs(expected);
+
+        verify(underTest).computeTestMethods();
+        verifyNoMoreInteractions(underTest);
+    }
+
+    @Test
+    public void testFilterShouldNotThrowExceptionForJUnitCategoryFilter() throws Exception {
+        // Given:
+        Filter filter = new Categories.CategoryFilter(null, CategoryOne.class);
+
+        // When:
+        underTest.filter(filter);
+
+        // Then: expect no exception
+    }
+
+    @Test(expected = NoTestsRemainException.class)
+    public void testFilterShouldThrowNoTestRemainExceptionForNonBlacklistedAndRecognizableFilterHavingNoTestMethods()
+            throws Exception {
+        // Given:
+        Filter filter = new Filter() {
+            @Override
+            public boolean shouldRun(Description description) {
+                return true;
+            }
+
+            @Override
+            public String describe() {
+                return "testMethod(com.tngtech.java.junit.dataprovider.Test)";
+            }
+        };
+
+        // When:
+        underTest.filter(filter);
+
+        // Then: expect no exception
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -341,6 +341,18 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(result).hasSize(2).containsAll(explodedMethods);
     }
 
+    @Test
+    public void testIsFilterBlackListedShouldReturnFalseForJunitPackagedFilter() {
+        // Given:
+        Filter filter = Filter.ALL;
+
+        // When:
+        boolean result = underTest.isFilterBlackListed(filter);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testGetDataProviderMethodShouldThrowIllegalArgumentExceptionIfTestMethodIsNull() {
         // Given:
@@ -396,34 +408,6 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).isEqualTo(dataProviderMethod);
-    }
-
-    @Test
-    public void testFindDataProviderLocationShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
-        // Given:
-        doReturn(new Class<?>[0]).when(useDataProvider).location();
-
-        // When:
-        TestClass result = underTest.findDataProviderLocation(useDataProvider);
-
-        // Then:
-        assertThat(result).isEqualTo(testClass);
-    }
-
-    @Test
-    public void testFindDataProviderLocationShouldReturnTestClassContainingSetLocationInUseDataProviderAnnotation() {
-        // Given:
-        final Class<?> dataProviderLocation = DataProviderRunnerTest.class;
-
-        doReturn(new Class<?>[] { dataProviderLocation }).when(useDataProvider).location();
-
-        // When:
-        TestClass result = underTest.findDataProviderLocation(useDataProvider);
-
-        // Then:
-        assertThat(result).isNotNull();
-        // assertThat(result.getJavaClass()).isEqualTo(dataProviderLocation);
-        assertThat(result.getName()).isEqualTo(dataProviderLocation.getName());
     }
 
     @Test
@@ -634,19 +618,35 @@ public class DataProviderRunnerTest extends BaseTest {
         assertDataProviderFrameworkMethods(result, dataConverterResult);
     }
 
+    // -- helper methods -----------------------------------------------------------------------------------------------
+
     @Test
-    public void testIsFilterBlackListedShouldReturnFalseForJunitPackagedFilter() {
+    public void testFindDataProviderLocationShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
         // Given:
-        Filter filter = Filter.ALL;
+        doReturn(new Class<?>[0]).when(useDataProvider).location();
 
         // When:
-        boolean result = underTest.isFilterBlackListed(filter);
+        TestClass result = underTest.findDataProviderLocation(useDataProvider);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(result).isEqualTo(testClass);
     }
 
-    // -- helper methods -----------------------------------------------------------------------------------------------
+    @Test
+    public void testFindDataProviderLocationShouldReturnTestClassContainingSetLocationInUseDataProviderAnnotation() {
+        // Given:
+        final Class<?> dataProviderLocation = DataProviderRunnerTest.class;
+
+        doReturn(new Class<?>[] { dataProviderLocation }).when(useDataProvider).location();
+
+        // When:
+        TestClass result = underTest.findDataProviderLocation(useDataProvider);
+
+        // Then:
+        assertThat(result).isNotNull();
+        // assertThat(result.getJavaClass()).isEqualTo(dataProviderLocation);
+        assertThat(result.getName()).isEqualTo(dataProviderLocation.getName());
+    }
 
     // Methods used to test isValidDataProviderMethod
     static Object[][] nonPublicDataProviderMethod() {
