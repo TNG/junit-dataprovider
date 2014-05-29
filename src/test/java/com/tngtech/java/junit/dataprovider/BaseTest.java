@@ -28,16 +28,17 @@ public class BaseTest {
     }
 
     private Method getMethodInt(Class<?> clazz, String methodName) {
-        while (clazz != null) {
-            for (Method method : clazz.getDeclaredMethods()) {
-                if (method.getName().equals(methodName)) {
-                    return method;
-                }
-            }
-            return getMethodInt(clazz.getSuperclass(), methodName);
+        if (clazz == null) {
+            fail(String.format("No method with name '%s' found.", methodName));
+            return null;
         }
-        fail(String.format("No method with name '%s' found in %s", methodName, clazz));
-        return null; // fool compiler
+
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        return getMethodInt(clazz.getSuperclass(), methodName);
     }
 
     // -- helper methods to create arrays, lists etc. ------------------------------------------------------------------

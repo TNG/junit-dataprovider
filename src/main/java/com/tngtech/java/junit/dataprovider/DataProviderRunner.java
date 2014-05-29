@@ -288,12 +288,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
                     dataProviderMethod.getName(), t.getMessage()), t);
         }
 
-        List<FrameworkMethod> result = explodeTestMethod(testMethod, dataProviderParameters);
-        if (result.isEmpty()) {
-            throw new Error(String.format("Data provider '%s' must neither be null nor empty but was: %s.",
-                    dataProviderMethod.getName(), dataProviderParameters));
-        }
-        return result;
+        String emptyResultMessage = String.format("Data provider '%s' must neither be null nor empty but was: %s.",
+                dataProviderMethod.getName(), dataProviderParameters);
+        return explodeTestMethod(testMethod, dataProviderParameters, emptyResultMessage);
     }
 
     /**
@@ -309,12 +306,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
         String[] dataProviderParameters = dataProvider.value();
 
-        List<FrameworkMethod> result = explodeTestMethod(testMethod, dataProviderParameters);
-        if (result.isEmpty()) {
-            throw new Error(String.format("%s.value() must be set but was: %s.", dataProvider.getClass()
-                    .getSimpleName(), dataProviderParameters));
-        }
-        return result;
+        String emptyResultMessage = String.format("%s.value() must be set but was: %s.", dataProvider.getClass()
+                .getSimpleName(), Arrays.toString(dataProviderParameters));
+        return explodeTestMethod(testMethod, dataProviderParameters, emptyResultMessage);
     }
 
     /**
@@ -329,11 +323,14 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         return new TestClass(useDataProvider.location()[0]);
     }
 
-    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data) {
+    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data, String emptyResultMessage) {
         int idx = 0;
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
         for (Object[] parameters : dataConverter.convert(data, testMethod.getMethod().getParameterTypes())) {
             result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
+        }
+        if (result.isEmpty()) {
+            throw new Error(emptyResultMessage);
         }
         return result;
     }
