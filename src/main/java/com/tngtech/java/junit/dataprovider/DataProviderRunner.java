@@ -56,6 +56,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     FrameworkMethodGenerator frameworkMethodGenerator;
 
     /**
+     * Cached result of {@link #computeTestMethods()}.
      * <p>
      * This field is package private (= visible) for testing.
      * </p>
@@ -72,6 +73,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         super(clazz);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Additionally adds an error for each property on each data provider which is not valid (see
+     * {@link #validateDataProviderMethods(List)}).
+     */
     @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
         // initialize frameworkMethodGenerator and dataConverter here because "super" in constructor already calls this,
@@ -131,6 +138,14 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         return computedTestMethods;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If possible the given {@code filter} is wrapped by {@link DataProviderFilter} to enable filtering of tests using
+     * a data provider.
+     *
+     * @param filter the {@link Filter} to wrap/apply
+     */
     @Override
     public void filter(Filter filter) throws NoTestsRemainException {
         Filter useFilter;
