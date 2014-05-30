@@ -77,13 +77,42 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
     }
 
     @Test
+    public void testInvokeExplosively() throws Throwable {
+        // Given:
+        Object obj = new Object();
+
+        Method method = getMethod("returnObjectArrayArrayMethod");
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 30, new Object[] { obj });
+
+        // When:
+        Object result = underTest.invokeExplosively(this, (Object) null);
+
+        // Then:
+        assertThat(result).isSameAs(obj);
+    }
+
+    @Test
+    public void testEqualsShouldReturnTrueForSameObject() {
+        // Given:
+        final Object[] params = new Object[] { 1, 1.0 };
+        DataProviderFrameworkMethod m = new DataProviderFrameworkMethod(method, 70, params);
+
+        // When:
+        boolean result = m.equals(m);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
     public void testEqualsShouldReturnTrueForEqualObjects() {
         // Given:
         final Object[] params1 = new Object[] { "str", 3, true };
         final Object[] params2 = new Object[] { "str", 3, true };
 
-        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(method, 70, params1);
-        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(method, 70, params2);
+        DataProviderFrameworkMethod m1 = new DataProviderFrameworkMethod(method, 71, params1);
+        DataProviderFrameworkMethod m2 = new DataProviderFrameworkMethod(method, 71, params2);
 
         // When:
         boolean result = m1.equals(m2);
@@ -154,5 +183,11 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
 
         // Then:
         assertThat(result).isEqualTo(m2.hashCode());
+    }
+
+    // -- help methods -------------------------------------------------------------------------------------------------
+
+    public Object returnObjectArrayArrayMethod(Object param) {
+        return param;
     }
 }
