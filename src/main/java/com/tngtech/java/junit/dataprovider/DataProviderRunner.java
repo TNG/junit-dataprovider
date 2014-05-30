@@ -16,6 +16,7 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
 
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
+import com.tngtech.java.junit.dataprovider.internal.FrameworkMethodGenerator;
 
 /**
  * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like data providers. Data
@@ -46,6 +47,15 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     DataConverter dataConverter;
 
     /**
+     * The {@link FrameworkMethodGenerator} to be used to generate all framework methods to be executed as test
+     * (enhanced by data providers data if desired).
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    FrameworkMethodGenerator frameworkMethodGenerator;
+
+    /**
      * <p>
      * This field is package private (= visible) for testing.
      * </p>
@@ -64,9 +74,11 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
-        // initialize dataConverter here because "super" in constructor already calls this, i.e.
-        // fields are not initialized yet but required in super.collectInitializationErrors(errors) ...
+        // initialize frameworkMethodGenerator and dataConverter here because "super" in constructor already calls this,
+        // i.e. fields are not initialized yet but required in super.collectInitializationErrors(errors) ...
         dataConverter = new DataConverter();
+        frameworkMethodGenerator = new FrameworkMethodGenerator(dataConverter);
+
         super.collectInitializationErrors(errors);
         validateDataProviderMethods(errors);
     }
@@ -99,9 +111,21 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
     }
 
+    /**
+     * Generates the exploded list of methods that run tests. All methods annotated with {@code @Test} on this class and
+     * super classes that are not overridden are checked if they use a {@code @}{@link DataProvider} or not. If yes, for
+     * each row of the {@link DataProvider}s result a specific, parameterized test method will be added. If not, the
+     * original test method is added.
+     * <p>
+     * Additionally, caches the result as {@link #computeTestMethods()} is call multiple times while test execution by
+     * the JUnit framework (to validate, to filter, to execute, ...).
+     *
+     * @return the exploded list of test methods (never {@code null})
+     */
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
         if (computedTestMethods == null) {
+            // Further method for generation is required due to stubbing of "super.computeTestMethods()" is not possible
             computedTestMethods = generateExplodedTestMethodsFor(super.computeTestMethods());
         }
         return computedTestMethods;
@@ -174,18 +198,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
         for (FrameworkMethod testMethod : testMethods) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
-            if (dataProviderMethod != null) {
-                result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
-
-            } else {
-                DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
-                if (dataProvider != null) {
-                    result.addAll(explodeTestMethod(testMethod, dataProvider));
-
-                } else {
-                    result.add(testMethod);
-                }
-            }
+            result.addAll(frameworkMethodGenerator.generateExplodedTestMethodsFor(testMethod, dataProviderMethod));
         }
         return result;
     }
@@ -270,48 +283,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * Creates a list of test methods out of an existing test method and its data provider method.
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     *
-     * @param testMethod the original test method
-     * @param dataProviderMethod the data provider method that gives the parameters
-     * @return a list of methods, each method bound to a parameter combination returned by the data provider
-     */
-    List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
-        Object dataProviderParameters;
-        try {
-            dataProviderParameters = dataProviderMethod.invokeExplosively(null);
-        } catch (Throwable t) {
-            throw new Error(String.format("Exception while invoking data provider method '%s': %s",
-                    dataProviderMethod.getName(), t.getMessage()), t);
-        }
-
-        String emptyResultMessage = String.format("Data provider '%s' must neither be null nor empty but was: %s.",
-                dataProviderMethod.getName(), dataProviderParameters);
-        return explodeTestMethod(testMethod, dataProviderParameters, emptyResultMessage);
-    }
-
-    /**
-     * Creates a list of test methods out of an existing test method and its {@link DataProvider#value()} arguments.
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     *
-     * @param testMethod the original test method
-     * @param dataProvider the {@link DataProvider} gives the parameters
-     * @return a list of methods, each method bound to a parameter combination returned by the {@link DataProvider}
-     */
-    List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
-        String[] dataProviderParameters = dataProvider.value();
-
-        String emptyResultMessage = String.format("%s.value() must be set but was: %s.", dataProvider.getClass()
-                .getSimpleName(), Arrays.toString(dataProviderParameters));
-        return explodeTestMethod(testMethod, dataProviderParameters, emptyResultMessage);
-    }
-
-    /**
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
@@ -321,17 +292,5 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             return getTestClassInt();
         }
         return new TestClass(useDataProvider.location()[0]);
-    }
-
-    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data, String emptyResultMessage) {
-        int idx = 0;
-        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
-        for (Object[] parameters : dataConverter.convert(data, testMethod.getMethod().getParameterTypes())) {
-            result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
-        }
-        if (result.isEmpty()) {
-            throw new Error(emptyResultMessage);
-        }
-        return result;
     }
 }

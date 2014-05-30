@@ -1,11 +1,14 @@
 package com.tngtech.java.junit.dataprovider;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.runners.model.FrameworkMethod;
 
 public class BaseTest {
 
@@ -53,6 +56,19 @@ public class BaseTest {
             result.add(array);
         }
         return result;
+    }
+
+    // -- Assertion helper ---------------------------------------------------------------------------------------------
+
+    protected void assertDataProviderFrameworkMethods(List<FrameworkMethod> actuals, List<Object[]> expecteds) {
+        assertThat(actuals).hasSameSizeAs(expecteds);
+        for (int idx = 0; idx < actuals.size(); idx++) {
+            assertThat(actuals.get(idx)).describedAs("at index " + idx).isInstanceOf(DataProviderFrameworkMethod.class);
+
+            DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) actuals.get(idx);
+            assertThat(actual.idx).describedAs("at index " + idx).isEqualTo(idx);
+            assertThat(actual.parameters).describedAs("at index " + idx).isEqualTo(expecteds.get(idx));
+        }
     }
 
     // -- Test data ----------------------------------------------------------------------------------------------------

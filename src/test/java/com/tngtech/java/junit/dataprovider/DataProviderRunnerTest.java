@@ -6,7 +6,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -28,6 +27,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
+import com.tngtech.java.junit.dataprovider.internal.FrameworkMethodGenerator;
 import com.tngtech.test.java.junit.dataprovider.category.CategoryOne;
 
 public class DataProviderRunnerTest extends BaseTest {
@@ -37,6 +37,8 @@ public class DataProviderRunnerTest extends BaseTest {
 
     @Mock
     private DataConverter dataConverter;
+    @Mock
+    private FrameworkMethodGenerator frameworkMethodGenerator;
     @Mock
     private TestClass testClass;
     @Mock
@@ -54,6 +56,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         MockitoAnnotations.initMocks(this);
         underTest.dataConverter = dataConverter; // override default dataConverter
+        underTest.frameworkMethodGenerator = frameworkMethodGenerator;
         doReturn(testClass).when(underTest).getTestClassInt();
 
         doReturn(anyMethod()).when(testMethod).getMethod();
@@ -313,32 +316,73 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testGenerateExplodedTestMethodsForShouldReturnOriginalTestMethodIfNoDataProviderMethod() {
+    public void testGenerateExplodedTestMethodsForShouldCallFrameworkMethodGeneratorWithNotFoundDataProviderMethodAndAddResult() {
         // Given:
         doReturn(null).when(underTest).getDataProviderMethod(testMethod);
+        doReturn(asList(testMethod)).when(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod, null);
 
         // When:
         List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(asList(testMethod));
 
         // Then:
         assertThat(result).containsOnly(testMethod);
+
+        verify(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod, null);
+        verifyNoMoreInteractions(frameworkMethodGenerator);
     }
 
     @Test
-    public void testGenerateExplodedTestMethodsForShouldReturnExplodedTestMethodsForValidDataProvider() {
+    public void testGenerateExplodedTestMethodsForShouldCallFrameworkMethodGeneratorWithFoundDataProviderMethodAndAddResult() {
         // Given:
         doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
 
         List<FrameworkMethod> explodedMethods = new ArrayList<FrameworkMethod>();
         explodedMethods.add(mock(FrameworkMethod.class));
         explodedMethods.add(mock(FrameworkMethod.class));
-        doReturn(explodedMethods).when(underTest).explodeTestMethod(testMethod, dataProviderMethod);
+        doReturn(explodedMethods).when(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod,
+                dataProviderMethod);
 
         // When:
         List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(asList(testMethod));
 
         // Then:
         assertThat(result).hasSize(2).containsAll(explodedMethods);
+
+        verify(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod, dataProviderMethod);
+        verifyNoMoreInteractions(frameworkMethodGenerator);
+    }
+
+    @Test
+    public void testGenerateExplodedTestMethodsForShouldCallFrameworkMethodGeneratorForAllTestMethodsAndAddResult() {
+        // Given:
+        FrameworkMethod testMethod2 = mock(FrameworkMethod.class);
+        FrameworkMethod dataProviderMethod2 = mock(FrameworkMethod.class);
+
+        doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
+        doReturn(dataProviderMethod2).when(underTest).getDataProviderMethod(testMethod2);
+
+        List<FrameworkMethod> explodedMethods = new ArrayList<FrameworkMethod>();
+        explodedMethods.add(mock(FrameworkMethod.class));
+        explodedMethods.add(mock(FrameworkMethod.class));
+        doReturn(explodedMethods).when(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod,
+                dataProviderMethod);
+
+        List<FrameworkMethod> explodedMethods2 = new ArrayList<FrameworkMethod>();
+        explodedMethods2.add(mock(FrameworkMethod.class));
+        explodedMethods2.add(mock(FrameworkMethod.class));
+        explodedMethods2.add(mock(FrameworkMethod.class));
+        doReturn(explodedMethods2).when(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod2,
+                dataProviderMethod2);
+
+        // When:
+        List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(asList(testMethod, testMethod2));
+
+        // Then:
+        assertThat(result).hasSize(5).containsAll(explodedMethods).containsAll(explodedMethods2);
+
+        verify(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod, dataProviderMethod);
+        verify(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod2, dataProviderMethod2);
+        verifyNoMoreInteractions(frameworkMethodGenerator);
     }
 
     @Test
@@ -530,96 +574,6 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(errors).isEmpty();
     }
 
-    @Test(expected = Error.class)
-    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataProviderMethodThrowsException()
-            throws Throwable {
-        // Given:
-        doThrow(NullPointerException.class).when(dataProviderMethod).invokeExplosively(null);
-
-        // When:
-        underTest.explodeTestMethod(testMethod, dataProviderMethod);
-
-        // Then: expect exception
-    }
-
-    @Test(expected = Error.class)
-    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataConverterReturnsEmpty() {
-        // Given:
-        doReturn(new ArrayList<Object[]>()).when(dataConverter).convert(any(), any(Class[].class));
-
-        // When:
-        underTest.explodeTestMethod(testMethod, dataProviderMethod);
-
-        // Then: expect exception
-    }
-
-    @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() {
-        // Given:
-        List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, 2, 3 });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
-
-        // When:
-        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
-
-        // Then:
-        assertDataProviderFrameworkMethods(result, dataConverterResult);
-    }
-
-    @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataConverterReturnsMultipleRows() {
-        // Given:
-        List<Object[]> dataConverterResult = listOfArrays(new Object[] { 11, "22", 33L },
-                new Object[] { 44, "55", 66L }, new Object[] { 77, "88", 99L });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
-
-        // When:
-        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
-
-        // Then:
-        assertDataProviderFrameworkMethods(result, dataConverterResult);
-    }
-
-    @Test(expected = Error.class)
-    public void testExplodeTestMethodsDataProviderShouldThrowErrorIfDataConverterReturnsAnEmptyList() {
-        // Given:
-        doReturn(new ArrayList<Object[]>()).when(dataConverter).convert(any(), any(Class[].class));
-
-        // When:
-        underTest.explodeTestMethod(testMethod, dataProvider);
-
-        // Then: expect exception
-    }
-
-    @Test
-    public void testExplodeTestMethodsDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() {
-        // Given:
-        List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, "test1" });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
-
-        // When:
-        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
-
-        // Then:
-        assertDataProviderFrameworkMethods(result, dataConverterResult);
-    }
-
-    @Test
-    public void testExplodeTestMethodsDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataProviderValueArrayReturnsMultipleRows() {
-        // Given:
-        List<Object[]> dataConverterResult = listOfArrays(new Object[] { "2a", "foo" }, new Object[] { "3b", "bar" },
-                new Object[] { "4c", "baz" });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class));
-
-        // When:
-        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
-
-        // Then:
-        assertDataProviderFrameworkMethods(result, dataConverterResult);
-    }
-
-    // -- helper methods -----------------------------------------------------------------------------------------------
-
     @Test
     public void testFindDataProviderLocationShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
         // Given:
@@ -648,6 +602,8 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(result.getName()).isEqualTo(dataProviderLocation.getName());
     }
 
+    // -- helper methods -----------------------------------------------------------------------------------------------
+
     // Methods used to test isValidDataProviderMethod
     static Object[][] nonPublicDataProviderMethod() {
         return null;
@@ -667,16 +623,5 @@ public class DataProviderRunnerTest extends BaseTest {
 
     public static Object[][] validDataProviderMethod() {
         return null;
-    }
-
-    private void assertDataProviderFrameworkMethods(List<FrameworkMethod> actuals, List<Object[]> expecteds) {
-        assertThat(actuals).hasSameSizeAs(expecteds);
-        for (int idx = 0; idx < actuals.size(); idx++) {
-            assertThat(actuals.get(idx)).describedAs("at index " + idx).isInstanceOf(DataProviderFrameworkMethod.class);
-
-            DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) actuals.get(idx);
-            assertThat(actual.idx).describedAs("at index " + idx).isEqualTo(idx);
-            assertThat(actual.parameters).describedAs("at index " + idx).isEqualTo(expecteds.get(idx));
-        }
     }
 }
