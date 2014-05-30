@@ -10,11 +10,11 @@ import org.junit.runners.model.FrameworkMethod;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderFrameworkMethod;
 
-public class FrameworkMethodGenerator {
+public class TestGenerator {
 
     private final DataConverter dataConverter;
 
-    public FrameworkMethodGenerator(DataConverter dataConverter) {
+    public TestGenerator(DataConverter dataConverter) {
         if (dataConverter == null) {
             throw new NullPointerException("dataConverter must not be null");
         }
@@ -45,7 +45,6 @@ public class FrameworkMethodGenerator {
         DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
         if (dataProvider != null) {
             return explodeTestMethod(testMethod, dataProvider);
-
         }
         return Arrays.asList(testMethod);
     }

@@ -2,15 +2,13 @@ package com.tngtech.java.junit.dataprovider;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +25,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
-import com.tngtech.java.junit.dataprovider.internal.FrameworkMethodGenerator;
+import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
+import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 import com.tngtech.test.java.junit.dataprovider.category.CategoryOne;
 
 public class DataProviderRunnerTest extends BaseTest {
@@ -38,7 +37,11 @@ public class DataProviderRunnerTest extends BaseTest {
     @Mock
     private DataConverter dataConverter;
     @Mock
-    private FrameworkMethodGenerator frameworkMethodGenerator;
+    private TestValidator testValidator;
+    @Mock
+    private TestGenerator testGenerator;
+    @Mock
+    private TestGenerator frameworkMethodGenerator;
     @Mock
     private TestClass testClass;
     @Mock
@@ -56,7 +59,9 @@ public class DataProviderRunnerTest extends BaseTest {
 
         MockitoAnnotations.initMocks(this);
         underTest.dataConverter = dataConverter; // override default dataConverter
-        underTest.frameworkMethodGenerator = frameworkMethodGenerator;
+        underTest.testValidator = testValidator;
+        underTest.testGenerator = testGenerator;
+        underTest.testGenerator = frameworkMethodGenerator;
         doReturn(testClass).when(underTest).getTestClassInt();
 
         doReturn(anyMethod()).when(testMethod).getMethod();
@@ -78,8 +83,8 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(underTest.getTestClass().getJavaClass()).isEqualTo(clazz);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testValidateTestMethodsShouldThrowIllegalArgumentExceptionIfArgumentIsNull() {
+    @Test(expected = NullPointerException.class)
+    public void testValidateTestMethodsShouldThrowNullPointerExceptionIfArgumentIsNull() {
         // Given:
 
         // When:
@@ -89,10 +94,9 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testValidateTestMethodsShouldCheckForPublicVoidNoArgIfNormalTestMethod() {
+    public void testValidateTestMethodsShouldCallTestValidatorValidateTestMethodForSingleTestMethod() {
         // Given:
         doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(Test.class);
-        doReturn(null).when(testMethod).getAnnotation(UseDataProvider.class);
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -100,55 +104,38 @@ public class DataProviderRunnerTest extends BaseTest {
         underTest.validateTestMethods(errors);
 
         // Then:
-        verify(testMethod).getAnnotation(DataProvider.class);
-        verify(testMethod).getAnnotation(UseDataProvider.class);
-        verify(testMethod).validatePublicVoidNoArg(false, errors);
-        verifyNoMoreInteractions(testMethod);
+        verify(testValidator).validateTestMethod(testMethod, errors);
+        verifyNoMoreInteractions(testValidator);
     }
 
     @Test
-    public void testValidateTestMethodsShouldCheckForPublicVoidIfUseDataProviderTestMethod() {
+    public void testValidateTestMethodsShouldCallTestValidatorValidateTestMethodForMultipleTestMethods() {
         // Given:
-        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(Test.class);
+        FrameworkMethod testMethod2 = mock(FrameworkMethod.class);
+        FrameworkMethod testMethod3 = mock(FrameworkMethod.class);
+        doReturn(asList(testMethod, testMethod2, testMethod3)).when(testClass).getAnnotatedMethods(Test.class);
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        // When:
+        underTest.validateTestMethods(errors);
+
+        // Then:
+        verify(testValidator).validateTestMethod(testMethod, errors);
+        verify(testValidator).validateTestMethod(testMethod2, errors);
+        verify(testValidator).validateTestMethod(testMethod3, errors);
+        verifyNoMoreInteractions(testValidator);
+    }
+
+    @Test
+    public void testValidateTestMethodsShouldAddErrorIfDataProviderMethodNotFoundForMethodWithUseDataProvider() {
+        // Given:
+        String dataProviderName = "notFoundDataProvider";
+
+        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
+        doReturn(null).when(underTest).getDataProviderMethod(testMethod);
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        // When:
-        underTest.validateTestMethods(errors);
-
-        // Then:
-        verify(testMethod).getAnnotation(DataProvider.class);
-        verify(testMethod).getAnnotation(UseDataProvider.class);
-        verify(testMethod).validatePublicVoid(false, errors);
-        verifyNoMoreInteractions(testMethod);
-    }
-
-    @Test
-    public void testValidateTestMethodsShouldCheckForPublicVoidIfDataProviderTestMethod() {
-        // Given:
-        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(Test.class);
-        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        // When:
-        underTest.validateTestMethods(errors);
-
-        // Then:
-        verify(testMethod).getAnnotation(DataProvider.class);
-        verify(testMethod).getAnnotation(UseDataProvider.class);
-        verify(testMethod).validatePublicVoid(false, errors);
-        verifyNoMoreInteractions(testMethod);
-    }
-
-    @Test
-    public void testValidateTestMethodsShouldAddErrorIfDataProviderAndUseDataProviderTestMethod() {
-        // Given:
-        doReturn("test1").when(testMethod).getName();
-        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(Test.class);
-        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
+        doReturn(dataProviderName).when(useDataProvider).value();
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -157,13 +144,56 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(errors).hasSize(1);
-        assertThat(errors.get(0)).isInstanceOf(Exception.class);
-        assertThat(errors.get(0).getMessage()).matches(
-                "Method test1\\(\\) should either have @UseDataProvider.* or @DataProvider.* annotation");
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such data provider");
 
-        verify(testMethod).getAnnotation(DataProvider.class);
-        verify(testMethod).getAnnotation(UseDataProvider.class);
-        verify(testMethod).getName();
+        verifyZeroInteractions(testValidator);
+    }
+
+    @Test
+    public void testValidateTestMethodsShouldCallTestValidatorValidateDataProviderMethodIfDataProviderMethodFound() {
+        // Given:
+        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
+        doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        // When:
+        underTest.validateTestMethods(errors);
+
+        // Then:
+        verify(testValidator).validateDataProviderMethod(dataProviderMethod, errors);
+        verifyNoMoreInteractions(testValidator);
+    }
+
+    @Test
+    public void testValidateTestMethodsShouldWorkCorrectlyForMultipleMethodsAnnotatedWithUseDataProvider() {
+        // Given:
+        String dataProviderName = "notFoundDataProvider3";
+
+        FrameworkMethod testMethod2 = mock(FrameworkMethod.class);
+        FrameworkMethod testMethod3 = mock(FrameworkMethod.class);
+        FrameworkMethod dataProviderMethod2 = mock(FrameworkMethod.class);
+
+        doReturn(asList(testMethod, testMethod2, testMethod3)).when(testClass).getAnnotatedMethods(
+                UseDataProvider.class);
+        doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
+        doReturn(dataProviderMethod2).when(underTest).getDataProviderMethod(testMethod2);
+        doReturn(null).when(underTest).getDataProviderMethod(testMethod3);
+
+        doReturn(useDataProvider).when(testMethod3).getAnnotation(UseDataProvider.class);
+        doReturn(dataProviderName).when(useDataProvider).value();
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        // When:
+        underTest.validateTestMethods(errors);
+
+        // Then:
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such data provider");
+
+        verify(testValidator).validateDataProviderMethod(dataProviderMethod, errors);
+        verify(testValidator).validateDataProviderMethod(dataProviderMethod2, errors);
         verifyNoMoreInteractions(testMethod);
     }
 
@@ -236,60 +266,6 @@ public class DataProviderRunnerTest extends BaseTest {
         underTest.filter(filter);
 
         // Then: expect no exception
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testValidateDataProviderMethodsShouldThrowIllegalArgumentExceptionIfArgumentIsNull() {
-        // Given:
-
-        // When:
-        underTest.validateDataProviderMethods(null);
-
-        // Then: expect exception
-    }
-
-    @Test
-    public void testValidateDataProviderMethodsShouldAddErrorIfDataProviderMethodDoesNotExist() {
-        // Given:
-        final String dataProviderName = "dataProviderMethodName";
-
-        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(dataProviderName).when(useDataProvider).value();
-        doReturn(null).when(underTest).getDataProviderMethod(testMethod);
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        // When:
-        underTest.validateDataProviderMethods(errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such data provider");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodsShouldCallValidateDataProviderMethodForEachDataProvider() {
-        // Given:
-        FrameworkMethod testMethod2 = mock(FrameworkMethod.class);
-        FrameworkMethod dataProviderMethod2 = mock(FrameworkMethod.class);
-
-        doReturn(asList(testMethod, testMethod2)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
-        doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
-        doReturn(dataProviderMethod2).when(underTest).getDataProviderMethod(testMethod2);
-        doReturn(mock(UseDataProvider.class)).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(mock(UseDataProvider.class)).when(testMethod2).getAnnotation(UseDataProvider.class);
-
-        doNothing().when(underTest).validateDataProviderMethod(any(FrameworkMethod.class), anyListOf(Throwable.class));
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        // When:
-        underTest.validateDataProviderMethods(errors);
-
-        // Then:
-        verify(underTest).validateDataProviderMethod(dataProviderMethod, errors);
-        verify(underTest).validateDataProviderMethod(dataProviderMethod2, errors);
     }
 
     @Test
@@ -455,126 +431,6 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItIsNotPublic() {
-        // Given:
-        String dataProviderName = "dataProviderNotPublic";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonPublicDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be public");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItIsNotStatic() {
-        // Given:
-        String dataProviderName = "dataProviderNotStatic";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonStaticDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be static");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfItRequiresParameters() {
-        // Given:
-        String dataProviderName = "dataProviderNonNoArg";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must have no parameters");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfNonConvertableReturnType() {
-        // Given:
-        String dataProviderName = "dataProviderNonConvertableReturnType";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(false).when(dataConverter).canConvert(any(Type.class));
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddErrorsIfItIsNotPublicAndNotStaticAndNonNoArgAndNonConvertableReturnType() {
-        // Given:
-        String dataProviderName = "dataProviderNotPublicNotStaticNonNoArg";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonPublicNonStaticNonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(false).when(dataConverter).canConvert(any(Type.class));
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).hasSize(4);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be public");
-        assertThat(errors.get(1).getMessage()).contains(dataProviderName).containsIgnoringCase("must be static");
-        assertThat(errors.get(2).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must have no parameters");
-        assertThat(errors.get(3).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
-    }
-
-    @Test
-    public void testValidateDataProviderMethodShouldAddNoErrorIfItIsValid() {
-        // Given:
-        String dataProviderName = "validDataProvider";
-
-        List<Throwable> errors = new ArrayList<Throwable>();
-
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-
-        // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
-
-        // Then:
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
     public void testFindDataProviderLocationShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
         // Given:
         doReturn(new Class<?>[0]).when(useDataProvider).location();
@@ -600,28 +456,5 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(result).isNotNull();
         // assertThat(result.getJavaClass()).isEqualTo(dataProviderLocation);
         assertThat(result.getName()).isEqualTo(dataProviderLocation.getName());
-    }
-
-    // -- helper methods -----------------------------------------------------------------------------------------------
-
-    // Methods used to test isValidDataProviderMethod
-    static Object[][] nonPublicDataProviderMethod() {
-        return null;
-    }
-
-    public List<List<Object>> nonStaticDataProviderMethod() {
-        return null;
-    }
-
-    public static Object[][] nonNoArgDataProviderMethod(Object obj) {
-        return new Object[][] { { obj } };
-    }
-
-    String nonPublicNonStaticNonNoArgDataProviderMethod(String arg1) {
-        return arg1;
-    }
-
-    public static Object[][] validDataProviderMethod() {
-        return null;
     }
 }

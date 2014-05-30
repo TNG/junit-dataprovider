@@ -1,7 +1,5 @@
 package com.tngtech.java.junit.dataprovider;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +14,8 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
 
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
-import com.tngtech.java.junit.dataprovider.internal.FrameworkMethodGenerator;
+import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
+import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
 /**
  * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like data providers. Data
@@ -47,13 +46,23 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     DataConverter dataConverter;
 
     /**
-     * The {@link FrameworkMethodGenerator} to be used to generate all framework methods to be executed as test
-     * (enhanced by data providers data if desired).
+     * The {@link TestValidator} to be used to validate all test methods to be executed as test and all data provider to
+     * be used to explode tests.
      * <p>
      * This field is package private (= visible) for testing.
      * </p>
      */
-    FrameworkMethodGenerator frameworkMethodGenerator;
+    TestValidator testValidator;
+
+    /**
+     * The {@link TestGenerator} to be used to generate all framework methods to be executed as test (enhanced by data
+     * providers data if desired).
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    TestGenerator testGenerator;
+
 
     /**
      * Cached result of {@link #computeTestMethods()}.
@@ -73,47 +82,46 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         super(clazz);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Additionally adds an error for each property on each data provider which is not valid (see
-     * {@link #validateDataProviderMethods(List)}).
-     */
     @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
-        // initialize frameworkMethodGenerator and dataConverter here because "super" in constructor already calls this,
-        // i.e. fields are not initialized yet but required in super.collectInitializationErrors(errors) ...
+        // initialize testValidator, testGenerator and dataConverter here because "super" in constructor already calls
+        // this, i.e. fields are not initialized yet but required in super.collectInitializationErrors(errors) ...
         dataConverter = new DataConverter();
-        frameworkMethodGenerator = new FrameworkMethodGenerator(dataConverter);
+        testValidator = new TestValidator(dataConverter);
+        testGenerator = new TestGenerator(dataConverter);
 
         super.collectInitializationErrors(errors);
-        validateDataProviderMethods(errors);
     }
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Additionally validates data providers.
      *
-     * @throws IllegalArgumentException if given {@code errors} is {@code null}
+     * @param errors that are added to this list
+     * @throws NullPointerException if given {@code errors} is {@code null}
      */
     @Override
     protected void validateTestMethods(List<Throwable> errors) {
         if (errors == null) {
-            throw new IllegalArgumentException("errors must not be null");
+            throw new NullPointerException("errors must not be null");
         }
+
+        // This method cannot use the result of "computeTestMethods()" because the method ignores invalid test methods
+        // and data providers silently (except if a data provider method cannot be called). However, the common errors
+        // are not raised as {@link RuntimeException} to go the JUnit way of detecting errors. This implies that we have
+        // to browse the whole class for test methods and data providers again :-(.
+
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(Test.class)) {
-            UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
-            DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
-
-            if (useDataProvider != null && dataProvider != null) {
-                errors.add(new Exception(String.format("Method %s() should either have @%s or @%s annotation",
-                        testMethod.getName(), useDataProvider.getClass().getSimpleName(), dataProvider.getClass()
-                                .getSimpleName())));
-
-            } else if (useDataProvider == null && dataProvider == null) {
-                testMethod.validatePublicVoidNoArg(false, errors);
-
+            testValidator.validateTestMethod(testMethod, errors);
+        }
+        for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
+            FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
+            if (dataProviderMethod == null) {
+                errors.add(new Exception("No such data provider: "
+                        + testMethod.getAnnotation(UseDataProvider.class).value()));
             } else {
-                testMethod.validatePublicVoid(false, errors);
+                testValidator.validateDataProviderMethod(dataProviderMethod, errors);
             }
         }
     }
@@ -158,35 +166,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * Validates test methods and their data providers. This method cannot use the result of
-     * {@link DataProviderRunner#computeTestMethods()} because the method ignores invalid test methods and data
-     * providers silently (except if a data provider method cannot be called). However, the common errors are not raised
-     * as {@link RuntimeException} to go the JUnit way of detecting errors. This implies that we have to browse the
-     * whole class for test methods and data providers again :-(.
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     *
-     * @param errors that are added to this list
-     * @throws IllegalArgumentException if given {@code errors} is {@code null}
-     */
-    void validateDataProviderMethods(List<Throwable> errors) {
-        if (errors == null) {
-            throw new IllegalArgumentException("errors must not be null");
-        }
-        for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
-            FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
-            if (dataProviderMethod == null) {
-                errors.add(new Exception("No such data provider: "
-                        + testMethod.getAnnotation(UseDataProvider.class).value()));
-
-            } else {
-                validateDataProviderMethod(dataProviderMethod, errors);
-            }
-        }
-    }
-
-    /**
      * Returns a {@link TestClass} object wrapping the class to be executed. This method is required for testing because
      * {@link #getTestClass()} is final and therefore cannot be stubbed :(
      */
@@ -213,7 +192,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
         for (FrameworkMethod testMethod : testMethods) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
-            result.addAll(frameworkMethodGenerator.generateExplodedTestMethodsFor(testMethod, dataProviderMethod));
+            result.addAll(testGenerator.generateExplodedTestMethodsFor(testMethod, dataProviderMethod));
         }
         return result;
     }
@@ -260,41 +239,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             }
         }
         return null;
-    }
-
-    /**
-     * Checks if the given {@code dataProviderMethod} is a valid data provider and adds a {@link Throwable} to
-     * {@code errors} if it
-     * <ul>
-     * <li>is not public,</li>
-     * <li>is not static,</li>
-     * <li>takes parameters, or</li>
-     * <li>does return a convertable type, see {@link DataConverter#canConvert(Type)}
-     * </ul>
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     * <ul>
-     *
-     * @param dataProviderMethod the method to check
-     * @param errors to be "returned" and thrown as {@link InitializationError}
-     */
-    void validateDataProviderMethod(FrameworkMethod dataProviderMethod, List<Throwable> errors) {
-        Method method = dataProviderMethod.getMethod();
-
-        String messageBasePart = "Data provider method '" + dataProviderMethod.getName() + "' must";
-        if (!Modifier.isPublic(method.getModifiers())) {
-            errors.add(new Exception(messageBasePart + " be public"));
-        }
-        if (!Modifier.isStatic(method.getModifiers())) {
-            errors.add(new Exception(messageBasePart + " be static"));
-        }
-        if (method.getParameterTypes().length != 0) {
-            errors.add(new Exception(messageBasePart + " have no parameters"));
-        }
-        if (!dataConverter.canConvert(method.getGenericReturnType())) {
-            errors.add(new Exception(messageBasePart + " either return Object[][] or List<List<Object>>"));
-        }
     }
 
     /**

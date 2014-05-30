@@ -21,10 +21,10 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FrameworkMethodGeneratorTest extends BaseTest {
+public class TestGeneratorTest extends BaseTest {
 
     @InjectMocks
-    private FrameworkMethodGenerator underTest;
+    private TestGenerator underTest;
 
     @Mock
     private DataConverter dataConverter;
@@ -33,7 +33,7 @@ public class FrameworkMethodGeneratorTest extends BaseTest {
     @Mock
     private FrameworkMethod dataProviderMethod;
     @Mock
-    private UseDataProvider useDataProvider;
+    private UseDataProvider useDataProvider; // TODO not used
     @Mock
     private DataProvider dataProvider;
 
@@ -45,12 +45,12 @@ public class FrameworkMethodGeneratorTest extends BaseTest {
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
-    public void testFrameworkMethodGenerator() {
+    public void testTestGeneratorShouldThrowNullPointerExceptionIfDataConverterIsNull() {
         // Given:
 
         // When:
         @SuppressWarnings("unused")
-        FrameworkMethodGenerator result = new FrameworkMethodGenerator(null);
+        TestGenerator result = new TestGenerator(null);
 
         // Then: expect exception
     }
@@ -90,7 +90,7 @@ public class FrameworkMethodGeneratorTest extends BaseTest {
     // underTest.generateExplodedTestMethodsFor(asList(testMethod));
     //
     // // Then:
-    // verify(frameworkMethodGenerator).generateExplodedTestMethodsFor(testMethod, dataProviderMethod);
+    // verify(testGenerator).generateExplodedTestMethodsFor(testMethod, dataProviderMethod);
     // // assertThat(result).hasSize(2).containsAll(explodedMethods);
     // }
 
