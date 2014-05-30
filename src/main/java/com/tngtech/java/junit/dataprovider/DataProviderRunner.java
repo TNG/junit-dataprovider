@@ -1,11 +1,9 @@
 package com.tngtech.java.junit.dataprovider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.experimental.categories.Categories.CategoryFilter;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -25,16 +23,6 @@ import com.tngtech.java.junit.dataprovider.internal.TestValidator;
  * additionally.
  */
 public class DataProviderRunner extends BlockJUnit4ClassRunner {
-
-    /**
-     * A list of filter packages which must not be wrapped by DataProviderRunner (this is a workaround for some plugins,
-     * e.g. the maven-surefire-plugin).
-     */
-    // @formatter:off
-    private static final List<String> BLACKLISTED_FILTER_PACKAGES = Arrays.asList(
-            "org.apache.maven.surefire"
-        );
-    // @formatter:on
 
     /**
      * The {@link DataConverter} to be used to convert from supported return types of any data provider to {@link List}
@@ -152,17 +140,16 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * If possible the given {@code filter} is wrapped by {@link DataProviderFilter} to enable filtering of tests using
      * a data provider.
      *
-     * @param filter the {@link Filter} to wrap/apply
+     * @param filter the {@link Filter} to be wrapped or apply, respectively
      */
     @Override
     public void filter(Filter filter) throws NoTestsRemainException {
-        Filter useFilter;
-        if (!(filter instanceof CategoryFilter) && !isFilterBlackListed(filter)) {
-            useFilter = new DataProviderFilter(filter);
-        } else {
-            useFilter = filter;
-        }
-        super.filter(useFilter);
+        // Filter newFilter = filter;
+        // // TODO not really testable? maybe first create and than test if it is applicable?
+        // if (DataProviderFilter.canBeWrapped(filter)) {
+        // newFilter = ;
+        // }
+        super.filter(new DataProviderFilter(filter));
     }
 
     /**
@@ -195,21 +182,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             result.addAll(testGenerator.generateExplodedTestMethodsFor(testMethod, dataProviderMethod));
         }
         return result;
-    }
-
-    /**
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     */
-    boolean isFilterBlackListed(Filter filter) {
-        String className = filter.getClass().getName();
-        for (String blacklistedPackage : BLACKLISTED_FILTER_PACKAGES) {
-            if (className.startsWith(blacklistedPackage)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

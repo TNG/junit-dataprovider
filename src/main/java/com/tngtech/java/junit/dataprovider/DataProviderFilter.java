@@ -24,43 +24,41 @@ public class DataProviderFilter extends Filter {
     private static final int GROUP_METHOD_IDX = 3;
     private static final int GROUP_CLASS = 4;
 
-    private final String filterDescription;
-    private final Matcher filterDescriptionMatcher;
+    /**
+     * Original filter which is used if its description (= {@link Filter#describe()}) is not parsable by
+     * {@link #DESCRIPTION_PATTERN}
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     **/
+    final Filter filter;
 
     /**
-     * Creates a new {@link DataProvider} using the textual {@link Filter#describe()} of supplied {@link Filter} to
-     * determine if a test method should run or not.
-     *
-     * @throws IllegalArgumentException if supplied {@link Filter} is {@code null} or
-     *             {@link Description#getDisplayName()} of supplied {@link Description} cannot be parsed
+     * Creates a new {@link DataProviderFilter} using the textual {@link Filter#describe()} of supplied {@link Filter}
+     * to determine if a test method should run or not. If given {@code filter} description can not be parsed, request
+     * for {@link #shouldRun(Description)} are just forwarded to it.
      */
     public DataProviderFilter(Filter filter) {
         if (filter == null) {
             throw new NullPointerException("supplied filter must not be null");
         }
-        filterDescription = filter.describe();
-        filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filterDescription);
-        if (!filterDescriptionMatcher.find()) {
-            throw new IllegalArgumentException(String.format("Filter %s with description %s is not supported by %s.",
-                    filter.getClass(), filterDescription, this.getClass().getSimpleName()));
-        }
+        this.filter = filter;
     }
 
-    /**
-     * @throws IllegalArgumentException if {@link Description#getDisplayName()} of supplied {@link Description} cannot
-     *             be parsed
-     */
     @Override
     public boolean shouldRun(Description description) {
+        Matcher filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filter.describe());
+        if (!filterDescriptionMatcher.find()) {
+            return filter.shouldRun(description);
+        }
+
         if (description.isTest()) {
             Matcher descriptionMatcher = DESCRIPTION_PATTERN.matcher(description.getDisplayName());
             if (!descriptionMatcher.matches()) {
-                throw new IllegalArgumentException(String.format("Test method description %s is not suppored by %s.",
-                        description.getDisplayName(), this.getClass().getSimpleName()));
+                return filter.shouldRun(description);
             }
             if (!filterDescriptionMatcher.group(GROUP_METHOD_NAME).equals(descriptionMatcher.group(GROUP_METHOD_NAME))
                     || !filterDescriptionMatcher.group(GROUP_CLASS).equals(descriptionMatcher.group(GROUP_CLASS))) {
-
                 return false;
             }
             return filterDescriptionMatcher.group(GROUP_METHOD_PARAMS) == null
@@ -79,6 +77,6 @@ public class DataProviderFilter extends Filter {
 
     @Override
     public String describe() {
-        return filterDescription;
+        return filter.describe();
     }
 }

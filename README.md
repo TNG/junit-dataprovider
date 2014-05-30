@@ -325,6 +325,7 @@ Release notes
 
 ### tbd. (???)
 
+* more fault tolerant filtering instead of explicitly maintain a black or white list ([#27](/../../issues/27))
 * ...
 
 ### v1.7.0 (20-Jun-2014)

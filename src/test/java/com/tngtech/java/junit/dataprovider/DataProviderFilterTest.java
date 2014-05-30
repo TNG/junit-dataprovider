@@ -3,6 +3,8 @@ package com.tngtech.java.junit.dataprovider;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,12 +12,19 @@ import java.util.regex.Matcher;
 
 import org.junit.Test;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.junit.runner.manipulation.Filter;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DataProviderFilterTest extends BaseTest {
 
+    @InjectMocks
     private DataProviderFilter underTest;
 
+    @Mock
     private Filter filter;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
@@ -30,32 +39,40 @@ public class DataProviderFilterTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testDataProviderFilterShouldThrowIllegalArgumentExceptionWhenFilterDescriptionCannotBeParsed() {
+    @Test
+    public void testShouldRunShouldCallOriginalFilterShouldRunIfOriginalFilterDescriptionCannotBeParsed() {
         // Given:
+        doReturn("invalid").when(filter).describe();
+        Description description = setupDescription(true, "test(Clazz)");
 
         // When:
-        setupDataProviderFilterWith("invalid");
+        underTest.shouldRun(description);
 
-        // Then: expect exception
+        // Then:
+        verify(filter).describe();
+        verify(filter).shouldRun(description);
+        verifyNoMoreInteractions(filter);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testShouldRunShouldThrowIllegalArgumentExceptionWhenDescriptionCannotBeParsed() {
+    @Test
+    public void testShouldRunShouldCallOriginalFilterShouldRunIfIsTestAndGivenDescriptionCannotBeParsed() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method test(Clazz)").when(filter).describe();
         Description description = setupDescription(true, "invalid");
 
         // When:
         underTest.shouldRun(description);
 
-        // Then: expect exception
+        // Then:
+        verify(filter).describe();
+        verify(filter).shouldRun(description);
+        verifyNoMoreInteractions(filter);
     }
 
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodName() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testOther[1: ](Clazz)");
 
         // When:
@@ -68,7 +85,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedClassName() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testMain[1: ](ClazzOther)");
 
         // When:
@@ -81,7 +98,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHasNoMethodIdx() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testMain(Clazz)");
 
         // When:
@@ -94,7 +111,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodIdx() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testMain[2: ](Clazz)");
 
         // When:
@@ -107,7 +124,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveOnlyMethodNameAndEqualsExactly() {
         // Given:
-        setupDataProviderFilterWith("Method testMain(Clazz)");
+        doReturn("Method testMain(Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testMain(Clazz)");
 
         // When:
@@ -120,7 +137,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndEqualsMethodNameAndClass() {
         // Given:
-        setupDataProviderFilterWith("Method testMain(Clazz)");
+        doReturn("Method testMain(Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testMain[1: ](Clazz)");
 
         // When:
@@ -133,7 +150,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAddtionalMethodIdxAndEqualsExcatly() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testMain[1: ](Clazz)");
 
         // When:
@@ -146,7 +163,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndMethodParamsAreDifferentButIdxIsEqual() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testMain[1: test](Clazz)");
 
         // When:
@@ -159,7 +176,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueForMatchingChildDescription() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
 
         Description description = setupDescription(false, "", setupDescription(true, "testMain[1: ](Clazz)"));
 
@@ -173,7 +190,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueForMultipleChildDescriptionWithLastMatching() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
 
         // @formatter:off
         Description description = setupDescription(false, "",
@@ -193,7 +210,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseForMultipleChildAndFurtherChildDescriptionWithNonMatching() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
 
         // @formatter:off
         Description description = setupDescription(false, "testMain[2: ](Clazz)",
@@ -217,7 +234,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testDescribeShouldReturnFilterDescripe() {
         // Given:
-        setupDataProviderFilterWith("Method testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
 
         // When:
         String result = underTest.describe();
@@ -324,12 +341,6 @@ public class DataProviderFilterTest extends BaseTest {
         // Then:
         assertThat(result).isTrue();
         assertThatMatcherGroupsAre(matcher, "ain", null, null, "Clazz");
-    }
-
-    private void setupDataProviderFilterWith(String filterDescriptionString) {
-        filter = mock(Filter.class);
-        doReturn(filterDescriptionString).when(filter).describe();
-        underTest = new DataProviderFilter(filter);
     }
 
     private Description setupDescription(boolean isTest, String descriptionDisplayName,
