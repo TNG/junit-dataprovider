@@ -285,6 +285,10 @@ Further examples can be found in [DataProviderJavaAcceptanceTest.java](/src/test
 Release notes
 -------------
 
+### tdb. (???)
+
+* implemented some utility methods ([#21](/../../issues/21))
+
 ### tbd. (???)
 
 * implemented [#20](/../../issues/20) to use ```@DataProvider``` directly providing test data for test method
