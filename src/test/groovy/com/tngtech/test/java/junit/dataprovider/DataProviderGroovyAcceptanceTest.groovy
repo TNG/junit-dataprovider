@@ -29,7 +29,7 @@ class DataProviderGroovyAcceptanceTest {
         assert (op1 && op2) == expected
     }
 
-        @DataProvider
+    @DataProvider
     static List<List<Object>> dataProviderBooleanLogicOr() {
         // @formatter:off
         return [
@@ -46,5 +46,20 @@ class DataProviderGroovyAcceptanceTest {
     void "test boolean logic for 'or'"(op1, op2, expected) {
         // Expect:
         assert (op1 || op2) == expected
+    }
+
+    // @formatter:off
+    @Test
+    @DataProvider([
+            'false,  false,  false',
+            'true,   false,  true ',
+            'false,  true,   true ',
+            'true,   true,   false'
+        ])
+    // @formatter:on
+    void "test boolean logic for 'xor'"(boolean op1, boolean op2, boolean expected) {
+        // Expect:
+        def a = [1,2] as String[]
+        assert ((op1 || op2) && (op1 != op2)) == expected
     }
 }
