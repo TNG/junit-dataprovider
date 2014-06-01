@@ -161,6 +161,8 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
                 } else {
                     result.addAll(explodeTestMethod(testMethod, dataProvider));
                 }
+            } else {
+                result.addAll(explodeTestMethod(testMethod, dataProviderMethod));
             }
         }
         return result;
