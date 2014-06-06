@@ -193,7 +193,18 @@ public class TestValidatorTest extends BaseTest {
         List<Throwable> errors = new ArrayList<Throwable>();
 
         // When:
-        underTest.validateDataProviderMethod(null, errors);
+        underTest.validateDataProviderMethod(null, dataProvider, errors);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testValidateDataProviderMethodShouldThrowNullPointerExceptionIfDataProviderIsNull() {
+        // Given:
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        // When:
+        underTest.validateDataProviderMethod(dataProviderMethod, null, errors);
 
         // Then: expect exception
     }
@@ -203,7 +214,7 @@ public class TestValidatorTest extends BaseTest {
         // Given:
 
         // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, null);
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, null);
 
         // Then: expect exception
     }
@@ -218,9 +229,10 @@ public class TestValidatorTest extends BaseTest {
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
         doReturn(true).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[0]).when(dataProvider).value();
 
         // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
 
         // Then:
         assertThat(errors).isEmpty();
@@ -236,9 +248,10 @@ public class TestValidatorTest extends BaseTest {
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonPublicDataProviderMethod")).when(dataProviderMethod).getMethod();
         doReturn(true).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[0]).when(dataProvider).value();
 
         // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
 
         // Then:
         assertThat(errors).hasSize(1);
@@ -255,9 +268,10 @@ public class TestValidatorTest extends BaseTest {
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonStaticDataProviderMethod")).when(dataProviderMethod).getMethod();
         doReturn(true).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[0]).when(dataProvider).value();
 
         // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
 
         // Then:
         assertThat(errors).hasSize(1);
@@ -274,9 +288,10 @@ public class TestValidatorTest extends BaseTest {
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
         doReturn(true).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[0]).when(dataProvider).value();
 
         // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
 
         // Then:
         assertThat(errors).hasSize(1);
@@ -294,14 +309,36 @@ public class TestValidatorTest extends BaseTest {
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
         doReturn(false).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[0]).when(dataProvider).value();
 
         // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
 
         // Then:
         assertThat(errors).hasSize(1);
         assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
                 "must either return Object[][] or List<List<Object>>");
+    }
+
+    @Test
+    public void testValidateDataProviderMethodShouldAddErrorIfDataProviderDefinesValue() {
+        // Given:
+        String dataProviderName = "dataProviderNonConvertableReturnType";
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
+        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(true).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[] { "test" }).when(dataProvider).value();
+
+        // When:
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
+
+        // Then:
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must not define @DataProvider.value()");
     }
 
     @Test
@@ -314,18 +351,21 @@ public class TestValidatorTest extends BaseTest {
         doReturn(dataProviderName).when(dataProviderMethod).getName();
         doReturn(getMethod("nonPublicNonStaticNonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
         doReturn(false).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[] { "test" }).when(dataProvider).value();
 
         // When:
-        underTest.validateDataProviderMethod(dataProviderMethod, errors);
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
 
         // Then:
-        assertThat(errors).hasSize(4);
+        assertThat(errors).hasSize(5);
         assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be public");
         assertThat(errors.get(1).getMessage()).contains(dataProviderName).containsIgnoringCase("must be static");
         assertThat(errors.get(2).getMessage()).contains(dataProviderName).containsIgnoringCase(
                 "must have no parameters");
         assertThat(errors.get(3).getMessage()).contains(dataProviderName).containsIgnoringCase(
                 "must either return Object[][] or List<List<Object>>");
+        assertThat(errors.get(4).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must not define @DataProvider.value()");
     }
 
     // -- helper methods -----------------------------------------------------------------------------------------------

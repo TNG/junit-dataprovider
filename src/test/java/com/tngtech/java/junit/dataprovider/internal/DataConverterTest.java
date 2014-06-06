@@ -1,6 +1,8 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -15,12 +17,44 @@ import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.tngtech.java.junit.dataprovider.BaseTest;
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.internal.DataConverter.Settings;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataConverterTest extends BaseTest {
 
     @InjectMocks
     private DataConverter underTest;
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
+    @Test(expected = NullPointerException.class)
+    public void testDataConverterSettingsShouldThrowNullPointerExceptionIfDataProviderIsNull() {
+        // Given:
+
+        // When:
+        @SuppressWarnings("unused")
+        Settings result = new Settings(null);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testDataConverterSettingsShouldContainAllSettingsFromDataProvider() {
+        // Given:
+        DataProvider dataProvider = mock(DataProvider.class);
+        doReturn(",").when(dataProvider).splitBy();
+        doReturn(false).when(dataProvider).convertNulls();
+        doReturn(true).when(dataProvider).trimValues();
+
+        // When:
+        Settings result = new Settings(dataProvider);
+
+        // Then:
+        assertThat(result).isNotNull();
+        assertThat(result.splitBy).isEqualTo(",");
+        assertThat(result.convertNulls).isFalse();
+        assertThat(result.trimValues).isTrue();
+    }
 
     @Test
     public void testCanConvertShouldReturnFalseIfTypeIsNull() {
@@ -164,61 +198,79 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testConvertValueShouldThrowNullPointerExceptionIfParameterTypesIsNull() {
+    public void testConvertShouldThrowNullPointerExceptionIfParameterTypesIsNull() {
         // Given:
-        final Object data = null;
-        final Class<?>[] parameterTypes = null;
+        Object data = null;
+        Class<?>[] parameterTypes = null;
+        Settings settings = anySettings();
 
         // When:
-        underTest.convert(data, parameterTypes);
+        underTest.convert(data, parameterTypes, settings);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConvertShouldThrowNullPointerExceptionIfSettingsIsNull() {
+        // Given:
+        Object data = null;
+        Class<?>[] parameterTypes = new Class<?>[] { Object.class };
+        Settings settings = null;
+
+        // When:
+        underTest.convert(data, parameterTypes, settings);
 
         // Then: expect exception
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConvertValueShouldThrowIllegalArgumentExceptionIfParameterTypesIsEmpty() {
+    public void testConvertShouldThrowIllegalArgumentExceptionIfParameterTypesIsEmpty() {
         // Given:
-        final Object data = null;
-        final Class<?>[] parameterTypes = new Class<?>[0];
+        Object data = null;
+        Class<?>[] parameterTypes = new Class<?>[0];
+        Settings settings = anySettings();
 
         // When:
-        underTest.convert(data, parameterTypes);
+        underTest.convert(data, parameterTypes, settings);
 
         // Then: expect exception
     }
 
     @Test(expected = ClassCastException.class)
-    public void testConvertValueShouldThrowClassCastExceptionIfDataIsNull() {
+    public void testConvertShouldThrowClassCastExceptionIfDataIsNull() {
         // Given:
-        final Object data = null;
-        final Class<?>[] parameterTypes = new Class<?>[] { String.class };
+        Object data = null;
+        Class<?>[] parameterTypes = new Class<?>[] { String.class };
+        Settings settings = anySettings();
 
         // When:
-        underTest.convert(data, parameterTypes);
+        underTest.convert(data, parameterTypes, settings);
 
         // Then: expect exception
     }
 
     @Test(expected = ClassCastException.class)
-    public void testConvertValueShouldThrowClassCastExceptionIfDataIsNotConvertable() {
+    public void testConvertShouldThrowClassCastExceptionIfDataIsNotConvertable() {
         // Given:
-        final Object data = "not convertable";
-        final Class<?>[] parameterTypes = new Class<?>[] { String.class };
+        Object data = "not convertable";
+        Class<?>[] parameterTypes = new Class<?>[] { Integer.class };
+        Settings settings = anySettings();
 
         // When:
-        underTest.convert(data, parameterTypes);
+        underTest.convert(data, parameterTypes, settings);
 
         // Then: expect exception
     }
 
     @Test
-    public void testConvertValueShouldReturnOneElementForObjectArrayArrayWithOneElement() {
+    public void testConvertShouldReturnOneElementForObjectArrayArrayWithOneElement() {
         // Given:
-        final Object[][] data = new Object[][] { { 1 } };
-        final Class<?>[] parameterTypes = new Class<?>[] { int.class };
+        Object[][] data = new Object[][] { { 1 } };
+        Class<?>[] parameterTypes = new Class<?>[] { int.class };
+        Settings settings = anySettings();
 
         // When:
-        List<Object[]> result = underTest.convert(data, parameterTypes);
+        List<Object[]> result = underTest.convert(data, parameterTypes, settings);
 
         // Then:
         assertThat(result).hasSize(1);
@@ -226,13 +278,14 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testConvertValueShouldReturnMultipleElementsForObjectArrayArrayWithMultipleElements() {
+    public void testConvertShouldReturnMultipleElementsForObjectArrayArrayWithMultipleElements() {
         // Given:
-        final Object[][] data = new Object[][] { { "11", 22L, 3.3 }, { "44", 55L, 6.6 }, { "77", 88L, 9.9 } };
-        final Class<?>[] parameterTypes = new Class<?>[] { String.class, long.class, double.class };
+        Object[][] data = new Object[][] { { "11", 22L, 3.3 }, { "44", 55L, 6.6 }, { "77", 88L, 9.9 } };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, long.class, double.class };
+        Settings settings = anySettings();
 
         // When:
-        List<Object[]> result = underTest.convert(data, parameterTypes);
+        List<Object[]> result = underTest.convert(data, parameterTypes, settings);
 
         // Then:
         assertThat(result).hasSize(3);
@@ -242,14 +295,15 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testConvertValueShouldReturnOneElementForListOfListOfObjectWithOneElement() {
+    public void testConvertShouldReturnOneElementForListOfListOfObjectWithOneElement() {
         // Given:
         @SuppressWarnings("unchecked")
-        final List<List<Character>> data = list(list('a'));
-        final Class<?>[] parameterTypes = new Class<?>[] { char.class };
+        List<List<Character>> data = list(list('a'));
+        Class<?>[] parameterTypes = new Class<?>[] { char.class };
+        Settings settings = anySettings();
 
         // When:
-        List<Object[]> result = underTest.convert(data, parameterTypes);
+        List<Object[]> result = underTest.convert(data, parameterTypes, settings);
 
         // Then:
         assertThat(result).hasSize(1);
@@ -257,14 +311,15 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testConvertValueShouldReturnMultipleElementsForListOfListOfObjectWithMultipleElements() {
+    public void testConvertShouldReturnMultipleElementsForListOfListOfObjectWithMultipleElements() {
         // Given:
         @SuppressWarnings("unchecked")
-        final List<List<?>> data = list(this.<Object> list('x', "foo"), list('y', "bar"), list('z', "baz"));
-        final Class<?>[] parameterTypes = new Class<?>[] { char.class, String.class };
+        List<List<?>> data = list(this.<Object> list('x', "foo"), list('y', "bar"), list('z', "baz"));
+        Class<?>[] parameterTypes = new Class<?>[] { char.class, String.class };
+        Settings settings = anySettings();
 
         // When:
-        List<Object[]> result = underTest.convert(data, parameterTypes);
+        List<Object[]> result = underTest.convert(data, parameterTypes, settings);
 
         // Then:
         assertThat(result).hasSize(3);
@@ -276,37 +331,70 @@ public class DataConverterTest extends BaseTest {
     @Test(expected = Error.class)
     public void testConvertShouldThrowErrorIfLengthOfSplitDataAndTargetTypesDiffer() {
         // Given:
-        String[] data = new String[] { "1, 2" };
+        String[] data = new String[] { "1,2" };
         Class<?>[] parameterTypes = new Class[] { int.class };
+        Settings settings = settings(",", false, false);
 
         // When:
-        underTest.convert(data, parameterTypes);
+        underTest.convert(data, parameterTypes, settings);
 
         // Then: expect exception
     }
 
     @Test
-    public void testConvertValueShouldReturnOneElementForStringArrayWithOneElement() {
+    public void testConvertShouldReturnOneElementForStringArrayWithOneElementSplitByComma() {
         // Given:
-        final String[] data = new String[] { "test, true" };
-        final Class<?>[] parameterTypes = new Class<?>[] { String.class, boolean.class };
+        String[] data = new String[] { "foo,true" };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, boolean.class };
+        Settings settings = settings(",", false, false);
 
         // When:
-        List<Object[]> result = underTest.convert(data, parameterTypes);
+        List<Object[]> result = underTest.convert(data, parameterTypes, settings);
 
         // Then:
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(new Object[] { "test", true });
+        assertThat(result.get(0)).isEqualTo(new Object[] { "foo", true });
     }
 
     @Test
-    public void testConvertValueShouldReturnMultipleElementsForStringArrayWithMultipleElements() {
+    public void testConvertShouldReturnOneElementForStringArrayWithOneElementSplitByPipe() {
         // Given:
-        final String[] data = new String[] { "1, 2, 3, 4.0, e", "6, 7, 8, 9.0, i" };
-        final Class<?>[] parameterTypes = new Class<?>[] { byte.class, int.class, long.class, double.class, char.class };
+        String[] data = new String[] { "bar|false" };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, boolean.class };
+        Settings settings = settings("\\|", false, false);
 
         // When:
-        List<Object[]> result = underTest.convert(data, parameterTypes);
+        List<Object[]> result = underTest.convert(data, parameterTypes, settings);
+
+        // Then:
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isEqualTo(new Object[] { "bar", false });
+    }
+
+    @Test
+    public void testConvertShouldReturnOneElementForStringArrayWithOneElementSplitByMultipleWhitespaces() {
+        // Given:
+        String[] data = new String[] { "baz    2" };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, int.class };
+        Settings settings = settings("\\s+", false, false);
+
+        // When:
+        List<Object[]> result = underTest.convert(data, parameterTypes, settings);
+
+        // Then:
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isEqualTo(new Object[] { "baz", 2 });
+    }
+
+    @Test
+    public void testConvertShouldReturnMultipleElementsForStringArrayWithMultipleElements() {
+        // Given:
+        String[] data = new String[] { "1, 2, 3, 4.0, e", "6, 7, 8, 9.0, i" };
+        Class<?>[] parameterTypes = new Class<?>[] { byte.class, int.class, long.class, double.class, char.class };
+        Settings settings = settings(",", false, true);
+
+        // When:
+        List<Object[]> result = underTest.convert(data, parameterTypes, settings);
 
         // Then:
         assertThat(result).hasSize(2);
@@ -320,9 +408,10 @@ public class DataConverterTest extends BaseTest {
         String data = "true,1,c,2,3,4,5.5,6.6";
         Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
                 long.class, float.class, double.class };
+        Settings settings = settings(",", false, false);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 10);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 10);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { true, (byte) 1, 'c', (short) 2, 3, 4L, 5.5f, 6.6d });
@@ -331,53 +420,69 @@ public class DataConverterTest extends BaseTest {
     @Test
     public void testGetParametersForShouldCorrectlyParseAllPrimitiveTypesAsJavaString() {
         // Given:
-        String data = "-5,2014l,-1.234567f,-901e-3";
+        String data = "-5;2014l;-1.234567f;-901e-3";
         Class<?>[] parameterTypes = new Class[] { int.class, long.class, float.class, double.class };
+        Settings settings = settings(";", false, false);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 11);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 11);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { -5, 2014l, -1.234567f, -0.901d });
     }
 
     @Test
-    public void testGetParametersForShouldCorrectlyParseAllPrimitiveTypesEvenIfUntrimmed() {
+    public void testGetParametersForShouldNotTrimValuesIfSettingsTrimIsFalse() {
         // Given:
-        String data = "   false   ,    11    ,    z    ,  22       ,   33   ,44      ,   55.55     ,  66.66     ";
-        Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
-                long.class, float.class, double.class };
+        String data = " foo|  bar   |baz    ";
+        Class<?>[] parameterTypes = new Class[] { String.class, String.class, String.class };
+        Settings settings = settings("\\|", false, false);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 12);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 12);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { " foo", "  bar   ", "baz    " });
+    }
+
+    @Test
+    public void testGetParametersForShouldTrimAndParseAllPrimitiveTypesIfSettingsTrimIsTrue() {
+        // Given:
+        String data = "   false   ;    11    ;    z    ;  22       ;   33   ;44      ;   55.55     ;  66.66     ";
+        Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
+                long.class, float.class, double.class };
+        Settings settings = settings(";", false, true);
+
+        // When:
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 13);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { false, (byte) 11, 'z', (short) 22, 33, 44L, 55.55f, 66.66d });
     }
 
     @Test
-    public void testGetParametersForShouldCorrectlyTrimNonSpaceWhitespaceChars() {
+    public void testGetParametersForShouldTrimNonSpaceWhitespaceCharsIfSettingsTrimIsTrue() {
         // Given:
         String data = "\n-1f\n,\r-2\r,\t3.0d\t";
-
         Class<?>[] parameterTypes = new Class[] { float.class, int.class, double.class };
+        Settings settings = settings(",", false, true);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 20);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 20);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { -1f, -2, 3d });
     }
 
     @Test
-    public void testGetParametersForShouldNotTrimNonBreakingSpace() {
+    public void testGetParametersForShouldNotTrimNonBreakingSpaceEvenIfSettingsTrimIsTrue() {
         // Given:
         String data = "\u00A0test\u00A0";
-
         Class<?>[] parameterTypes = new Class[] { String.class };
+        Settings settings = settings(",", false, true);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 21);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 21);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { "\u00A0test\u00A0" });
@@ -386,11 +491,12 @@ public class DataConverterTest extends BaseTest {
     @Test
     public void testGetParametersForShouldCorrectlyHandleLeadingEmptyString() {
         // Given:
-        String data = ",true";
+        String data = "/true";
         Class<?>[] parameterTypes = new Class[] { String.class, boolean.class };
+        Settings settings = settings("/", false, true);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 30);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 30);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { "", true });
@@ -399,11 +505,12 @@ public class DataConverterTest extends BaseTest {
     @Test
     public void testGetParametersForShouldCorrectlyHandleTrailingEmptyString() {
         // Given:
-        String data = "1,";
+        String data = "1 ";
         Class<?>[] parameterTypes = new Class[] { int.class, String.class };
+        Settings settings = settings(" ", false, true);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 31);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 31);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { 1, "" });
@@ -414,9 +521,10 @@ public class DataConverterTest extends BaseTest {
         // Given:
         String data = "noChar";
         Class<?>[] parameterTypes = new Class[] { char.class };
+        Settings settings = anySettings();
 
         // When:
-        underTest.getParametersFor(data, parameterTypes, 40);
+        underTest.getParametersFor(data, parameterTypes, settings, 40);
 
         // Then: expect exception
     }
@@ -426,9 +534,10 @@ public class DataConverterTest extends BaseTest {
         // Given:
         String data = "noInt";
         Class<?>[] parameterTypes = new Class[] { BigInteger.class };
+        Settings settings = anySettings();
 
         // When:
-        underTest.getParametersFor(data, parameterTypes, 41);
+        underTest.getParametersFor(data, parameterTypes, settings, 41);
 
         // Then: expect exception
     }
@@ -438,9 +547,10 @@ public class DataConverterTest extends BaseTest {
         // Given:
         String data = "noObject";
         Class<?>[] parameterTypes = new Class[] { Object.class };
+        Settings settings = anySettings();
 
         // When:
-        underTest.getParametersFor(data, parameterTypes, 42);
+        underTest.getParametersFor(data, parameterTypes, settings, 42);
 
         // Then: expect exception
     }
@@ -450,9 +560,10 @@ public class DataConverterTest extends BaseTest {
         // Given:
         String data = " VAL1,  VAL2 ";
         Class<?>[] parameterTypes = new Class[] { TestEnum.class, TestEnum.class };
+        Settings settings = settings(",", false, true);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 50);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 50);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1, TestEnum.VAL2 });
@@ -463,9 +574,10 @@ public class DataConverterTest extends BaseTest {
         // Given:
         String data = "UNKNOW_ENUM_VALUE";
         Class<?>[] parameterTypes = new Class[] { TestEnum.class };
+        Settings settings = anySettings();
 
         // When:
-        underTest.getParametersFor(data, parameterTypes, 51);
+        underTest.getParametersFor(data, parameterTypes, settings, 51);
 
         // Then: expect exception
     }
@@ -476,9 +588,10 @@ public class DataConverterTest extends BaseTest {
         String data = "true,1,c,2,3,4,5.5,6.6";
         Class<?>[] parameterTypes = new Class[] { Boolean.class, Byte.class, Character.class, Short.class,
                 Integer.class, Long.class, Float.class, Double.class };
+        Settings settings = settings(",", false, false);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 60);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 60);
 
         // Then:
         assertThat(result).isEqualTo(
@@ -487,26 +600,42 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testGetParametersForShouldCorrectlyParseNullValue() {
+    public void testGetParametersForShouldParseNullValuesAsStringIfSettingsConvertNullsIsFalse() {
         // Given:
-        String data = "null, null  ";
-        Class<?>[] parameterTypes = new Class[] { Boolean.class, String.class };
+        String data = "null#null";
+        Class<?>[] parameterTypes = new Class[] { String.class, String.class };
+        Settings settings = settings("#", false, false);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 70);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 70);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { "null", "null" });
+    }
+
+    @Test
+    public void testGetParametersForShouldParseNullValuesAsNullObjectIfSettingsConvertNullsIsTrue() {
+        // Given:
+        String data = "null,null";
+        Class<?>[] parameterTypes = new Class[] { String.class, String.class };
+        Settings settings = settings(",", true, false);
+
+        // When:
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 71);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { null, null });
     }
 
     @Test
-    public void testGetParametersForShouldCorrectlyHandleNullValue() {
+    public void testGetParametersForShouldReturnNullObjectWrappedInObjectArray() {
         // Given:
-        final String data = null;
-        final Class<?>[] parameterTypes = new Class<?>[] { Integer.class };
+        String data = null;
+        Class<?>[] parameterTypes = new Class<?>[] { Integer.class };
+        Settings settings = settings(" ", false, false);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 71);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 72);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { null });
@@ -515,17 +644,32 @@ public class DataConverterTest extends BaseTest {
     @Test
     public void testGetParametersForShouldCorrectlyUseConstructorWithSingleStringArg() {
         // Given:
-        final String data = "home/schmida";
-        final Class<?>[] parameterTypes = new Class<?>[] { File.class };
+        String data = "home/schmida";
+        Class<?>[] parameterTypes = new Class<?>[] { File.class };
+        Settings settings = settings(",", false, false);
 
         // When:
-        Object[] result = underTest.getParametersFor(data, parameterTypes, 80);
+        Object[] result = underTest.getParametersFor(data, parameterTypes, settings, 80);
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { new File("home/schmida") });
     }
 
     // -- helper methods -----------------------------------------------------------------------------------------------
+
+    private Settings settings(String splitBy, boolean convertNulls, boolean trim) {
+        DataProvider dataProvider = mock(DataProvider.class);
+        doReturn(splitBy).when(dataProvider).splitBy();
+        doReturn(convertNulls).when(dataProvider).convertNulls();
+        doReturn(trim).when(dataProvider).trimValues();
+        return new Settings(dataProvider);
+    }
+
+    private Settings anySettings() {
+        return settings("q", false, false);
+    }
+
+    // -- methods used as Method objects -------------------------------------------------------------------------------
 
     public static List<Object> methodReturningListOfObject() {
         return null;

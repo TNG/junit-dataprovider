@@ -149,8 +149,8 @@ public class DataProviderRunnerTest extends BaseTest {
         verifyZeroInteractions(testValidator);
     }
 
-    @Test
-    public void testValidateTestMethodsShouldCallTestValidatorValidateDataProviderMethodIfDataProviderMethodFound() {
+    @Test(expected = IllegalStateException.class)
+    public void testValidateTestMethodsShouldThrowIllegalStateExceptionIfDataProviderAnnotationNotFoundOnDataProviderMethod() {
         // Given:
         doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
         doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
@@ -160,8 +160,23 @@ public class DataProviderRunnerTest extends BaseTest {
         // When:
         underTest.validateTestMethods(errors);
 
+        // Then: expect exception
+    }
+
+    @Test
+    public void testValidateTestMethodsShouldCallTestValidatorValidateDataProviderMethodIfDataProviderMethodFound() {
+        // Given:
+        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
+        doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
+        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        // When:
+        underTest.validateTestMethods(errors);
+
         // Then:
-        verify(testValidator).validateDataProviderMethod(dataProviderMethod, errors);
+        verify(testValidator).validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
         verifyNoMoreInteractions(testValidator);
     }
 
@@ -173,11 +188,14 @@ public class DataProviderRunnerTest extends BaseTest {
         FrameworkMethod testMethod2 = mock(FrameworkMethod.class);
         FrameworkMethod testMethod3 = mock(FrameworkMethod.class);
         FrameworkMethod dataProviderMethod2 = mock(FrameworkMethod.class);
+        DataProvider dataProvider2 = mock(DataProvider.class);
 
         doReturn(asList(testMethod, testMethod2, testMethod3)).when(testClass).getAnnotatedMethods(
                 UseDataProvider.class);
         doReturn(dataProviderMethod).when(underTest).getDataProviderMethod(testMethod);
+        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
         doReturn(dataProviderMethod2).when(underTest).getDataProviderMethod(testMethod2);
+        doReturn(dataProvider2).when(dataProviderMethod2).getAnnotation(DataProvider.class);
         doReturn(null).when(underTest).getDataProviderMethod(testMethod3);
 
         doReturn(useDataProvider).when(testMethod3).getAnnotation(UseDataProvider.class);
@@ -192,8 +210,8 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(errors).hasSize(1);
         assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such data provider");
 
-        verify(testValidator).validateDataProviderMethod(dataProviderMethod, errors);
-        verify(testValidator).validateDataProviderMethod(dataProviderMethod2, errors);
+        verify(testValidator).validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
+        verify(testValidator).validateDataProviderMethod(dataProviderMethod2, dataProvider2, errors);
         verifyNoMoreInteractions(testMethod);
     }
 
@@ -402,6 +420,8 @@ public class DataProviderRunnerTest extends BaseTest {
         doReturn("notAvailableDataProviderMethod").when(useDataProvider).value();
 
         doReturn(testClass).when(underTest).findDataProviderLocation(useDataProvider);
+        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn("availableDataProviderMethod").when(dataProviderMethod).getName();
 
         // When:
         FrameworkMethod result = underTest.getDataProviderMethod(testMethod);

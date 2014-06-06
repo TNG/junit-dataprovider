@@ -9,6 +9,7 @@ import org.junit.runners.model.FrameworkMethod;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderFrameworkMethod;
+import com.tngtech.java.junit.dataprovider.internal.DataConverter.Settings;
 
 public class TestGenerator {
 
@@ -60,17 +61,20 @@ public class TestGenerator {
      * @return a list of methods, each method bound to a parameter combination returned by the data provider
      */
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
-        Object dataProviderParameters;
+        Object data;
         try {
-            dataProviderParameters = dataProviderMethod.invokeExplosively(null);
+            data = dataProviderMethod.invokeExplosively(null);
         } catch (Throwable t) {
             throw new Error(String.format("Exception while invoking data provider method '%s': %s",
                     dataProviderMethod.getName(), t.getMessage()), t);
         }
 
+        Settings settings = new Settings(dataProviderMethod.getAnnotation(DataProvider.class));
+
+        List<Object[]> converted = dataConverter.convert(data, testMethod.getMethod().getParameterTypes(), settings);
         String emptyResultMessage = String.format("Data provider '%s' must neither be null nor empty but was: %s.",
-                dataProviderMethod.getName(), dataProviderParameters);
-        return explodeTestMethod(testMethod, dataProviderParameters, emptyResultMessage);
+                dataProviderMethod.getName(), data);
+        return explodeTestMethod(testMethod, converted, emptyResultMessage);
     }
 
     /**
@@ -84,17 +88,21 @@ public class TestGenerator {
      * @return a list of methods, each method bound to a parameter combination returned by the {@link DataProvider}
      */
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
-        String[] dataProviderParameters = dataProvider.value();
+        String[] data = dataProvider.value();
 
+        List<Object[]> converted = dataConverter.convert(data, testMethod.getMethod().getParameterTypes(),
+                new Settings(dataProvider));
         String emptyResultMessage = String.format("%s.value() must be set but was: %s.", dataProvider.getClass()
-                .getSimpleName(), Arrays.toString(dataProviderParameters));
-        return explodeTestMethod(testMethod, dataProviderParameters, emptyResultMessage);
+                .getSimpleName(), Arrays.toString(data));
+        return explodeTestMethod(testMethod, converted, emptyResultMessage);
     }
 
-    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data, String emptyResultMessage) {
+    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, List<Object[]> converted,
+            String emptyResultMessage) {
+
         int idx = 0;
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
-        for (Object[] parameters : dataConverter.convert(data, testMethod.getMethod().getParameterTypes())) {
+        for (Object[] parameters : converted) {
             result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
         }
         if (result.isEmpty()) {

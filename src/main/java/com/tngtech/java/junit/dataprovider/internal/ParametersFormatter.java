@@ -29,7 +29,7 @@ public class ParametersFormatter {
      * </tr>
      * </table>
      *
-     * @param parameters the parameters are converted to a comma separated {@link String}
+     * @param parameters the parameters are converted to a regex-separated {@link String}
      * @return a {@link String} representation of the given parameters
      */
     public String format(Object[] parameters) {

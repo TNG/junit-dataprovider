@@ -73,12 +73,18 @@ public class TestValidator {
      * <ul>
      *
      * @param dataProviderMethod the method to check
+     * @param dataProvider the {@code @}{@link DataProvider} annotation used on {@code dataProviderMethod}
      * @param errors to be "returned" and thrown as {@link InitializationError}
      * @throws NullPointerException iif any argument is {@code null}
      */
-    public void validateDataProviderMethod(FrameworkMethod dataProviderMethod, List<Throwable> errors) {
+    public void validateDataProviderMethod(FrameworkMethod dataProviderMethod, DataProvider dataProvider,
+            List<Throwable> errors) {
+
         if (dataProviderMethod == null) {
             throw new NullPointerException("dataProviderMethod must not be null");
+        }
+        if (dataProvider == null) {
+            throw new NullPointerException("dataProvider must not be null");
         }
         if (errors == null) {
             throw new NullPointerException("errors must not be null");
@@ -98,6 +104,9 @@ public class TestValidator {
         }
         if (!dataConverter.canConvert(method.getGenericReturnType())) {
             errors.add(new Exception(messageBasePart + " either return Object[][] or List<List<Object>>"));
+        }
+        if (dataProvider.value().length > 0) {
+            errors.add(new Exception(messageBasePart + " not define @DataProvider.value()"));
         }
     }
 }

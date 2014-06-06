@@ -7,8 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark a test method for use with a data provider. The value must be the name of a {@code @}{@link DataProvider}
- * method.
+ * Annotate a test method for using it with a data provider. The {@link #value()} must be the name of a {@code @}
+ * {@link DataProvider} method which can optionally be located in another class (see {@link #location()}).
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -18,6 +18,10 @@ public @interface UseDataProvider {
     /** The required name of the data provider method to use test data from. */
     String value();
 
-    /** The class holding the data provider method, defaults to the test class (just first class will be considered). */
+    /**
+     * Optionally specify the class holding the data provider method having the name given in {@link #value()}. Defaults
+     * to the test class where {@code @}{@link UseDataProvider} annotation is used. (Just first class will be
+     * considered).
+     */
     Class<?>[] location() default {};
 }

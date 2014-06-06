@@ -280,7 +280,7 @@ class DataProviderTest {
 
 Instead of using ```@UseDataProvider``` to point to a method providing test data, you can directly
 pass test data using ```@DataProvider``` annotation and its ```#value()``` method to provide an
-array of comma-separated ```String```s. Each comma-separated ```String``` is split and trimmed back by
+array of regex-separated ```String```s. Each regex-separated ```String``` is split and trimmed back by
 spaces (= "``` ```"), tabs (= "```\t```) and line-separator (= "```\n```" or "```\r```"). The
 resulting ```String``` is then parsed to its corresponding type in the test method signature. All primitive
 types (e.g. ```char```, ```boolean```, ```int```), primitive wrapper types (e.g. ```Long```, ```Double```), ```Enum```s,
@@ -325,6 +325,7 @@ Release notes
 
 ### tbd. (???)
 
+* added ```splitBy```, ```convertNulls``` and ```trimValues```` parameter to ```@DataProvider``` ([#24](/../../issues/24))
 * ...
 
 ### v1.7.0 (20-Jun-2014)

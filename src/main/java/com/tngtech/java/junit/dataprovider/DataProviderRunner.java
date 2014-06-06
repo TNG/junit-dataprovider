@@ -121,7 +121,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
                 errors.add(new Exception("No such data provider: "
                         + testMethod.getAnnotation(UseDataProvider.class).value()));
             } else {
-                testValidator.validateDataProviderMethod(dataProviderMethod, errors);
+                DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
+                if (dataProvider == null) {
+                    throw new IllegalStateException(String.format("@%s annotaion not found on data provider method %s",
+                            DataProvider.class.getSimpleName(), dataProviderMethod.getName()));
+                }
+                testValidator.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
             }
         }
     }

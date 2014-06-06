@@ -129,15 +129,15 @@ public class DataProviderJavaAcceptanceTest {
         assertThat(result).isEqualTo(cal1IsEarlierThenCal2);
     }
 
-    @DataProvider
+    @DataProvider(splitBy = "\\|", trimValues = true)
     public static String[] dataProviderFileExistence() {
         // @formatter:off
         return new String[] {
-                "src,             true",
-                "src/main,        true",
-                "src/main/java/,  true",
-                "src/test/java/,  true",
-                "test,            false",
+                "src             | true",
+                "src/main        | true",
+                "src/main/java/  | true",
+                "src/test/java/  | true",
+                "test            | false",
         };
         // @formatter:on
     }
@@ -187,6 +187,20 @@ public class DataProviderJavaAcceptanceTest {
         })
     // @formatter:off
     public void testStringLength(String str, int expectedLength) {
+        // Expect:
+        assertThat(str.length()).isEqualTo(expectedLength);
+    }
+
+    // @formatter:off
+    @Test
+    @DataProvider(value = {
+        "               |  0",
+        "a              |  1",
+        "abc            |  3",
+        "veryLongString | 14",
+    }, splitBy = "\\|", trimValues = true, convertNulls = true)
+    // @formatter:off
+    public void testStringLength2(String str, int expectedLength) {
         // Expect:
         assertThat(str.length()).isEqualTo(expectedLength);
     }
