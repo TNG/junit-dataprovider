@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  * and will not be printed.</li>
  * <li>
  * <p>
- * <i>Use it directly on test method:</i> Provide all the data for the test method parameters as comma-separted
+ * <i>Use it directly on test method:</i> Provide all the data for the test method parameters as comma-separated
  * {@link String}s using {@code String[] value()}.
  * <p>
  * <b>Note:</b> All parameters of the test method must be primitive types (e.g. {@code char}, {@code int},
@@ -37,6 +37,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface DataProvider {
 
-    /** Use this Define a list of parameters for the test method */
+    /** Use this to define a list of parameters each as a comma-separated {@link String} for the test method. */
     String[] value() default {};
 }
