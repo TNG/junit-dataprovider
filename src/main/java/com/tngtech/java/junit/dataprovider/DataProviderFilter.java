@@ -56,7 +56,7 @@ public class DataProviderFilter extends Filter {
             Matcher descriptionMatcher = DESCRIPTION_PATTERN.matcher(description.getDisplayName());
             if (!descriptionMatcher.matches()) {
                 throw new IllegalArgumentException(String.format("Test method description %s is not suppored by %s.",
-                        filterDescription, this.getClass().getSimpleName()));
+                        description.getDisplayName(), this.getClass().getSimpleName()));
             }
             if (!filterDescriptionMatcher.group(GROUP_METHOD_NAME).equals(descriptionMatcher.group(GROUP_METHOD_NAME))
                     || !filterDescriptionMatcher.group(GROUP_CLASS).equals(descriptionMatcher.group(GROUP_CLASS))) {
