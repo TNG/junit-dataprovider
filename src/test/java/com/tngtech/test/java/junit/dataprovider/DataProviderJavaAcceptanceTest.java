@@ -173,10 +173,10 @@ public class DataProviderJavaAcceptanceTest {
     // @formatter:off
     @Test
     @DataProvider({
-        "0, UP",
-        "1, DOWN",
-        "3, FLOOR",
-    })
+            "0, UP",
+            "1, DOWN",
+            "3, FLOOR",
+        })
     // @formatter:off
     public void testOldModeToRoundingMode(int oldMode, RoundingMode expected) {
         // Expect:
