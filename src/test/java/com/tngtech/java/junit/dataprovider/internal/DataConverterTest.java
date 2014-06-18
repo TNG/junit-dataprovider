@@ -2,7 +2,9 @@ package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -420,13 +422,25 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test(expected = Error.class)
+    public void testGetParametersForShouldThrowErrorForTargetTypeConstructorWithStringArgWhichThrowsException() {
+        // Given:
+        String data = "noInt";
+        Class<?>[] parameterTypes = new Class[] { BigInteger.class };
+
+        // When:
+        underTest.getParametersFor(data, parameterTypes, 41);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = Error.class)
     public void testGetParametersForShouldThrowErrorForUnsupportedTargetType() {
         // Given:
         String data = "noObject";
         Class<?>[] parameterTypes = new Class[] { Object.class };
 
         // When:
-        underTest.getParametersFor(data, parameterTypes, 41);
+        underTest.getParametersFor(data, parameterTypes, 42);
 
         // Then: expect exception
     }
@@ -483,6 +497,32 @@ public class DataConverterTest extends BaseTest {
 
         // Then:
         assertThat(result).isEqualTo(new Object[] { null, null });
+    }
+
+    @Test
+    public void testGetParametersForShouldCorrectlyHandleNullValue() {
+        // Given:
+        final String data = null;
+        final Class<?>[] parameterTypes = new Class<?>[] { Integer.class };
+
+        // When:
+        Object[] result = underTest.getParametersFor(data, parameterTypes, 71);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { null });
+    }
+
+    @Test
+    public void testGetParametersForShouldCorrectlyUseConstructorWithSingleStringArg() {
+        // Given:
+        final String data = "/home/schmida";
+        final Class<?>[] parameterTypes = new Class<?>[] { File.class };
+
+        // When:
+        Object[] result = underTest.getParametersFor(data, parameterTypes, 80);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { new File("/home/schmida/") });
     }
 
     // -- helper methods -----------------------------------------------------------------------------------------------

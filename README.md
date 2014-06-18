@@ -12,6 +12,7 @@ junit-dataprovider
 * [Download](#download)
 * [Usage examples](#usage-examples)
 	* [Array syntax](#array-syntax)
+	* [String syntax](#string-syntax)
 	* [List syntax](#list-syntax)
 	* [Let ```@DataProvider``` directly providing test data](#let-dataprovider-directly-providing-test-data)
 * [Release notes](#release-notes)
@@ -198,6 +199,46 @@ public class StringDataProvider {
 }
 ```
 
+### String syntax
+
+For example using [Java](https://www.java.com/) and its ```String``` syntax:
+
+
+```java
+import static org.junit.Assert.*;
+
+import java.io.File;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.tngtech.java.junit.dataprovider.*;
+
+@RunWith(DataProviderRunner.class)
+public class DataProviderTest {
+
+    @DataProvider
+    public static String[] dataProviderFileExistence() {
+        // @formatter:off
+        return new String[] {
+                "src,             true",
+                "src/main,        true",
+                "src/main/java/,  true",
+                "src/test/java/,  true",
+                "test,            false",
+        };
+        // @formatter:on
+    }
+
+    @Test
+    @UseDataProvider("dataProviderFileExistence")
+    public void testFileExistence(File file, boolean expected) {
+        // Expect:
+        assertThat(file.exists()).isEqualTo(expected);
+    }
+}
+```
+
 ### List syntax
 
 For example using [Groovy](http://groovy.codehaus.org/) (if you are not able 
@@ -209,9 +250,7 @@ import static org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import com.tngtech.java.junit.dataprovider.DataProvider
-import com.tngtech.java.junit.dataprovider.DataProviderRunner
-import com.tngtech.java.junit.dataprovider.UseDataProvider
+import com.tngtech.java.junit.dataprovider.*
 
 @RunWith(DataProviderRunner)
 class DataProviderTest {
@@ -235,7 +274,6 @@ class DataProviderTest {
         assert (op1 && op2) == expected
     }
 }
-
 ```
 
 ### Let ```@DataProvider``` directly providing test data
@@ -288,6 +326,7 @@ Release notes
 ### tbd. (???)
 
 * implemented [#20](/../../issues/20) to use ```@DataProvider``` directly providing test data for test method
+* support any type which have a singl-argument ```String``` constructor for ```String[]``` data provider ([#26](/../../issues/26))
 * removed some internal technical debts by refactoring ([#23](/../../issues/23)) and ([#25](/../../issues/25))
 
 ### v1.6.0 (26-Apr-2014)
