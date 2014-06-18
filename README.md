@@ -288,7 +288,7 @@ Release notes
 ### tbd. (???)
 
 * implemented [#20](/../../issues/20) to use ```@DataProvider``` directly providing test data for test method
-* removed some internal technical debts by refactoring ([#23](/../../issues/23))
+* removed some internal technical debts by refactoring ([#23](/../../issues/23)) and ([#25](/../../issues/25))
 
 ### v1.6.0 (26-Apr-2014)
 
