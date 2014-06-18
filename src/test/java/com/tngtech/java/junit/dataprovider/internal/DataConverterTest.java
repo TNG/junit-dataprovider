@@ -522,7 +522,7 @@ public class DataConverterTest extends BaseTest {
         Object[] result = underTest.getParametersFor(data, parameterTypes, 80);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new File("/home/schmida/") });
+        assertThat(result).isEqualTo(new Object[] { new File(data) });
     }
 
     // -- helper methods -----------------------------------------------------------------------------------------------
