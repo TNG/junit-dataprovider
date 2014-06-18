@@ -515,14 +515,14 @@ public class DataConverterTest extends BaseTest {
     @Test
     public void testGetParametersForShouldCorrectlyUseConstructorWithSingleStringArg() {
         // Given:
-        final String data = "/home/schmida";
+        final String data = "home/schmida";
         final Class<?>[] parameterTypes = new Class<?>[] { File.class };
 
         // When:
         Object[] result = underTest.getParametersFor(data, parameterTypes, 80);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new File(data) });
+        assertThat(result).isEqualTo(new Object[] { new File("home/schmida") });
     }
 
     // -- helper methods -----------------------------------------------------------------------------------------------
