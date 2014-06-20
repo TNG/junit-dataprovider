@@ -323,7 +323,7 @@ Further examples can be found in [DataProviderJavaAcceptanceTest.java](/src/test
 Release notes
 -------------
 
-### tbd. (???)
+### v1.7.0 (20-Jun-2014)
 
 * implemented [#20](/../../issues/20) to use ```@DataProvider``` directly providing test data for test method
 * support any type which have a singl-argument ```String``` constructor for ```String[]``` data provider ([#26](/../../issues/26))
