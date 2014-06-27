@@ -1,8 +1,8 @@
 package com.tngtech.java.junit.dataprovider;
 
-import static com.tngtech.java.junit.dataprovider.DataProviderUtils.$;
-import static com.tngtech.java.junit.dataprovider.DataProviderUtils.$$;
-import static com.tngtech.java.junit.dataprovider.DataProviderUtils.testForEach;
+import static com.tngtech.java.junit.dataprovider.DataProviders.$;
+import static com.tngtech.java.junit.dataprovider.DataProviders.$$;
+import static com.tngtech.java.junit.dataprovider.DataProviders.testForEach;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class DataProviderUtilsTest extends BaseTest {
+public class DataProvidersTest extends BaseTest {
 
     @Test
     public void test$ShouldReturnEmptyObjectArrayForNoArgs() {
@@ -77,10 +77,10 @@ public class DataProviderUtilsTest extends BaseTest {
         // Given:
 
         // When:
-        Object[] result = $$(new Object[] { "test1" }, new Object[] { "test2" }, new Object[] { "test3" });
+        Object[] result = $$(new Object[] { "test1", 1 }, new Object[] { "test2" }, new Object[] { "test3", 3 });
 
         // Then:
-        assertThat(result).isEqualTo(new Object[][] { { "test1" }, { "test2" }, { "test3" } });
+        assertThat(result).isEqualTo(new Object[][] { { "test1", 1 }, { "test2" }, { "test3", 3 } });
     }
 
     @Test
@@ -99,27 +99,6 @@ public class DataProviderUtilsTest extends BaseTest {
 
         // Then:
         assertThat(result).isEqualTo(new Object[][] { { 0, 0, 0 }, { 0, 1, 1 }, { 1, 1, 2 }, { 1, 2, 3 } });
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testTestForEachClassOfEnumShouldThrowNullPointerExceptionForNullArg() {
-        // Given:
-
-        // When:
-        testForEach((Class<TestEnum>) null);
-
-        // Then: expect exception
-    }
-
-    @Test
-    public void testTestForEachClassOfEnum() {
-        // Given:
-
-        // When:
-        Object[][] result = testForEach(TestEnum.class);
-
-        // Then:
-        assertThat(result).isEqualTo(new Object[][] { { TestEnum.VAL1 }, { TestEnum.VAL2 }, { TestEnum.VAL3 } });
     }
 
     @Test
@@ -160,10 +139,9 @@ public class DataProviderUtilsTest extends BaseTest {
         // Given:
 
         // When:
-        Object[][] result = testForEach((Iterable<Object>) null);
+        testForEach((Iterable<Object>) null);
 
-        // Then:
-        assertThat(result).isEqualTo(new Object[][] { { TestEnum.VAL1 }, { TestEnum.VAL2 }, { TestEnum.VAL3 } });
+        // Then: expect exception
     }
 
     @Test
@@ -192,5 +170,26 @@ public class DataProviderUtilsTest extends BaseTest {
 
         // Then:
         assertThat(result).isEqualTo(new Object[][] { { Long.valueOf(261l) }, { Long.valueOf(167120l) } });
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testTestForEachClassOfEnumShouldThrowNullPointerExceptionForNullArg() {
+        // Given:
+
+        // When:
+        testForEach((Class<TestEnum>) null);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testTestForEachClassOfEnumShouldReturnObjectArrayArrayForEachEnumValue() {
+        // Given:
+
+        // When:
+        Object[][] result = testForEach(TestEnum.class);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] { { TestEnum.VAL1 }, { TestEnum.VAL2 }, { TestEnum.VAL3 } });
     }
 }

@@ -1,7 +1,7 @@
 package com.tngtech.test.java.junit.dataprovider;
 
-import static com.tngtech.java.junit.dataprovider.DataProviderUtils.$;
-import static com.tngtech.java.junit.dataprovider.DataProviderUtils.$$;
+import static com.tngtech.java.junit.dataprovider.DataProviders.$;
+import static com.tngtech.java.junit.dataprovider.DataProviders.$$;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.RoundingMode;
