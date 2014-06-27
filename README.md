@@ -14,6 +14,7 @@ junit-dataprovider
 	* [Array syntax](#array-syntax)
 	* [List syntax](#list-syntax)
 	* [Let ```@DataProvider``` directly providing test data](#let-dataprovider-directly-providing-test-data)
+	* [Utility methods](#utility-methods)
 * [Release notes](#release-notes)
 * [Eclipse template](#eclipse-template)
 * [Contributing](#contributing)
@@ -276,6 +277,40 @@ and ```String```s are supported.
 
         // Then:
         assertThat(isEmpty).isTrue();
+    }
+```
+
+### Utility methods
+
+```
+    import static com.tngtech.java.junit.dataprovider.DataProviders.*;
+
+    import java.math.RoundingMode;
+
+
+    @DataProvider
+    public static Object[][] dataProviderAdd() {
+        // @formatter:off
+        return $$(
+                $( -1, -1, -2 ),
+                $( -1,  0, -1 ),
+                $(  0, -1, -1 ),
+                $(  0,  0,  0 ),
+                $(  0,  1,  1 ),
+                $(  1,  0,  1 ),
+                $(  1,  1,  2 )
+        );
+        // @formatter:on
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderStringIsNullOrEmpty() {
+        return testForEach(null, "");
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderRoundingMode() {
+        return testForEach(RoundingMode.class);
     }
 ```
 
