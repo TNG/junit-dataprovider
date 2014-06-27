@@ -14,7 +14,7 @@ public class DataProviders {
      * </code>
      * </pre>
      *
-     * @param args which should be contained by the resulting {@link Object} array
+     * @param args which should be contained in the resulting {@link Object} array
      * @return an {@link Object} array containing all the given {@code args}
      * @see #$$
      */
@@ -37,8 +37,8 @@ public class DataProviders {
      * </code>
      * </pre>
      *
-     * @param args
-     * @return
+     * @param args which should be contained in the resulting array of {@link Object} array
+     * @return an array of {@link Object} arrays containing all the given {@code args}
      * @see #$
      */
     public static Object[][] $$(Object[]... args) {

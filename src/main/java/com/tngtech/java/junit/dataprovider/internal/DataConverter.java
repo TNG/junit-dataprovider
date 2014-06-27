@@ -1,12 +1,11 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.tngtech.java.junit.dataprovider.DataProvider;
 
 /**
  * Internal class to convert some data to its corresponding parameters.
@@ -168,12 +167,25 @@ public class DataConverter {
 
             } catch (IllegalArgumentException e) {
                 throw new Error(String.format(
-                        "'%s' is not a valid value of enum %s used in @%s. Please be aware of case sensitivity.", str,
-                        targetType.getSimpleName(), DataProvider.class.getSimpleName()));
+                        "'%s' is not a valid value of enum %s. Please be aware of case sensitivity.", str,
+                        targetType.getSimpleName()));
             }
         }
 
-        throw new Error(String.format("'%s' is not supported as parameter type of test using @%s.",
-                targetType.getSimpleName(), DataProvider.class.getSimpleName()));
+        for (Constructor<?> constructor : targetType.getConstructors()) {
+            if (constructor.getParameterTypes().length == 1 && String.class.equals(constructor.getParameterTypes()[0])) {
+                try {
+                    return constructor.newInstance(str);
+
+                } catch (Exception e) {
+                    throw new Error(String.format("Tried to invoke '%s' for argument '%s'. Exception: %s", constructor,
+                            str, e.getMessage()), e);
+                }
+            }
+        }
+
+        throw new Error("'" + targetType.getSimpleName() + "' is not supported as parameter type of test. Supported"
+                + " types are primitive types, primitive wrapper types, case-sensitive 'Enum' values, 'String's"
+                + ", and types having single-argument 'String' constructor.");
     }
 }

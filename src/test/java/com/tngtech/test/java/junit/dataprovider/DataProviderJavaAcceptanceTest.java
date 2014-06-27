@@ -4,6 +4,7 @@ import static com.tngtech.java.junit.dataprovider.DataProviders.$;
 import static com.tngtech.java.junit.dataprovider.DataProviders.$$;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -131,6 +132,26 @@ public class DataProviderJavaAcceptanceTest {
     }
 
     @DataProvider
+    public static String[] dataProviderFileExistence() {
+        // @formatter:off
+        return new String[] {
+                "src,             true",
+                "src/main,        true",
+                "src/main/java/,  true",
+                "src/test/java/,  true",
+                "test,            false",
+        };
+        // @formatter:on
+    }
+
+    @Test
+    @UseDataProvider("dataProviderFileExistence")
+    public void testFileExistence(File file, boolean expected) {
+        // Expect:
+        assertThat(file.exists()).isEqualTo(expected);
+    }
+
+    @DataProvider
     public static List<List<Object>> dataProviderNumberFormat() {
         List<List<Object>> result = new ArrayList<List<Object>>();
         List<Object> first = new ArrayList<Object>();
@@ -175,10 +196,10 @@ public class DataProviderJavaAcceptanceTest {
     // @formatter:off
     @Test
     @DataProvider({
-        "0, UP",
-        "1, DOWN",
-        "3, FLOOR",
-    })
+            "0, UP",
+            "1, DOWN",
+            "3, FLOOR",
+        })
     // @formatter:off
     public void testOldModeToRoundingMode(int oldMode, RoundingMode expected) {
         // Expect:
