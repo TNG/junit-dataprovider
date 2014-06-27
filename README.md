@@ -91,14 +91,13 @@ Motivation and distinction
 > all test methodes to run, before validating and filtering it. At this points of execution, though, no instance of the
 > test class is instanciated.
 > Then as a second step [JUnit][] creates a single instance of the class under test for every single test method.
-> One possiblity, for sure, is that junit-dataprovider could create an instance and invoke the ```@DataProvider``` 
+> One possiblity, for sure, is that junit-dataprovider could create an instance and invoke the ```@DataProvider```
 > as [junitparams][] does interally, but neither ```@Before``` nor ```MethodeRule``` is minded. 
 > Therefore, I decided to disallow a ```@DataProvider``` instance methods that nobody using junit-dataprovider 
 > believes accessing data of a test class instance is possible.
 
-*Note*: Even ```@BeforeClass``` and ```@ClassRule``` are not executed currently (see [#22](/../../issues/22)) 
-before the static ```@DataProvider``` method because (validation and) filtering of test methods is done 
-immediately after creation of ```DataProviderRunner``` :-(
+*Note*: ```@ClassRule``` are currently not executed before the static ```@DataProvider``` method because of problems
+due to internal [JUnit][] implementation which is different to the implementation for ```@BeforeClass```.
 
 
 Requirements
@@ -122,6 +121,10 @@ the **Dependency Information** section how to integrate it with your dependency 
 
 Usage examples
 --------------
+
+*Note*: All static test setup methods are executed before any data provider such that all static
+fields can be prepared in ```@BeforeClass``` setup methods and smoothly accessed within
+```@DataProvider``` methods.
 
 ### Array syntax 
 
@@ -325,6 +328,7 @@ Release notes
 
 ### tbd. (???)
 
+* executing ```@BeforeClass``` before ```@DataProvider``` methods ([#22](/../../issues/22))
 * ...
 
 ### v1.7.0 (20-Jun-2014)
