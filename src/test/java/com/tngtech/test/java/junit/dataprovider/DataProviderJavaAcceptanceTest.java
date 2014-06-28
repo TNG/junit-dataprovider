@@ -19,8 +19,8 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 @RunWith(DataProviderRunner.class)
 public class DataProviderJavaAcceptanceTest {
 
-    public static String emptyString = null;
-    public static String notEmptyString = null;
+    private static String emptyString = null;
+    private static String notEmptyString = null;
 
     @BeforeClass
     public static void setup() {
