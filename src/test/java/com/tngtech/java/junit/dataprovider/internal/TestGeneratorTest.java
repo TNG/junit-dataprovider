@@ -18,7 +18,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.tngtech.java.junit.dataprovider.BaseTest;
 import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestGeneratorTest extends BaseTest {
@@ -32,8 +31,6 @@ public class TestGeneratorTest extends BaseTest {
     private FrameworkMethod testMethod;
     @Mock
     private FrameworkMethod dataProviderMethod;
-    @Mock
-    private UseDataProvider useDataProvider; // TODO not used
     @Mock
     private DataProvider dataProvider;
 
@@ -76,23 +73,6 @@ public class TestGeneratorTest extends BaseTest {
         // Then:
         assertThat(result).containsOnly(testMethod);
     }
-
-    // TODO
-    // @Test
-    // public void testGenerateExplodedTestMethodsForShouldReturnExplodedTestMethodsForValidGivenDataProvider() {
-    // // Given:
-    // List<FrameworkMethod> explodedMethods = new ArrayList<FrameworkMethod>();
-    // explodedMethods.add(mock(FrameworkMethod.class));
-    // explodedMethods.add(mock(FrameworkMethod.class));
-    // // doReturn(explodedMethods).when(underTest).explodeTestMethod(testMethod, dataProviderMethod);
-    //
-    // // When:
-    // underTest.generateExplodedTestMethodsFor(asList(testMethod));
-    //
-    // // Then:
-    // verify(testGenerator).generateExplodedTestMethodsFor(testMethod, dataProviderMethod);
-    // // assertThat(result).hasSize(2).containsAll(explodedMethods);
-    // }
 
     @Test(expected = Error.class)
     public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataProviderMethodThrowsException()
