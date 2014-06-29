@@ -62,7 +62,6 @@ public class DataConverter {
             }
         }
         return false;
-
     }
 
     /**
@@ -122,7 +121,7 @@ public class DataConverter {
      * </p>
      *
      * @param data regex-separated {@link String} of parameters for test method
-     * @param parameterTypes target types of parameters to which corresponding value in regex-separated {@code data}
+     * @param parameterTypes target types of parameters to which corresponding values in regex-separated {@code data}
      *            should be converted
      * @param settings to be used to convert given {@code data}
      * @param rowIdx index of current {@code data} for better error messages
@@ -133,13 +132,13 @@ public class DataConverter {
             return new Object[] { null };
         }
 
-        Object[] result = new Object[parameterTypes.length];
-
         String[] splitData = splitBy(data, settings.splitBy);
         if (parameterTypes.length != splitData.length) {
             throw new Error(String.format("Test method expected %d parameters but got %d from @DataProvider row %d",
                     parameterTypes.length, splitData.length, rowIdx));
         }
+
+        Object[] result = new Object[parameterTypes.length];
         for (int idx = 0; idx < splitData.length; idx++) {
             String toConvert = (settings.trimValues) ? splitData[idx].trim() : splitData[idx];
             if (settings.convertNulls && "null".equals(toConvert)) {
@@ -166,6 +165,7 @@ public class DataConverter {
         if (String.class.equals(targetType)) {
             return str;
         }
+
         if (boolean.class.equals(targetType) || Boolean.class.equals(targetType)) {
             return Boolean.valueOf(str);
         }
@@ -190,6 +190,7 @@ public class DataConverter {
         if (double.class.equals(targetType) || Double.class.equals(targetType)) {
             return Double.valueOf(str);
         }
+
         if (targetType.isEnum()) {
             return convertToEnumValue(str, targetType);
         }
