@@ -116,6 +116,41 @@ public class DataConverter {
     }
 
     /**
+     * Checks if the types of the given list of {@code arguments} matches the given test methods {@code parameterTypes}
+     * and throws an {@link Error} if not.
+     *
+     * @param arguments the arguments to be used for each test method to be executed
+     * @param parameterTypes test method parameter types (from {@link Method#getParameterTypes()})
+     * @throws NullPointerException iif given {@code parameterTypes} or {@code settings} are {@code null}
+     * @throws Error iif test methods parameter types does not match the given {@code arguments}
+     */
+    public void checkIfArgumentsMatchParameterTypes(List<Object[]> arguments, Class<?>[] parameterTypes) {
+        if (arguments == null) {
+            throw new NullPointerException("arguments must not be null");
+        }
+        if (parameterTypes == null) {
+            throw new NullPointerException("testMethod must not be null");
+        }
+
+        for (Object[] objects : arguments) {
+            if (parameterTypes.length != objects.length) {
+                throw new Error(String.format("Expected %s arguments for test method but got %s parameters.",
+                        parameterTypes.length, objects.length));
+            }
+            for (int idx = 0; idx < objects.length; idx++) {
+                Object object = objects[idx];
+                if (object != null) {
+                    Class<?> paramType = parameterTypes[idx];
+                    if (!paramType.isInstance(object) && !isWrappedInstance(paramType, object)) {
+                        throw new Error(String.format("Parameter %d is of type %s but argument given is %s of type %s",
+                                idx, paramType.getSimpleName(), object, object.getClass().getSimpleName()));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
@@ -203,6 +238,18 @@ public class DataConverter {
         throw new Error("'" + targetType.getSimpleName() + "' is not supported as parameter type of test methods"
                 + ". Supported types are primitive types and their wrappers, case-sensitive 'Enum'"
                 + " values, 'String's, and types having a single 'String' parameter constructor.");
+    }
+
+    private boolean isWrappedInstance(Class<?> clazz, Object object) {
+        return (boolean.class.equals(clazz) && Boolean.class.isInstance(object))
+                || (byte.class.equals(clazz) && Byte.class.isInstance(object))
+                || (char.class.equals(clazz) && Character.class.isInstance(object))
+                || (double.class.equals(clazz) && Double.class.isInstance(object))
+                || (float.class.equals(clazz) && Float.class.isInstance(object))
+                || (int.class.equals(clazz) && Integer.class.isInstance(object))
+                || (long.class.equals(clazz) && Long.class.isInstance(object))
+                || (short.class.equals(clazz) && Short.class.isInstance(object))
+                || (void.class.equals(clazz) && Void.class.isInstance(object));
     }
 
     private Object convertToChar(String str, Class<?> charType) throws Error {

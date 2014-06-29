@@ -105,6 +105,8 @@ public class TestGenerator {
     private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, List<Object[]> converted,
             String emptyResultMessage) {
 
+        dataConverter.checkIfArgumentsMatchParameterTypes(converted, testMethod.getMethod().getParameterTypes());
+
         int idx = 0;
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
         for (Object[] parameters : converted) {

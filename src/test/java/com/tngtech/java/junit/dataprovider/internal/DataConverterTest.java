@@ -402,6 +402,134 @@ public class DataConverterTest extends BaseTest {
         assertThat(result.get(1)).isEqualTo(new Object[] { (byte) 6, 7, 8l, 9.0, 'i' });
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testCheckTestMethodArgumentsShouldThrowNullPointerExceptionIfArgumentsIsNull() {
+        // Given:
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(null, new Class<?>[0]);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCheckTestMethodArgumentsShouldThrowNullPointerExceptionIfParameterTypesIsNull() {
+        // Given:
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(new ArrayList<Object[]>(), null);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = Error.class)
+    public void testCheckTestMethodArgumentsShouldThrowErrorIfLengthOfArgumentsAndParameterTypesDoesNotMatch() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[0], new Object[0]);
+        Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = Error.class)
+    public void testCheckTestMethodArgumentsShouldThrowErrorIfSingleArgumentIsNotAssignableToParameterTypeOnOnlyTest() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { "1" });
+        Class<?>[] parameterTypes = new Class<?>[] { int.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = Error.class)
+    public void testCheckTestMethodArgumentsShouldThrowErrorIfSingleArgumentIsNotAssignableToParameterTypeOnSecondTest() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { 1 }, new Object[] { "2" }, new Object[] { 3 });
+        Class<?>[] parameterTypes = new Class<?>[] { int.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = Error.class)
+    public void testCheckTestMethodArgumentsShouldThrowErrorIfAnyArgumentTypeIsNotAssignableToParameterTypeOnOnlyTest() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { 1, "1", 7l });
+        Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = Error.class)
+    public void testCheckTestMethodArgumentsShouldThrowErrorIfAnyArgumentTypeIsNotAssignableToParameterTypeOnSecondTest() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { 1, "1", true }, new Object[] { 2, "2", 2l });
+        Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldNotThrowErrorIfArgumentTypesEqualsParameterTypesOnOnlyTest() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { Character.valueOf('a') });
+        Class<?>[] parameterTypes = new Class<?>[] { Character.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldNotThrowErrorIfArgumentTypesEqualParameterTypesExactlyOnMultipleTests() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { "a", Boolean.TRUE }, new Object[] { "b", Boolean.FALSE });
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, Boolean.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldNotThrowErrorIfArgumentsAreAssignableToParameterTypes() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { Long.valueOf(1l) }, new Object[] { Integer.valueOf(2) });
+        Class<?>[] parameterTypes = new Class<?>[] { Number.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldNotThrowErrorIfArgumentsAreWrappedPrimitivesOfParameterTypes() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { Long.valueOf(1l) }, new Object[] { Long.valueOf(2l) });
+        Class<?>[] parameterTypes = new Class<?>[] { long.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
     @Test
     public void testGetParametersForShouldCorrectlyParseAllPrimitiveTypes() {
         // Given:

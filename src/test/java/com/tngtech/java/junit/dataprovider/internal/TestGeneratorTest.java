@@ -2,8 +2,10 @@ package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,6 +113,7 @@ public class TestGeneratorTest extends BaseTest {
 
         // Then:
         assertDataProviderFrameworkMethods(result, dataConverterResult);
+        verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 
     @Test
@@ -126,6 +129,7 @@ public class TestGeneratorTest extends BaseTest {
 
         // Then:
         assertDataProviderFrameworkMethods(result, dataConverterResult);
+        verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 
     @Test(expected = Error.class)
@@ -150,6 +154,7 @@ public class TestGeneratorTest extends BaseTest {
 
         // Then:
         assertDataProviderFrameworkMethods(result, dataConverterResult);
+        verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 
     @Test
@@ -164,5 +169,6 @@ public class TestGeneratorTest extends BaseTest {
 
         // Then:
         assertDataProviderFrameworkMethods(result, dataConverterResult);
+        verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 }
