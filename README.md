@@ -345,7 +345,7 @@ Release notes
 
 ### v1.5.1 (07-Mar-2014)
 
-* adjusted depedencies of uploaded 'pom.xml' (especially for JUnit => 'provided') (#[#15](/../../issues/15))
+* adjusted depedencies of uploaded 'pom.xml' (especially for JUnit => 'provided') ([#15](/../../issues/15))
 * fixed that ```DataProviderRunner``` is incompatible with ```Categories``` ([#14](/../../issues/14))
 * added LICENSE.TXT with Apache License 2.0 ([#13](/../../issues/13))
 * fixed MANIFEST.MF
