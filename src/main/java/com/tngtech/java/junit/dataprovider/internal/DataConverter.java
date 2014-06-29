@@ -14,6 +14,10 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
  */
 public class DataConverter {
 
+    /**
+     * Settings to be used to convert data to {@link List}{@code <}{@link Object}{@code >} by
+     * {@link #convert(Object, Class[], Settings)}
+     */
     public static class Settings {
         public final String splitBy;
         public final boolean convertNulls;
@@ -87,19 +91,16 @@ public class DataConverter {
         }
 
         List<Object[]> result = new ArrayList<Object[]>();
-
         if (data instanceof Object[][]) {
             for (Object[] parameters : (Object[][]) data) {
                 result.add(parameters);
             }
-            return result;
 
         } else if (data instanceof String[]) {
             int idx = 0;
             for (String paramString : (String[]) data) {
                 result.add(getParametersFor(paramString, parameterTypes, settings, idx++));
             }
-            return result;
 
         } else if (data instanceof List) {
             @SuppressWarnings("unchecked")
@@ -107,10 +108,12 @@ public class DataConverter {
             for (List<Object> parameters : lists) {
                 result.add(parameters.toArray());
             }
-            return result;
+
+        } else {
+            throw new ClassCastException(String.format(
+                    "Cannot cast to either Object[][], String[], or List<List<Object>> because data was: %s", data));
         }
-        throw new ClassCastException(String.format(
-                "Cannot cast to either Object[][], String[], or List<List<Object>> because data was: %s", data));
+        return result;
     }
 
     /**
@@ -138,7 +141,12 @@ public class DataConverter {
                     parameterTypes.length, splitData.length, rowIdx));
         }
         for (int idx = 0; idx < splitData.length; idx++) {
-            result[idx] = convertValue(splitData[idx], parameterTypes[idx], settings);
+            String toConvert = (settings.trimValues) ? splitData[idx].trim() : splitData[idx];
+            if (settings.convertNulls && "null".equals(toConvert)) {
+                result[idx] = null;
+            } else {
+                result[idx] = convertValue(toConvert, parameterTypes[idx]);
+            }
         }
         return result;
     }
@@ -154,76 +162,87 @@ public class DataConverter {
         return splitData;
     }
 
-    private Object convertValue(String str, Class<?> targetType, Settings settings) {
-        String toConvert = (settings.trimValues) ? str.trim() : str;
-
-        if (settings.convertNulls && "null".equals(toConvert)) {
-            return null;
-        }
-
+    private Object convertValue(String str, Class<?> targetType) {
         if (String.class.equals(targetType)) {
-            return toConvert;
+            return str;
         }
-
         if (boolean.class.equals(targetType) || Boolean.class.equals(targetType)) {
-            return Boolean.valueOf(toConvert);
+            return Boolean.valueOf(str);
         }
         if (byte.class.equals(targetType) || Byte.class.equals(targetType)) {
-            return Byte.valueOf(toConvert);
+            return Byte.valueOf(str);
         }
         if (char.class.equals(targetType) || Character.class.equals(targetType)) {
-            if (toConvert.length() == 1) {
-                return toConvert.charAt(0);
-            }
-            throw new Error(String.format("'%s' cannot be converted to %s.", toConvert, targetType.getSimpleName()));
+            return convertToChar(str, targetType);
         }
         if (short.class.equals(targetType) || Short.class.equals(targetType)) {
-            return Short.valueOf(toConvert);
+            return Short.valueOf(str);
         }
         if (int.class.equals(targetType) || Integer.class.equals(targetType)) {
-            return Integer.valueOf(toConvert);
+            return Integer.valueOf(str);
         }
         if (long.class.equals(targetType) || Long.class.equals(targetType)) {
-            String longStr = toConvert;
-            if (longStr.endsWith("l")) {
-                longStr = longStr.substring(0, longStr.length() - 1);
-            }
-            return Long.valueOf(longStr);
+            return convertToLong(str);
         }
         if (float.class.equals(targetType) || Float.class.equals(targetType)) {
-            return Float.valueOf(toConvert);
+            return Float.valueOf(str);
         }
         if (double.class.equals(targetType) || Double.class.equals(targetType)) {
-            return Double.valueOf(toConvert);
+            return Double.valueOf(str);
         }
-
         if (targetType.isEnum()) {
-            try {
-                @SuppressWarnings({ "rawtypes", "unchecked" })
-                Enum result = Enum.valueOf((Class<Enum>) targetType, toConvert);
-                return result;
-
-            } catch (IllegalArgumentException e) {
-                throw new Error(String.format(
-                        "'%s' is not a valid value of enum %s. Please be aware of case sensitivity.", toConvert,
-                        targetType.getSimpleName()));
-            }
+            return convertToEnumValue(str, targetType);
         }
 
+        Object result = tryConvertUsingSingleStringParamConstructor(str, targetType);
+        if (result != null) {
+            return result;
+        }
+
+        throw new Error("'" + targetType.getSimpleName() + "' is not supported as parameter type of test methods"
+                + ". Supported types are primitive types and their wrappers, case-sensitive 'Enum'"
+                + " values, 'String's, and types having a single 'String' parameter constructor.");
+    }
+
+    private Object convertToChar(String str, Class<?> charType) throws Error {
+        if (str.length() == 1) {
+            return str.charAt(0);
+        }
+        throw new Error(String.format("'%s' cannot be converted to %s.", str, charType.getSimpleName()));
+    }
+
+    private Object convertToLong(String str) {
+        String longStr = str;
+        if (longStr.endsWith("l")) {
+            longStr = longStr.substring(0, longStr.length() - 1);
+        }
+        return Long.valueOf(longStr);
+    }
+
+    private Object convertToEnumValue(String str, Class<?> enumType) throws Error {
+        try {
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            Enum result = Enum.valueOf((Class<Enum>) enumType, str);
+            return result;
+
+        } catch (IllegalArgumentException e) {
+            throw new Error(String.format("'%s' is not a valid value of enum %s. Please be aware of case sensitivity.",
+                    str, enumType.getSimpleName()));
+        }
+    }
+
+    private Object tryConvertUsingSingleStringParamConstructor(String str, Class<?> targetType) {
         for (Constructor<?> constructor : targetType.getConstructors()) {
             if (constructor.getParameterTypes().length == 1 && String.class.equals(constructor.getParameterTypes()[0])) {
                 try {
-                    return constructor.newInstance(toConvert);
+                    return constructor.newInstance(str);
 
                 } catch (Exception e) {
                     throw new Error(String.format("Tried to invoke '%s' for argument '%s'. Exception: %s", constructor,
-                            toConvert, e.getMessage()), e);
+                            str, e.getMessage()), e);
                 }
             }
         }
-
-        throw new Error("'" + targetType.getSimpleName() + "' is not supported as parameter type of test. Supported"
-                + " types are primitive types, primitive wrapper types, case-sensitive 'Enum' values, 'String's"
-                + ", and types having single-argument 'String' constructor.");
+        return null;
     }
 }
