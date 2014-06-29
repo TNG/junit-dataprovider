@@ -60,7 +60,7 @@ jar {
     manifest {
         attributes (
             'Built-By': "Gradle ${gradle.gradleVersion}",
-            'Built-Date': new Date(),
+            'Built-Date': new Date(), // TODO destroys incremental build feature
             'Specification-Title': 'JUnit dataprovider',
             'Specification-Version': version,
             'Specification-Vendor': 'TNG Technology Consulting GmbH',
