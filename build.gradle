@@ -41,7 +41,7 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.10'
+    gradleVersion = '2.0'
 }
 
 task jenkinsTest {
@@ -91,11 +91,11 @@ jacocoTestReport {
     }
 }
 jacoco {
-    toolVersion = '0.6.5.201403032054'
+    toolVersion = '0.7.1.201405082137'
 }
 
 findbugs {
-    toolVersion = '2.0.1'
+    toolVersion = '2.0.3'
     ignoreFailures = true
 }
 
