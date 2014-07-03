@@ -239,6 +239,25 @@ public class TestValidatorTest extends BaseTest {
     }
 
     @Test
+    public void testValidateDataProviderMethodShouldAddNoErrorIfDataProviderMethodWithTestMethodParameterIsValid() {
+        // Given:
+        String dataProviderName = "validDataProvider";
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
+        doReturn(getMethod("validDataProviderMethodWithTestMethodParameter")).when(dataProviderMethod).getMethod();
+        doReturn(true).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[0]).when(dataProvider).value();
+
+        // When:
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
+
+        // Then:
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
     public void testValidateDataProviderMethodShouldAddErrorIfDataProviderMethodIsNotPublic() {
         // Given:
         String dataProviderName = "dataProviderNotPublic";
@@ -396,6 +415,10 @@ public class TestValidatorTest extends BaseTest {
     }
 
     public static Object[][] validDataProviderMethod() {
+        return null;
+    }
+
+    public static Object[][] validDataProviderMethodWithTestMethodParameter(FrameworkMethod testMethod) {
         return null;
     }
 }
