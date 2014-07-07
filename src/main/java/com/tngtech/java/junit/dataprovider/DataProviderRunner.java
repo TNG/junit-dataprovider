@@ -63,7 +63,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      */
     TestGenerator testGenerator;
 
-
     /**
      * Cached result of {@link #computeTestMethods()}.
      * <p>

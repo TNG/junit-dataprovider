@@ -63,12 +63,12 @@ public class TestGenerator {
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
         Object data;
         try {
-          Class<?>[] parameterTypes = dataProviderMethod.getMethod().getParameterTypes();
-          if (parameterTypes.length > 0) {
-              data = dataProviderMethod.invokeExplosively(null, testMethod);
-          } else {
-              data = dataProviderMethod.invokeExplosively(null);
-          }
+            Class<?>[] parameterTypes = dataProviderMethod.getMethod().getParameterTypes();
+            if (parameterTypes.length > 0) {
+                data = dataProviderMethod.invokeExplosively(null, testMethod);
+            } else {
+                data = dataProviderMethod.invokeExplosively(null);
+            }
         } catch (Throwable t) {
             throw new Error(String.format("Exception while invoking data provider method '%s': %s",
                     dataProviderMethod.getName(), t.getMessage()), t);
