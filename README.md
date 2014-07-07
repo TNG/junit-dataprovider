@@ -15,6 +15,7 @@ junit-dataprovider
 	* [String syntax](#string-syntax)
 	* [List syntax](#list-syntax)
 	* [Let ```@DataProvider``` directly providing test data](#let-dataprovider-directly-providing-test-data)
+	* [Access ```FrameworkMethod``` within ```@DataProvider``` method](#access-frameworkmethod-within-dataprovider-method)
 * [Release notes](#release-notes)
 * [Eclipse template](#eclipse-template)
 * [Contributing](#contributing)
@@ -317,6 +318,38 @@ and ```String```s are supported.
     }
 ```
 
+### Access ```FrameworkMethod``` within ```@DataProvider``` method
+
+```java
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface ExternalFile {
+        public enum Format {
+            CSV,
+            XML,
+            XLS;
+        }
+
+        Format format();
+        String value();
+    }
+
+    @DataProvider
+    public static Object[][] loadFromExternalFile(FrameworkMethod testMethod) {
+        String testDataFile = testMethod.getAnnotation(ExternalFile.class).value();
+        // Load the data from the external file here ...
+        return new Object[][] { { testDataFile } };
+    }
+
+    @Test
+    @UseDataProvider("loadFromExternalFile")
+    @ExternalFile(format = ExternalFile.Format.CSV, value = "testdata.csv")
+    public void testThatUsesUniversalDataProvider(String testData) {
+        // Expect:
+        assertThat(testData).isEqualTo("testdata.csv");
+    }
+```
+
 Further examples can be found in [DataProviderJavaAcceptanceTest.java](/src/test/java/com/tngtech/test/java/junit/dataprovider/DataProviderJavaAcceptanceTest.java).
 
 
@@ -326,6 +359,7 @@ Release notes
 ### tbd. (???)
 
 * added ```splitBy```, ```convertNulls``` and ```trimValues```` parameter to ```@DataProvider``` ([#24](/../../issues/24))
+* ```@DataProvider``` method can now optionally access corresponding ```FrameworkMethod``` via parameter ([#28](/../../issues/28))
 * ...
 
 ### v1.7.0 (20-Jun-2014)
