@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
+import org.junit.runners.model.FrameworkMethod;
 
 @RunWith(DataProviderRunner.class)
 public class DataProviderJavaAcceptanceTest {
@@ -229,5 +230,20 @@ public class DataProviderJavaAcceptanceTest {
 
         // Then:
         assertThat(isEmpty).isTrue();
+    }
+
+    @Test
+    @UseDataProvider("loadFromExternalFile")
+    @ExternalFile(format = ExternalFile.Format.CSV, value = "testdata.csv")
+    public void testThatUsesUniversalDataProvider(String testData) {
+        assertThat(testData).isEqualTo("testdata.csv");
+    }
+
+    @DataProvider
+    public static Object[][] loadFromExternalFile(FrameworkMethod testMethod) {
+        String testDataFile = testMethod.getAnnotation(ExternalFile.class).value();
+        return new Object[][]{
+            { testDataFile }
+        };
     }
 }
