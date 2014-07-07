@@ -99,10 +99,10 @@ public class TestValidator {
         if (!Modifier.isStatic(method.getModifiers())) {
             errors.add(new Exception(messageBasePart + " be static"));
         }
-        if (method.getParameterTypes().length != 0) {
-            if (! method.getParameterTypes()[0].equals(FrameworkMethod.class)) {
-                errors.add(new Exception(messageBasePart + " have no parameters or a single FrameworkMethod parameter"));
-            }
+        if (method.getParameterTypes().length != 0
+                && (method.getParameterTypes().length != 1 || !method.getParameterTypes()[0]
+                        .equals(FrameworkMethod.class))) {
+            errors.add(new Exception(messageBasePart + " either have a single FrameworkMethod parameter or none"));
         }
         if (!dataConverter.canConvert(method.getGenericReturnType())) {
             errors.add(new Exception(messageBasePart + " either return Object[][] or List<List<Object>>"));

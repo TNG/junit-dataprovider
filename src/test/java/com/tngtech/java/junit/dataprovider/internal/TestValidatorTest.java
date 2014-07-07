@@ -239,14 +239,14 @@ public class TestValidatorTest extends BaseTest {
     }
 
     @Test
-    public void testValidateDataProviderMethodShouldAddNoErrorIfDataProviderMethodWithTestMethodParameterIsValid() {
+    public void testValidateDataProviderMethodShouldAddNoErrorIfDataProviderMethodWithFrameworkMethodParameterIsValid() {
         // Given:
         String dataProviderName = "validDataProvider";
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethodWithTestMethodParameter")).when(dataProviderMethod).getMethod();
+        doReturn(getMethod("validDataProviderMethodWithFrameworkMethodParameter")).when(dataProviderMethod).getMethod();
         doReturn(true).when(dataConverter).canConvert(any(Type.class));
         doReturn(new String[0]).when(dataProvider).value();
 
@@ -298,14 +298,14 @@ public class TestValidatorTest extends BaseTest {
     }
 
     @Test
-    public void testValidateDataProviderMethodShouldAddErrorIfDataProviderMethodRequiresParameters() {
+    public void testValidateDataProviderMethodShouldAddErrorIfDataProviderMethodRequiresOneParametersOfInvalidType() {
         // Given:
         String dataProviderName = "dataProviderNonNoArg";
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(getMethod("wrongArgDataProviderMethod")).when(dataProviderMethod).getMethod();
         doReturn(true).when(dataConverter).canConvert(any(Type.class));
         doReturn(new String[0]).when(dataProvider).value();
 
@@ -315,7 +315,28 @@ public class TestValidatorTest extends BaseTest {
         // Then:
         assertThat(errors).hasSize(1);
         assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must have no parameters");
+                "must either have a single FrameworkMethod parameter or none");
+    }
+
+    @Test
+    public void testValidateDataProviderMethodShouldAddErrorIfDataProviderMethodRequiresTwoParameters() {
+        // Given:
+        String dataProviderName = "dataProviderNonNoArg";
+
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(dataProviderName).when(dataProviderMethod).getName();
+        doReturn(getMethod("twoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
+        doReturn(true).when(dataConverter).canConvert(any(Type.class));
+        doReturn(new String[0]).when(dataProvider).value();
+
+        // When:
+        underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
+
+        // Then:
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
+                "must either have a single FrameworkMethod parameter or none");
     }
 
     @Test
@@ -380,7 +401,7 @@ public class TestValidatorTest extends BaseTest {
         assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("must be public");
         assertThat(errors.get(1).getMessage()).contains(dataProviderName).containsIgnoringCase("must be static");
         assertThat(errors.get(2).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must have no parameters");
+                "must either have a single FrameworkMethod parameter or none");
         assertThat(errors.get(3).getMessage()).contains(dataProviderName).containsIgnoringCase(
                 "must either return Object[][] or List<List<Object>>");
         assertThat(errors.get(4).getMessage()).contains(dataProviderName).containsIgnoringCase(
@@ -406,8 +427,12 @@ public class TestValidatorTest extends BaseTest {
         return null;
     }
 
-    public static Object[][] nonNoArgDataProviderMethod(Object obj) {
+    public static Object[][] wrongArgDataProviderMethod(Object obj) {
         return new Object[][] { { obj } };
+    }
+
+    public static Object[][] twoArgDataProviderMethod(FrameworkMethod testMethod, Object obj) {
+        return new Object[][] { { testMethod, obj } };
     }
 
     String nonPublicNonStaticNonNoArgDataProviderMethod(String arg1) {
@@ -418,7 +443,8 @@ public class TestValidatorTest extends BaseTest {
         return null;
     }
 
-    public static Object[][] validDataProviderMethodWithTestMethodParameter(FrameworkMethod testMethod) {
+    public static Object[][] validDataProviderMethodWithFrameworkMethodParameter(
+            @SuppressWarnings("unused") FrameworkMethod testMethod) {
         return null;
     }
 }
