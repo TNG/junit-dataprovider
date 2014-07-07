@@ -65,7 +65,7 @@ public class TestGenerator {
         try {
           Class<?>[] parameterTypes = dataProviderMethod.getMethod().getParameterTypes();
           if (parameterTypes.length > 0) {
-              data = dataProviderMethod.invokeExplosively(dataProviderMethod, testMethod);
+              data = dataProviderMethod.invokeExplosively(null, testMethod);
           } else {
               data = dataProviderMethod.invokeExplosively(null);
           }
