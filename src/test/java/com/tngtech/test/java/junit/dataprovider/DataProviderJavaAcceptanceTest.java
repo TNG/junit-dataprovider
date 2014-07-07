@@ -3,6 +3,10 @@ package com.tngtech.test.java.junit.dataprovider;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -213,17 +217,14 @@ public class DataProviderJavaAcceptanceTest {
             "1, DOWN",
             "3, FLOOR",
         })
-    // @formatter:off
+    // @formatter:on
     public void testOldModeToRoundingMode(int oldMode, RoundingMode expected) {
         // Expect:
         assertThat(RoundingMode.valueOf(oldMode)).isEqualTo(expected);
     }
 
     @Test
-    @DataProvider({
-            "null",
-            "",
-        })
+    @DataProvider({ "null", "", })
     public void testIsEmptyString2(String str) {
         // When:
         boolean isEmpty = (str == null) ? true : str.isEmpty();
@@ -232,9 +233,23 @@ public class DataProviderJavaAcceptanceTest {
         assertThat(isEmpty).isTrue();
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface ExternalFile {
+        public enum Format {
+            CSV,
+            XML,
+            XLS;
+        }
+
+        Format format();
+        String value();
+    }
+
     @DataProvider
     public static Object[][] loadFromExternalFile(FrameworkMethod testMethod) {
         String testDataFile = testMethod.getAnnotation(ExternalFile.class).value();
+        // Load the data from the external file here ...
         return new Object[][] { { testDataFile } };
     }
 
