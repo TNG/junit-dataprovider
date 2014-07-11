@@ -9,15 +9,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Categories;
-import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
-import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runners.ParentRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
 import org.mockito.Mock;
@@ -27,7 +26,6 @@ import org.mockito.Spy;
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
 import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
-import com.tngtech.test.java.junit.dataprovider.category.CategoryOne;
 
 public class DataProviderRunnerTest extends BaseTest {
 
@@ -254,36 +252,19 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testFilterShouldNotThrowExceptionForJUnitCategoryFilter() throws Exception {
+    public void testFilterShouldWrapGivenFilterWithDataProviderFilter() throws Exception {
         // Given:
-        Filter filter = new Categories.CategoryFilter(null, CategoryOne.class);
+        Filter filter = Filter.ALL;
 
         // When:
         underTest.filter(filter);
 
-        // Then: expect no exception
-    }
+        // Then:
+        Object actual = getPrivateField(ParentRunner.class, "fFilter", underTest);
+        assertThat(actual).isInstanceOf(DataProviderFilter.class);
 
-    @Test(expected = NoTestsRemainException.class)
-    public void testFilterShouldThrowNoTestRemainExceptionForNonBlacklistedAndRecognizableFilterHavingNoTestMethods()
-            throws Exception {
-        // Given:
-        Filter filter = new Filter() {
-            @Override
-            public boolean shouldRun(Description description) {
-                return true;
-            }
-
-            @Override
-            public String describe() {
-                return "testMethod(com.tngtech.java.junit.dataprovider.Test)";
-            }
-        };
-
-        // When:
-        underTest.filter(filter);
-
-        // Then: expect no exception
+        Object actualFilter = getPrivateField(DataProviderFilter.class, "filter", actual);
+        assertThat(actualFilter).isEqualTo(filter);
     }
 
     @Test
@@ -379,18 +360,6 @@ public class DataProviderRunnerTest extends BaseTest {
         verifyNoMoreInteractions(frameworkMethodGenerator);
     }
 
-    @Test
-    public void testIsFilterBlackListedShouldReturnFalseForJunitPackagedFilter() {
-        // Given:
-        Filter filter = Filter.ALL;
-
-        // When:
-        boolean result = underTest.isFilterBlackListed(filter);
-
-        // Then:
-        assertThat(result).isFalse();
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testGetDataProviderMethodShouldThrowIllegalArgumentExceptionIfTestMethodIsNull() {
         // Given:
@@ -476,5 +445,13 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(result).isNotNull();
         // assertThat(result.getJavaClass()).isEqualTo(dataProviderLocation);
         assertThat(result.getName()).isEqualTo(dataProviderLocation.getName());
+    }
+
+    // -- helper methods -----------------------------------------------------------------------------------------------
+
+    private Object getPrivateField(Class<?> clazz, String fieldName, Object instance) throws Exception {
+        Field filterField = clazz.getDeclaredField(fieldName);
+        filterField.setAccessible(true);
+        return filterField.get(instance);
     }
 }
