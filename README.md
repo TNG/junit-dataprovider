@@ -356,12 +356,11 @@ Further examples can be found in [DataProviderJavaAcceptanceTest.java](/src/test
 Release notes
 -------------
 
-### tbd. (???)
+### v1.8.0 (11-Jul-2014)
 
 * added ```splitBy```, ```convertNulls``` and ```trimValues```` parameter to ```@DataProvider``` ([#24](/../../issues/24))
 * more fault tolerant filtering instead of explicitly maintain a black or white list ([#27](/../../issues/27))
 * ```@DataProvider``` method can now optionally access corresponding ```FrameworkMethod``` via parameter ([#28](/../../issues/28))
-* ...
 
 ### v1.7.0 (20-Jun-2014)
 
