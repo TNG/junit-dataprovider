@@ -41,11 +41,23 @@ public class TestGenerator {
             return Collections.emptyList();
         }
         if (dataProviderMethod != null) {
-            return explodeTestMethod(testMethod, dataProviderMethod);
+            try {
+                return explodeTestMethod(testMethod, dataProviderMethod);
+            } catch (Exception e) {
+                throw new Error(String.format("Cannot explode '%s.%s' using '%s' due to: %s", testMethod.getMethod()
+                        .getDeclaringClass().getSimpleName(), testMethod.getName(), dataProviderMethod.getName(),
+                        e.getMessage()), e);
+            }
         }
         DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
         if (dataProvider != null) {
-            return explodeTestMethod(testMethod, dataProvider);
+            try {
+                return explodeTestMethod(testMethod, dataProvider);
+            } catch (Exception e) {
+                throw new Error(String.format("Exception while exploding '%s.%s' using its '@DataProvider' due to: %s",
+                        testMethod.getMethod().getDeclaringClass().getSimpleName(), testMethod.getName(),
+                        e.getMessage()), e);
+            }
         }
         return Arrays.asList(testMethod);
     }
@@ -70,16 +82,13 @@ public class TestGenerator {
                 data = dataProviderMethod.invokeExplosively(null);
             }
         } catch (Throwable t) {
-            throw new Error(String.format("Exception while invoking data provider method '%s': %s",
+            throw new IllegalArgumentException(String.format("Exception while invoking data provider method '%s': %s",
                     dataProviderMethod.getName(), t.getMessage()), t);
         }
 
         Settings settings = new Settings(dataProviderMethod.getAnnotation(DataProvider.class));
-
         List<Object[]> converted = dataConverter.convert(data, testMethod.getMethod().getParameterTypes(), settings);
-        String emptyResultMessage = String.format("Data provider '%s' must neither be null nor empty but was: %s.",
-                dataProviderMethod.getName(), data);
-        return explodeTestMethod(testMethod, converted, emptyResultMessage);
+        return explodeTestMethod(testMethod, converted);
     }
 
     /**
@@ -97,23 +106,20 @@ public class TestGenerator {
 
         List<Object[]> converted = dataConverter.convert(data, testMethod.getMethod().getParameterTypes(),
                 new Settings(dataProvider));
-        String emptyResultMessage = String.format("%s.value() must be set but was: %s.", dataProvider.getClass()
-                .getSimpleName(), Arrays.toString(data));
-        return explodeTestMethod(testMethod, converted, emptyResultMessage);
+        return explodeTestMethod(testMethod, converted);
     }
 
-    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, List<Object[]> converted,
-            String emptyResultMessage) {
-
+    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, List<Object[]> converted) {
+        if (converted.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Could not create test methods using probably 'null' or 'empty' data provider");
+        }
         dataConverter.checkIfArgumentsMatchParameterTypes(converted, testMethod.getMethod().getParameterTypes());
 
         int idx = 0;
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
         for (Object[] parameters : converted) {
             result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
-        }
-        if (result.isEmpty()) {
-            throw new Error(emptyResultMessage);
         }
         return result;
     }

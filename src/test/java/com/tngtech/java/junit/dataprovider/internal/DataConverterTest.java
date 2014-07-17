@@ -328,8 +328,8 @@ public class DataConverterTest extends BaseTest {
         assertThat(result.get(2)).isEqualTo(data.get(2).toArray());
     }
 
-    @Test(expected = Error.class)
-    public void testConvertShouldThrowErrorIfLengthOfSplitDataAndTargetTypesDiffer() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testConvertShouldThrowIllegalArgumentExceptionIfLengthOfSplitDataAndTargetTypesDiffer() {
         // Given:
         String[] data = new String[] { "1,2" };
         Class<?>[] parameterTypes = new Class[] { int.class };
@@ -422,8 +422,8 @@ public class DataConverterTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = Error.class)
-    public void testCheckTestMethodArgumentsShouldThrowErrorIfLengthOfArgumentsAndParameterTypesDoesNotMatch() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckTestMethodArgumentsShouldThrowIllegalArgumentExceptionIfLengthOfArgumentsAndParameterTypesDoesNotMatch() {
         // Given:
         List<Object[]> arguments = listOfArrays(new Object[0], new Object[0]);
         Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
@@ -434,8 +434,8 @@ public class DataConverterTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = Error.class)
-    public void testCheckTestMethodArgumentsShouldThrowErrorIfSingleArgumentIsNotAssignableToParameterTypeOnOnlyTest() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckTestMethodArgumentsShouldThrowIllegalArgumentExceptionIfSingleArgumentIsNotAssignableToParameterTypeOnOnlyTest() {
         // Given:
         List<Object[]> arguments = listOfArrays(new Object[] { "1" });
         Class<?>[] parameterTypes = new Class<?>[] { int.class };
@@ -446,8 +446,8 @@ public class DataConverterTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = Error.class)
-    public void testCheckTestMethodArgumentsShouldThrowErrorIfSingleArgumentIsNotAssignableToParameterTypeOnSecondTest() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckTestMethodArgumentsShouldThrowIllegalArgumentExceptionIfSingleArgumentIsNotAssignableToParameterTypeOnSecondTest() {
         // Given:
         List<Object[]> arguments = listOfArrays(new Object[] { 1 }, new Object[] { "2" }, new Object[] { 3 });
         Class<?>[] parameterTypes = new Class<?>[] { int.class };
@@ -458,8 +458,8 @@ public class DataConverterTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = Error.class)
-    public void testCheckTestMethodArgumentsShouldThrowErrorIfAnyArgumentTypeIsNotAssignableToParameterTypeOnOnlyTest() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckTestMethodArgumentsShouldThrowIllegalArgumentExceptionIfAnyArgumentTypeIsNotAssignableToParameterTypeOnOnlyTest() {
         // Given:
         List<Object[]> arguments = listOfArrays(new Object[] { 1, "1", 7l });
         Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
@@ -470,8 +470,8 @@ public class DataConverterTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = Error.class)
-    public void testCheckTestMethodArgumentsShouldThrowErrorIfAnyArgumentTypeIsNotAssignableToParameterTypeOnSecondTest() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckTestMethodArgumentsShouldThrowIllegalArgumentExceptionIfAnyArgumentTypeIsNotAssignableToParameterTypeOnSecondTest() {
         // Given:
         List<Object[]> arguments = listOfArrays(new Object[] { 1, "1", true }, new Object[] { 2, "2", 2l });
         Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
@@ -644,8 +644,8 @@ public class DataConverterTest extends BaseTest {
         assertThat(result).isEqualTo(new Object[] { 1, "" });
     }
 
-    @Test(expected = Error.class)
-    public void testGetParametersForShouldThrowErrorIfCharHasNotLengthOne() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetParametersForShouldThrowIllegalArgumentExceptionIfCharHasNotLengthOne() {
         // Given:
         String data = "noChar";
         Class<?>[] parameterTypes = new Class[] { char.class };
@@ -657,8 +657,8 @@ public class DataConverterTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = Error.class)
-    public void testGetParametersForShouldThrowErrorForTargetTypeConstructorWithStringArgWhichThrowsException() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetParametersForShouldThrowIllegalArgumentExceptionForTargetTypeConstructorWithStringArgWhichThrowsException() {
         // Given:
         String data = "noInt";
         Class<?>[] parameterTypes = new Class[] { BigInteger.class };
@@ -670,8 +670,8 @@ public class DataConverterTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = Error.class)
-    public void testGetParametersForShouldThrowErrorForUnsupportedTargetType() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetParametersForShouldThrowIllegalArgumentExceptionForUnsupportedTargetType() {
         // Given:
         String data = "noObject";
         Class<?>[] parameterTypes = new Class[] { Object.class };
@@ -697,8 +697,8 @@ public class DataConverterTest extends BaseTest {
         assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1, TestEnum.VAL2 });
     }
 
-    @Test(expected = Error.class)
-    public void testGetParametersForShouldThrowErrorIfEnumValueIsInvalid() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetParametersForShouldThrowIllegalArgumentExceptionIfEnumValueIsInvalid() {
         // Given:
         String data = "UNKNOW_ENUM_VALUE";
         Class<?>[] parameterTypes = new Class[] { TestEnum.class };

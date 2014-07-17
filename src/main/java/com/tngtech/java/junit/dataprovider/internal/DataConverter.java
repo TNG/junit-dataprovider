@@ -122,7 +122,7 @@ public class DataConverter {
      * @param arguments the arguments to be used for each test method to be executed
      * @param parameterTypes test method parameter types (from {@link Method#getParameterTypes()})
      * @throws NullPointerException iif given {@code parameterTypes} or {@code settings} are {@code null}
-     * @throws Error iif test methods parameter types does not match the given {@code arguments}
+     * @throws IllegalArgumentException iif test methods parameter types does not match the given {@code arguments}
      */
     public void checkIfArgumentsMatchParameterTypes(List<Object[]> arguments, Class<?>[] parameterTypes) {
         if (arguments == null) {
@@ -134,16 +134,18 @@ public class DataConverter {
 
         for (Object[] objects : arguments) {
             if (parameterTypes.length != objects.length) {
-                throw new Error(String.format("Expected %s arguments for test method but got %s parameters.",
-                        parameterTypes.length, objects.length));
+                throw new IllegalArgumentException(String.format(
+                        "Expected %s arguments for test method but got %s parameters.", parameterTypes.length,
+                        objects.length));
             }
             for (int idx = 0; idx < objects.length; idx++) {
                 Object object = objects[idx];
                 if (object != null) {
                     Class<?> paramType = parameterTypes[idx];
                     if (!paramType.isInstance(object) && !isWrappedInstance(paramType, object)) {
-                        throw new Error(String.format("Parameter %d is of type %s but argument given is %s of type %s",
-                                idx, paramType.getSimpleName(), object, object.getClass().getSimpleName()));
+                        throw new IllegalArgumentException(String.format(
+                                "Parameter %d is of type %s but argument given is %s of type %s", idx,
+                                paramType.getSimpleName(), object, object.getClass().getSimpleName()));
                     }
                 }
             }
@@ -161,6 +163,7 @@ public class DataConverter {
      * @param settings to be used to convert given {@code data}
      * @param rowIdx index of current {@code data} for better error messages
      * @return split, trimmed and converted {@code Object[]} of supplied regex-separated {@code data}
+     * @throws IllegalArgumentException iif count of split data and paramter types differs
      */
     Object[] getParametersFor(String data, Class<?>[] parameterTypes, Settings settings, int rowIdx) {
         if (data == null) {
@@ -169,8 +172,9 @@ public class DataConverter {
 
         String[] splitData = splitBy(data, settings.splitBy);
         if (parameterTypes.length != splitData.length) {
-            throw new Error(String.format("Test method expected %d parameters but got %d from @DataProvider row %d",
-                    parameterTypes.length, splitData.length, rowIdx));
+            throw new IllegalArgumentException(String.format(
+                    "Test method expected %d parameters but got %d from @DataProvider row %d", parameterTypes.length,
+                    splitData.length, rowIdx));
         }
 
         Object[] result = new Object[parameterTypes.length];
@@ -201,29 +205,34 @@ public class DataConverter {
             return str;
         }
 
-        if (boolean.class.equals(targetType) || Boolean.class.equals(targetType)) {
-            return Boolean.valueOf(str);
-        }
-        if (byte.class.equals(targetType) || Byte.class.equals(targetType)) {
-            return Byte.valueOf(str);
-        }
-        if (char.class.equals(targetType) || Character.class.equals(targetType)) {
-            return convertToChar(str, targetType);
-        }
-        if (short.class.equals(targetType) || Short.class.equals(targetType)) {
-            return Short.valueOf(str);
-        }
-        if (int.class.equals(targetType) || Integer.class.equals(targetType)) {
-            return Integer.valueOf(str);
-        }
-        if (long.class.equals(targetType) || Long.class.equals(targetType)) {
-            return convertToLong(str);
-        }
-        if (float.class.equals(targetType) || Float.class.equals(targetType)) {
-            return Float.valueOf(str);
-        }
-        if (double.class.equals(targetType) || Double.class.equals(targetType)) {
-            return Double.valueOf(str);
+        try {
+            if (boolean.class.equals(targetType) || Boolean.class.equals(targetType)) {
+                return Boolean.valueOf(str);
+            }
+            if (byte.class.equals(targetType) || Byte.class.equals(targetType)) {
+                return Byte.valueOf(str);
+            }
+            if (char.class.equals(targetType) || Character.class.equals(targetType)) {
+                return convertToChar(str, targetType);
+            }
+            if (short.class.equals(targetType) || Short.class.equals(targetType)) {
+                return Short.valueOf(str);
+            }
+            if (int.class.equals(targetType) || Integer.class.equals(targetType)) {
+                return Integer.valueOf(str);
+            }
+            if (long.class.equals(targetType) || Long.class.equals(targetType)) {
+                return convertToLong(str);
+            }
+            if (float.class.equals(targetType) || Float.class.equals(targetType)) {
+                return Float.valueOf(str);
+            }
+            if (double.class.equals(targetType) || Double.class.equals(targetType)) {
+                return Double.valueOf(str);
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    String.format("Cannot convert %s to %s", str, targetType.getSimpleName()));
         }
 
         if (targetType.isEnum()) {
@@ -235,7 +244,8 @@ public class DataConverter {
             return result;
         }
 
-        throw new Error("'" + targetType.getSimpleName() + "' is not supported as parameter type of test methods"
+        throw new IllegalArgumentException("'" + targetType.getSimpleName()
+                + "' is not supported as parameter type of test methods"
                 + ". Supported types are primitive types and their wrappers, case-sensitive 'Enum'"
                 + " values, 'String's, and types having a single 'String' parameter constructor.");
     }
@@ -252,11 +262,12 @@ public class DataConverter {
                 || (void.class.equals(clazz) && Void.class.isInstance(object));
     }
 
-    private Object convertToChar(String str, Class<?> charType) throws Error {
+    private Object convertToChar(String str, Class<?> charType) {
         if (str.length() == 1) {
             return str.charAt(0);
         }
-        throw new Error(String.format("'%s' cannot be converted to %s.", str, charType.getSimpleName()));
+        throw new IllegalArgumentException(String.format("'%s' cannot be converted to %s.", str,
+                charType.getSimpleName()));
     }
 
     private Object convertToLong(String str) {
@@ -267,15 +278,16 @@ public class DataConverter {
         return Long.valueOf(longStr);
     }
 
-    private Object convertToEnumValue(String str, Class<?> enumType) throws Error {
+    private Object convertToEnumValue(String str, Class<?> enumType) {
         try {
             @SuppressWarnings({ "rawtypes", "unchecked" })
             Enum result = Enum.valueOf((Class<Enum>) enumType, str);
             return result;
 
         } catch (IllegalArgumentException e) {
-            throw new Error(String.format("'%s' is not a valid value of enum %s. Please be aware of case sensitivity.",
-                    str, enumType.getSimpleName()));
+            throw new IllegalArgumentException(String.format(
+                    "'%s' is not a valid value of enum %s. Please be aware of case sensitivity.", str,
+                    enumType.getSimpleName()));
         }
     }
 
@@ -286,8 +298,9 @@ public class DataConverter {
                     return constructor.newInstance(str);
 
                 } catch (Exception e) {
-                    throw new Error(String.format("Tried to invoke '%s' for argument '%s'. Exception: %s", constructor,
-                            str, e.getMessage()), e);
+                    throw new IllegalArgumentException(String.format(
+                            "Tried to invoke '%s' for argument '%s'. Exception: %s", constructor, str, e.getMessage()),
+                            e);
                 }
             }
         }

@@ -77,8 +77,8 @@ public class TestGeneratorTest extends BaseTest {
         assertThat(result).containsOnly(testMethod);
     }
 
-    @Test(expected = Error.class)
-    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataProviderMethodThrowsException()
+    @Test(expected = IllegalArgumentException.class)
+    public void testExplodeTestMethodsUseDataProviderShouldThrowIllegalArgumentExceptionIfDataProviderMethodThrowsException()
             throws Throwable {
         // Given:
         doThrow(NullPointerException.class).when(dataProviderMethod).invokeExplosively(null);
@@ -89,8 +89,8 @@ public class TestGeneratorTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = Error.class)
-    public void testExplodeTestMethodsUseDataProviderShouldThrowErrorIfDataConverterReturnsEmpty() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testExplodeTestMethodsUseDataProviderShouldThrowIllegalArgumentExceptionIfDataConverterReturnsEmpty() {
         // Given:
         doReturn(new ArrayList<Object[]>()).when(dataConverter).convert(any(), any(Class[].class), any(Settings.class));
         doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
@@ -132,8 +132,8 @@ public class TestGeneratorTest extends BaseTest {
         verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 
-    @Test(expected = Error.class)
-    public void testExplodeTestMethodsDataProviderShouldThrowErrorIfDataConverterReturnsAnEmptyList() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testExplodeTestMethodsDataProviderShouldIllegalArgumentExceptionIfDataConverterReturnsAnEmptyList() {
         // Given:
         doReturn(new ArrayList<Object[]>()).when(dataConverter).convert(any(), any(Class[].class), any(Settings.class));
 
