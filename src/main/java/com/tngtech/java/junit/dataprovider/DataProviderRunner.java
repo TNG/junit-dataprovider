@@ -148,11 +148,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     public void filter(Filter filter) throws NoTestsRemainException {
-        // Filter newFilter = filter;
-        // // TODO not really testable? maybe first create and than test if it is applicable?
-        // if (DataProviderFilter.canBeWrapped(filter)) {
-        // newFilter = ;
-        // }
         super.filter(new DataProviderFilter(filter));
     }
 
