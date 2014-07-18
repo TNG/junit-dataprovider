@@ -358,6 +358,7 @@ Release notes
 
 ### tbd. (tbd.)
 
+* improved error messages ([#31](/../../issues/31))
 * ...
 
 ### v1.8.0 (11-Jul-2014)
