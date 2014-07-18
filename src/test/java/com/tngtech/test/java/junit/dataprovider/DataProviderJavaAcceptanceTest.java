@@ -1,5 +1,7 @@
 package com.tngtech.test.java.junit.dataprovider;
 
+import static com.tngtech.java.junit.dataprovider.DataProviders.$;
+import static com.tngtech.java.junit.dataprovider.DataProviders.$$;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -71,15 +73,15 @@ public class DataProviderJavaAcceptanceTest {
     @DataProvider
     public static Object[][] dataProviderAdd() {
         // @formatter:off
-        return new Object[][] {
-                { -1, -1, -2 },
-                { -1,  0, -1 },
-                {  0, -1, -1 },
-                {  0,  0,  0 },
-                {  0,  1,  1 },
-                {  1,  0,  1 },
-                {  1,  1,  2 },
-        };
+        return $$(
+                $( -1, -1, -2 ),
+                $( -1,  0, -1 ),
+                $(  0, -1, -1 ),
+                $(  0,  0,  0 ),
+                $(  0,  1,  1 ),
+                $(  1,  0,  1 ),
+                $(  1,  1,  2 )
+        );
         // @formatter:on
     }
 

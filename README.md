@@ -16,6 +16,7 @@ junit-dataprovider
 	* [List syntax](#list-syntax)
 	* [Let ```@DataProvider``` directly providing test data](#let-dataprovider-directly-providing-test-data)
 	* [Access ```FrameworkMethod``` within ```@DataProvider``` method](#access-frameworkmethod-within-dataprovider-method)
+	* [Utility methods](#utility-methods)
 * [Release notes](#release-notes)
 * [Eclipse template](#eclipse-template)
 * [Contributing](#contributing)
@@ -45,6 +46,7 @@ Motivation and distinction
 > data points), on the contrary the junit-dataprovider considers each row of the data provider
 > as standalone test case.
 
+[JUnit Theories]: https://github.com/junit-team/junit/wiki/Theories
 
 #### Why can I not use [JUnit Theories][] and data points containing [DTO][]s for test cases?
 
@@ -75,11 +77,10 @@ Motivation and distinction
 #### Is it possible to execute a junit-dataprovider test method for a single test data row?
 
 > Unfortunately this is not possible directly expect if the other test data rows are commented out 
-> in the source code. The rerun of a single test data row, though, is working, if e.g. in Eclipse 
+> in the source code. The rerun of a single test data row, though, is working, if e.g. in [Eclipse][]
 > you right click the test to be executed and choose run/debug.
 
-
-[JUnit Theories]: https://github.com/junit-team/junit/wiki/Theories
+[Eclipse]: http://eclipse.org/
 
 #### May I move a junit-dataprovider into a separate class?
 
@@ -350,15 +351,53 @@ and ```String```s are supported.
     }
 ```
 
-Further examples can be found in [DataProviderJavaAcceptanceTest.java](/src/test/java/com/tngtech/test/java/junit/dataprovider/DataProviderJavaAcceptanceTest.java).
+### Utility methods
+
+To be able to use the full power of these utility methods, add
+```com.tngtech.java.junit.dataprovider.DataProviders.*``` as [Eclipse][] type favorite.
+
+```java
+    import static com.tngtech.java.junit.dataprovider.DataProviders.*;
+
+    import java.math.RoundingMode;
+
+
+    @DataProvider
+    public static Object[][] dataProviderAdd() {
+        // @formatter:off
+        return $$(
+                $( -1, -1, -2 ),
+                $( -1,  0, -1 ),
+                $(  0, -1, -1 ),
+                $(  0,  0,  0 ),
+                $(  0,  1,  1 ),
+                $(  1,  0,  1 ),
+                $(  1,  1,  2 )
+        );
+        // @formatter:on
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderStringIsNullOrEmpty() {
+        return testForEach(null, "");
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderRoundingMode() {
+        return testForEach(RoundingMode.class);
+    }
+```
+
+*Note:* Further examples can be found in [DataProviderJavaAcceptanceTest.java](/src/test/java/com/tngtech/test/java/junit/dataprovider/DataProviderJavaAcceptanceTest.java).
 
 
 Release notes
 -------------
 
-### tbd. (tbd.)
+### tdb. (???)
 
 * improved error messages ([#31](/../../issues/31))
+* added some helpful utility methods ([#21](/../../issues/21))
 * ...
 
 ### v1.8.0 (11-Jul-2014)
@@ -427,8 +466,8 @@ Release notes
 * initial release
 
 
-Eclipse template
-----------------
+[Eclipse][] template
+--------------------
 
 * Name:                     dataProvider
 * Context:                  Java type members
