@@ -15,25 +15,6 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 public class DataConverter {
 
     /**
-     * Settings to be used to convert data to {@link List}{@code <}{@link Object}{@code >} by
-     * {@link #convert(Object, Class[], Settings)}
-     */
-    public static class Settings {
-        public final String splitBy;
-        public final boolean convertNulls;
-        public final boolean trimValues;
-
-        public Settings(DataProvider dataProvider) {
-            if (dataProvider == null) {
-                throw new NullPointerException("dataProvider must not be null");
-            }
-            this.splitBy = dataProvider.splitBy();
-            this.convertNulls = dataProvider.convertNulls();
-            this.trimValues = dataProvider.trimValues();
-        }
-    }
-
-    /**
      * Returns {@code true} iif this {@link DataConverter} can convert the given {@code type}. Currently supported
      * {@code type}s:
      * <ul>
@@ -72,18 +53,18 @@ public class DataConverter {
      *
      * @param data to be converted
      * @param parameterTypes required types for {@code data}
-     * @param settings to be used to convert given {@code data}
+     * @param dataProvider containing settings which should be used to convert given {@code data}
      * @return converted data as {@link List}{@code <}{@link Object}{@code []>} with the required {@code parameterTypes}
      * @throws NullPointerException iif given {@code parameterTypes} or {@code settings} are {@code null}
      * @throws IllegalArgumentException iif given {@code parameterTypes} is empty
      * @throws ClassCastException iif {@code data} is not a compatible type
      */
-    public List<Object[]> convert(Object data, Class<?>[] parameterTypes, Settings settings) {
+    public List<Object[]> convert(Object data, Class<?>[] parameterTypes, DataProvider dataProvider) {
         if (parameterTypes == null) {
             throw new NullPointerException("parameterTypes must not be null");
         }
-        if (settings == null) {
-            throw new NullPointerException("settings must not be null");
+        if (dataProvider == null) {
+            throw new NullPointerException("dataProvider must not be null");
         }
         if (parameterTypes.length == 0) {
             throw new IllegalArgumentException("parameterTypes must not be empty");
@@ -98,7 +79,7 @@ public class DataConverter {
         } else if (data instanceof String[]) {
             int idx = 0;
             for (String paramString : (String[]) data) {
-                result.add(getParametersFor(paramString, parameterTypes, settings, idx++));
+                result.add(getParametersFor(paramString, parameterTypes, dataProvider, idx++));
             }
 
         } else if (data instanceof List) {
@@ -160,17 +141,17 @@ public class DataConverter {
      * @param data regex-separated {@link String} of parameters for test method
      * @param parameterTypes target types of parameters to which corresponding values in regex-separated {@code data}
      *            should be converted
-     * @param settings to be used to convert given {@code data}
+     * @param dataProvider containing settings which should be used to convert given {@code data}
      * @param rowIdx index of current {@code data} for better error messages
      * @return split, trimmed and converted {@code Object[]} of supplied regex-separated {@code data}
      * @throws IllegalArgumentException iif count of split data and paramter types differs
      */
-    Object[] getParametersFor(String data, Class<?>[] parameterTypes, Settings settings, int rowIdx) {
+    Object[] getParametersFor(String data, Class<?>[] parameterTypes, DataProvider dataProvider, int rowIdx) {
         if (data == null) {
             return new Object[] { null };
         }
 
-        String[] splitData = splitBy(data, settings.splitBy);
+        String[] splitData = splitBy(data, dataProvider.splitBy());
         if (parameterTypes.length != splitData.length) {
             throw new IllegalArgumentException(String.format(
                     "Test method expected %d parameters but got %d from @DataProvider row %d", parameterTypes.length,
@@ -179,8 +160,8 @@ public class DataConverter {
 
         Object[] result = new Object[parameterTypes.length];
         for (int idx = 0; idx < splitData.length; idx++) {
-            String toConvert = (settings.trimValues) ? splitData[idx].trim() : splitData[idx];
-            if (settings.convertNulls && "null".equals(toConvert)) {
+            String toConvert = (dataProvider.trimValues()) ? splitData[idx].trim() : splitData[idx];
+            if (dataProvider.convertNulls() && "null".equals(toConvert)) {
                 result[idx] = null;
             } else {
                 result[idx] = convertValue(toConvert, parameterTypes[idx]);

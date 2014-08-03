@@ -9,7 +9,6 @@ import org.junit.runners.model.FrameworkMethod;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderFrameworkMethod;
-import com.tngtech.java.junit.dataprovider.internal.DataConverter.Settings;
 
 public class TestGenerator {
 
@@ -86,8 +85,9 @@ public class TestGenerator {
                     dataProviderMethod.getName(), t.getMessage()), t);
         }
 
-        Settings settings = new Settings(dataProviderMethod.getAnnotation(DataProvider.class));
-        List<Object[]> converted = dataConverter.convert(data, testMethod.getMethod().getParameterTypes(), settings);
+        DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
+        List<Object[]> converted = dataConverter
+                .convert(data, testMethod.getMethod().getParameterTypes(), dataProvider);
         return explodeTestMethod(testMethod, converted);
     }
 
@@ -104,8 +104,8 @@ public class TestGenerator {
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
         String[] data = dataProvider.value();
 
-        List<Object[]> converted = dataConverter.convert(data, testMethod.getMethod().getParameterTypes(),
-                new Settings(dataProvider));
+        List<Object[]> converted = dataConverter
+                .convert(data, testMethod.getMethod().getParameterTypes(), dataProvider);
         return explodeTestMethod(testMethod, converted);
     }
 
