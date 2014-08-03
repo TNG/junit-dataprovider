@@ -1,6 +1,7 @@
 package com.tngtech.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -11,13 +12,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.tngtech.java.junit.dataprovider.internal.ParametersFormatter;
+import com.tngtech.java.junit.dataprovider.internal.TestFormatter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataProviderFrameworkMethodTest extends BaseTest {
 
     @Mock
-    private ParametersFormatter formatter;
+    private TestFormatter formatter;
 
     private final Method method = anyMethod();
 
@@ -65,25 +66,27 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
 
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 20, parameters);
         underTest.setFormatter(formatter);
+        doReturn("test").when(formatter).format(method, 20, parameters);
 
         // When:
         String result = underTest.getName();
 
         // Then:
-        assertThat(result).matches(method.getName() + "\\[20: .*\\]");
+        assertThat(result).isEqualTo("test");
 
-        verify(formatter).format(parameters);
+        verify(formatter).format(method, 20, parameters);
         verifyNoMoreInteractions(formatter);
     }
 
     @Test
     public void testInvokeExplosively() throws Throwable {
         // Given:
-        Object obj = new Object();
+        final Object obj = new Object();
+        final Object[] parameters = new Object[] { obj };
 
         Method method = getMethod("returnObjectArrayArrayMethod");
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 30, new Object[] { obj });
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 30, parameters);
 
         // When:
         Object result = underTest.invokeExplosively(this, (Object) null);
@@ -96,6 +99,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
     public void testEqualsShouldReturnTrueForSameObject() {
         // Given:
         final Object[] params = new Object[] { 1, 1.0 };
+
         DataProviderFrameworkMethod m = new DataProviderFrameworkMethod(method, 70, params);
 
         // When:

@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import org.junit.runners.model.FrameworkMethod;
 
-import com.tngtech.java.junit.dataprovider.internal.ParametersFormatter;
+import com.tngtech.java.junit.dataprovider.internal.TestFormatter;
 
 /**
  * A special framework method that allows the usage of parameters for the test method.
@@ -29,9 +29,10 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     final Object[] parameters;
 
     /**
-     * Formatter to format parameters for this test method properly.
+     * Formatter for this test method.
      */
-    private ParametersFormatter formatter;
+    private TestFormatter testFormatter;
+
 
     public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters) {
         super(method);
@@ -45,12 +46,12 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
 
         this.idx = idx;
         this.parameters = Arrays.copyOf(parameters, parameters.length);
-        this.formatter = new ParametersFormatter(); // set default formatter
+        this.testFormatter = new TestFormatter(); // set default testFormatter
     }
 
     @Override
     public String getName() {
-        return String.format("%s[%d: %s]", super.getName(), idx, formatter.format(parameters));
+        return testFormatter.format(getMethod(), idx, parameters);
     }
 
     @Override
@@ -94,7 +95,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      * This method exists and is package private (= visible) only for testing.
      * </p>
      */
-    void setFormatter(ParametersFormatter formatter) {
-        this.formatter = formatter;
+    void setFormatter(TestFormatter testFormatter) {
+        this.testFormatter = testFormatter;
     }
 }

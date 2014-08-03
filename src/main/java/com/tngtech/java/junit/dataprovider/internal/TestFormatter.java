@@ -1,8 +1,42 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public class ParametersFormatter {
+public class TestFormatter {
+
+    /**
+     * Returns a {@link String} representation of the given {@code method}, {@code idx} and {@code parameters}. The
+     * parameter conversion rules are as follows:
+     * <table>
+     * <tr>
+     * <th>Parameter value</th>
+     * <th>target {@link String}</th>
+     * </tr>
+     * <tr>
+     * <td>null</td>
+     * <td>&lt;null&gt;</td>
+     * </tr>
+     * <tr>
+     * <td>&quot;&quot; (= empty string)</td>
+     * <td>&lt;empty string&gt;</td>
+     * </tr>
+     * <tr>
+     * <td>array (e.g. String[])</td>
+     * <td>{@code "[" + format(array) + "]"}</td>
+     * </tr>
+     * <tr>
+     * <td>other</td>
+     * <td>{@link Object#toString()}</td>
+     * </tr>
+     * </table>
+     *
+     * @param parameters the parameters are converted to a regex-separated {@link String}
+     * @return a {@link String} representation of the given parameters
+     */
+    public String format(Method method, int idx, Object[] parameters) {
+        return method.getName() + '[' + idx + ": " + format(parameters) + ']';
+    }
 
     /**
      * Returns a {@link String} representation of the given {@code parameters}. The conversion rules are as follows:
@@ -33,6 +67,7 @@ public class ParametersFormatter {
      * @return a {@link String} representation of the given parameters
      */
     public String format(Object[] parameters) {
+
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < parameters.length; i++) {
             Object param = parameters[i];
