@@ -15,7 +15,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     /**
      * Index of exploded test method such that each get a unique name.
      * <p>
-     * This method is package private (= visible) for testing.
+     * This field is package private (= visible) for testing.
      * </p>
      */
     final int idx;
@@ -23,7 +23,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     /**
      * Parameters to invoke the test method.
      * <p>
-     * This method is package private (= visible) for testing.
+     * This field is package private (= visible) for testing.
      * </p>
      */
     final Object[] parameters;
