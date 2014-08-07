@@ -488,10 +488,28 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testCheckTestMethodArgumentsShouldNotThrowErrorIfArgumentsAreWrappedPrimitivesOfParameterTypes() {
+    public void testCheckTestMethodArgumentsShouldNotThrowErrorIfArgumentsAreWrappedLongPrimitivesOfParameterTypes() {
         // Given:
         List<Object[]> arguments = listOfArrays(new Object[] { Long.valueOf(1l) }, new Object[] { Long.valueOf(2l) });
         Class<?>[] parameterTypes = new Class<?>[] { long.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldNotThrowErrorIfArgumentsAreWrappedMultiplePrimitivesOfParameterTypes() {
+        // Given:
+        // @formatter:off
+        List<Object[]> arguments = listOfArrays(
+                new Object[] { Byte.valueOf((byte) 1), Character.valueOf('a'), Double.valueOf(1.1) },
+                new Object[] { Byte.valueOf((byte) 2), Character.valueOf('b'), Double.valueOf(2.2) },
+                new Object[] { Byte.valueOf((byte) 3), Character.valueOf('c'), Double.valueOf(3.3) }
+            );
+        // @formatter:on
+        Class<?>[] parameterTypes = new Class<?>[] { byte.class, char.class, double.class };
 
         // When:
         underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
