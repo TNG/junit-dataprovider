@@ -2,6 +2,7 @@ package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -68,6 +69,33 @@ public class TestGeneratorTest extends BaseTest {
     @Test
     public void testGenerateExplodedTestMethodsForShouldReturnOriginalTestMethodIfNoDataProviderIsUsed() {
         // Given:
+
+        // When:
+        List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(testMethod, null);
+
+        // Then:
+        assertThat(result).containsOnly(testMethod);
+    }
+
+    @Test(expected = Error.class)
+    public void testGenerateExplodedTestMethodsForShouldCatchExceptionUsingUseDataProviderAndReThrowAsError()
+            throws Throwable {
+        // Given:
+        doThrow(IllegalArgumentException.class).when(dataProviderMethod).invokeExplosively(any(), anyVararg());
+
+        // When:
+        List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(testMethod, dataProviderMethod);
+
+        // Then:
+        assertThat(result).containsOnly(testMethod);
+    }
+
+    @Test(expected = Error.class)
+    public void testGenerateExplodedTestMethodsForShouldCatchExceptionUsingDataProviderAndReThrowAsError() {
+        // Given:
+        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
+        doThrow(IllegalArgumentException.class).when(dataConverter)
+                .convert(any(), any(Class[].class), eq(dataProvider));
 
         // When:
         List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(testMethod, null);
