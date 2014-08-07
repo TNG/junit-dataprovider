@@ -641,6 +641,20 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void testGetParametersForShouldThrowIllegalArgumentExceptionIfValueOfThrowsNumberFormatException() {
+        // Given:
+        String data = "noInt";
+        Class<?>[] parameterTypes = new Class[] { int.class };
+
+        doReturn(",").when(dataProvider).splitBy();
+
+        // When:
+        underTest.getParametersFor(data, parameterTypes, dataProvider, 41);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void testGetParametersForShouldThrowIllegalArgumentExceptionForTargetTypeConstructorWithStringArgWhichThrowsException() {
         // Given:
         String data = "noInt";
@@ -649,7 +663,7 @@ public class DataConverterTest extends BaseTest {
         doReturn(",").when(dataProvider).splitBy();
 
         // When:
-        underTest.getParametersFor(data, parameterTypes, dataProvider, 41);
+        underTest.getParametersFor(data, parameterTypes, dataProvider, 42);
 
         // Then: expect exception
     }
@@ -663,7 +677,7 @@ public class DataConverterTest extends BaseTest {
         doReturn(",").when(dataProvider).splitBy();
 
         // When:
-        underTest.getParametersFor(data, parameterTypes, dataProvider, 42);
+        underTest.getParametersFor(data, parameterTypes, dataProvider, 43);
 
         // Then: expect exception
     }
