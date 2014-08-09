@@ -14,10 +14,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.tngtech.java.junit.dataprovider.BaseTest;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TestFormatterTest extends BaseTest {
+public class TestNameFormatterTest extends BaseTest {
 
     @InjectMocks
-    private TestFormatter underTest;
+    private TestNameFormatter underTest;
 
     @Test
     public void testGetNameShouldHandleSingleValueCorrectly() {

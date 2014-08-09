@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import org.junit.runners.model.FrameworkMethod;
 
-import com.tngtech.java.junit.dataprovider.internal.TestFormatter;
+import com.tngtech.java.junit.dataprovider.internal.TestNameFormatter;
 
 /**
  * A special framework method that allows the usage of parameters for the test method.
@@ -31,7 +31,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     /**
      * Formatter for this test method.
      */
-    private TestFormatter testFormatter;
+    private TestNameFormatter testNameFormatter;
 
 
     public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters) {
@@ -46,12 +46,12 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
 
         this.idx = idx;
         this.parameters = Arrays.copyOf(parameters, parameters.length);
-        this.testFormatter = new TestFormatter(); // set default testFormatter
+        this.testNameFormatter = new TestNameFormatter(); // set default testNameFormatter
     }
 
     @Override
     public String getName() {
-        return testFormatter.format(getMethod(), idx, parameters);
+        return testNameFormatter.format(getMethod(), idx, parameters);
     }
 
     @Override
@@ -90,12 +90,12 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     }
 
     /**
-     * Parameters formatter to format parameters of the test method.
+     * Test name formatter to generate a the {@link String} representation of the test method.
      * <p>
      * This method exists and is package private (= visible) only for testing.
      * </p>
      */
-    void setFormatter(TestFormatter testFormatter) {
-        this.testFormatter = testFormatter;
+    void setTestNameFormatter(TestNameFormatter testNameFormatter) {
+        this.testNameFormatter = testNameFormatter;
     }
 }

@@ -12,13 +12,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.tngtech.java.junit.dataprovider.internal.TestFormatter;
+import com.tngtech.java.junit.dataprovider.internal.TestNameFormatter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataProviderFrameworkMethodTest extends BaseTest {
 
     @Mock
-    private TestFormatter formatter;
+    private TestNameFormatter formatter;
 
     private final Method method = anyMethod();
 
@@ -65,7 +65,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         final Object[] parameters = new Object[] { 718, "718" };
 
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 20, parameters);
-        underTest.setFormatter(formatter);
+        underTest.setTestNameFormatter(formatter);
         doReturn("test").when(formatter).format(method, 20, parameters);
 
         // When:

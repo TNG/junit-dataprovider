@@ -3,7 +3,7 @@ package com.tngtech.java.junit.dataprovider.internal;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public class TestFormatter {
+public class TestNameFormatter {
 
     /**
      * Returns a {@link String} representation of the given {@code method}, {@code idx} and {@code parameters}. The
