@@ -142,7 +142,7 @@ public class DataConverter {
      * @param parameterTypes target types of parameters to which corresponding values in regex-separated {@code data}
      *            should be converted
      * @param dataProvider containing settings which should be used to convert given {@code data}
-     * @param rowIdx index of current {@code data} for better error messages
+     * @param rowIdx index of current {@code data} (row) for better error messages
      * @return split, trimmed and converted {@code Object[]} of supplied regex-separated {@code data}
      * @throws IllegalArgumentException iif count of split data and paramter types differs
      */

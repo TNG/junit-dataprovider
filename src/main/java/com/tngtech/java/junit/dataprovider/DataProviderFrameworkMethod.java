@@ -33,7 +33,13 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      */
     private TestNameFormatter testNameFormatter;
 
-
+    /**
+     * Create a {@link FrameworkMethod} extended with special attributes for using this test with a data provider.
+     *
+     * @param method test method for which the {@link FrameworkMethod} is created
+     * @param idx the index (row) of the used data provider
+     * @param parameters used for invoking this test method
+     */
     public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters) {
         super(method);
 
