@@ -97,6 +97,32 @@ public class DataProviderJavaAcceptanceTest {
         assertThat(result).isEqualTo(expected);
     }
 
+    @DataProvider(format = "%m: %p[0] * %p[1] == %p[2]")
+    public static Object[][] dataProviderMultiply() {
+        // @formatter:off
+        return new Object[][] {
+                {  0,  0,  0 },
+                { -1,  0,  0 },
+                {  0,  1,  0 },
+                {  1,  1,  1 },
+                {  1, -1, -1 },
+                { -1, -1,  1 },
+                {  1,  2,  2 },
+                { -1,  2, -2 },
+                { -1, -2,  2 },
+                { -1, -2,  2 },
+                {  6,  7, 42 },
+            };
+        // @formatter:on
+    }
+
+    @Test
+    @UseDataProvider("dataProviderMultiply")
+    public void testMultiply(int a, int b, int expected) {
+        // Expect:
+        assertThat(a * b).isEqualTo(expected);
+    }
+
     @DataProvider
     public static Object[][] dataProviderWithNonConstantObjects() {
         Calendar yesterday = Calendar.getInstance();

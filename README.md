@@ -15,6 +15,7 @@ junit-dataprovider
 	* [String syntax](#string-syntax)
 	* [List syntax](#list-syntax)
 	* [Let ```@DataProvider``` directly providing test data](#let-dataprovider-directly-providing-test-data)
+	* [Customize test method name](#customize-test-method-name)
 	* [Access ```FrameworkMethod``` within ```@DataProvider``` method](#access-frameworkmethod-within-dataprovider-method)
 	* [Utility methods](#utility-methods)
 * [Release notes](#release-notes)
@@ -319,6 +320,43 @@ and ```String```s are supported.
     }
 ```
 
+### Customize test method name
+
+Using this feature may break the following other features:
+* Running all tests of a data provider test method does only work if the custom ```@DataProvider#format()```
+matches ```%m[%i: .*]```
+* Jumping to a test method by double-clicking in [Eclipse][] does only work if and only if the customized
+test name starts with the method name followed by a character which is not a valid java identifier.
+* If test method names are not unique within its class, it can cause undeterministic behaviour!
+
+```java
+    // ...
+
+    @DataProvider(format = "%m: %p[0] * %p[1] == %p[2]")
+    public static Object[][] dataProviderMultiply() {
+        // @formatter:off
+        return new Object[][] {
+                {  0,  0,  0 },
+                {  0,  1,  0 },
+                {  1,  1,  1 },
+                {  1, -1, -1 },
+                { -1, -1,  1 },
+                {  1,  2,  2 },
+                {  6,  7, 42 },
+            };
+        // @formatter:on
+    }
+
+    @Test
+    @UseDataProvider("dataProviderMultiply")
+    public void testMultiply(int a, int b, int expected) {
+        // Expect:
+        assertThat(a * b).isEqualTo(expected);
+    }
+
+    // ...
+```
+
 ### Access ```FrameworkMethod``` within ```@DataProvider``` method
 
 ```java
@@ -398,6 +436,7 @@ Release notes
 
 * improved error messages ([#31](/../../issues/31))
 * added some helpful utility methods ([#21](/../../issues/21))
+* made test name customizable via ```@DataProvider#format()``` ([#30](/../../issues/30))
 * ...
 
 ### v1.8.0 (11-Jul-2014)
