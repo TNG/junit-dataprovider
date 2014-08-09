@@ -18,7 +18,7 @@ import com.tngtech.java.junit.dataprovider.internal.TestNameFormatter;
 public class DataProviderFrameworkMethodTest extends BaseTest {
 
     @Mock
-    private TestNameFormatter formatter;
+    private TestNameFormatter testNameFormatter;
 
     private final Method method = anyMethod();
 
@@ -65,8 +65,8 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         final Object[] parameters = new Object[] { 718, "718" };
 
         DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 20, parameters);
-        underTest.setTestNameFormatter(formatter);
-        doReturn("test").when(formatter).format(method, 20, parameters);
+        underTest.setTestNameFormatter(testNameFormatter);
+        doReturn("test").when(testNameFormatter).format(method, 20, parameters);
 
         // When:
         String result = underTest.getName();
@@ -74,8 +74,8 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         // Then:
         assertThat(result).isEqualTo("test");
 
-        verify(formatter).format(method, 20, parameters);
-        verifyNoMoreInteractions(formatter);
+        verify(testNameFormatter).format(method, 20, parameters);
+        verifyNoMoreInteractions(testNameFormatter);
     }
 
     @Test
