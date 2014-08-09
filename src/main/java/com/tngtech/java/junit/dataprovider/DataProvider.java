@@ -66,4 +66,76 @@ public @interface DataProvider {
      * @see String#trim()
      */
     boolean trimValues() default true;
+
+    /**
+     * Format pattern to be used to generate test method description. The following placeholders are by default
+     * available (for more information see their implementations in package
+     * {@link com.tngtech.java.junit.dataprovider.internal.placeholder}:
+     * <table border="1">
+     * <tr>
+     * <th>Placeholder</th>
+     * <th>Aliases</th>
+     * <th>Example</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>{@code %c}</td>
+     * <td>-</td>
+     * <td><i>DataProviderRunnerTest</i></td>
+     * <td>Simple name of test method class (= {@link Class#getSimpleName()})</td>
+     * </tr>
+     * <tr>
+     * <td>{@code %cc}</td>
+     * <td>-</td>
+     * <td><i>com.tngtech.java .junit.dataprovider .DataProviderRunnerTest</i></td>
+     * <td>Canonical name of test method class (= {@link Class#getCanonicalName()})</td>
+     * </tr>
+     * <tr>
+     * <td>{@code %m}</td>
+     * <td>-</td>
+     * <td><i>testIsEmptyString</i></td>
+     * <td>Simple name of test method (= {@link Method#getName()})</td>
+     * </tr>
+     * <tr>
+     * <td>{@code %cm}</td>
+     * <td>-</td>
+     * <td><i>com.tngtech.test .java.junit.dataprovider .DataProviderJavaAcceptanceTest
+     * .testIsEmptyString(java.lang.String) </i></td>
+     * <td>Complete signature of test method (= {@link Method#toString()})</td>
+     * </tr>
+     * <tr>
+     * <td>{@code %i}</td>
+     * <td>-</td>
+     * <td><i>13</i></td>
+     * <td>Index of the data provider test of current test method (starting at {@code 0}). Useful to generate unique
+     * test method descriptions.</td>
+     * </tr>
+     * <tr>
+     * <td>{@code %p[x]}</td>
+     * <td>-</td>
+     * <td><i>test, &lt;null&gt;, 4</i></td>
+     * <td>Subscripting all parameters by positive or negative index (1.) and range (2.). All indices may either be
+     * positive (starting at {@code 0} and increment) to number parameters from the beginning or negative (starting from
+     * {@code -1} and decrement) to number parameters from the end:
+     * <ol>
+     * <li>A positive or negative index {code x} to get the {@link String} representation of a specific parameter, e.g.
+     * {@code %p[3]} (= third parameter) or {@code %p[-2]} (= second last parameter).</li>
+     * <li>A range index producing the comma-separated String representation of corresponding parameters, e.g.
+     * <ul>
+     * <li>{@code %p[0..1]} for the first two parameters,</li>
+     * <li>{@code %p[0..-2]} for all parameters expect the last, or</li>
+     * <li>{@code %p[-3..-1]} for the last two parameters.</li>
+     * </ul>
+     * </ol>
+     * <b>Attention:</b> This placeholder will cause an {@link IndexOutOfBoundsException} iif any index exceeds the
+     * parameters array length</td>
+     * </tr>
+     * </table>
+     * *Hints:*
+     * <ul>
+     * <li>A produced test method name should be unique among all other in the same class.</li>
+     * <li>Every above listed parameter can be used multiple times</li>
+     * </ul>
+     */
+    String format() default "%m[%i: %p[0..-1]]";
 }

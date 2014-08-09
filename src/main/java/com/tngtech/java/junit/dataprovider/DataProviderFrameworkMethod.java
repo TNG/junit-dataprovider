@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import org.junit.runners.model.FrameworkMethod;
 
-import com.tngtech.java.junit.dataprovider.internal.TestNameFormatter;
+import com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder;
 
 /**
  * A special framework method that allows the usage of parameters for the test method.
@@ -29,9 +29,12 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     final Object[] parameters;
 
     /**
-     * Formatter for this test method.
+     * Format of test method name.
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
      */
-    private TestNameFormatter testNameFormatter;
+    final String nameFormat;
 
     /**
      * Create a {@link FrameworkMethod} extended with special attributes for using this test with a data provider.
@@ -39,12 +42,16 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      * @param method test method for which the {@link FrameworkMethod} is created
      * @param idx the index (row) of the used data provider
      * @param parameters used for invoking this test method
+     * @param nameFormat defines the format of the test method name according to {@code @}{@link DataProvider#format()}
      */
-    public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters) {
+    public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters, String nameFormat) {
         super(method);
 
         if (parameters == null) {
             throw new NullPointerException("parameter must not be null");
+        }
+        if (nameFormat == null) {
+            throw new NullPointerException("nameFormat must not be null");
         }
         if (parameters.length == 0) {
             throw new IllegalArgumentException("parameter must not be empty");
@@ -52,12 +59,17 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
 
         this.idx = idx;
         this.parameters = Arrays.copyOf(parameters, parameters.length);
-        this.testNameFormatter = new TestNameFormatter(); // set default testNameFormatter
+        this.nameFormat = nameFormat;
     }
 
     @Override
     public String getName() {
-        return testNameFormatter.format(getMethod(), idx, parameters);
+        String result = nameFormat;
+        for (BasePlaceholder placeHolder : Placeholders.all()) {
+            placeHolder.setContext(getMethod(), idx, Arrays.copyOf(parameters, parameters.length));
+            result = placeHolder.process(result);
+        }
+        return result;
     }
 
     @Override
@@ -70,6 +82,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + idx;
+        result = prime * result + ((nameFormat == null) ? 0 : nameFormat.hashCode());
         result = prime * result + Arrays.hashCode(parameters);
         return result;
     }
@@ -89,19 +102,16 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         if (idx != other.idx) {
             return false;
         }
+        if (nameFormat == null) {
+            if (other.nameFormat != null) {
+                return false;
+            }
+        } else if (!nameFormat.equals(other.nameFormat)) {
+            return false;
+        }
         if (!Arrays.equals(parameters, other.parameters)) {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Test name formatter to generate a the {@link String} representation of the test method.
-     * <p>
-     * This method exists and is package private (= visible) only for testing.
-     * </p>
-     */
-    void setTestNameFormatter(TestNameFormatter testNameFormatter) {
-        this.testNameFormatter = testNameFormatter;
     }
 }

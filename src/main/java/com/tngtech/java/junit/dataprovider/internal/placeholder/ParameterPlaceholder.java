@@ -1,73 +1,68 @@
-package com.tngtech.java.junit.dataprovider.internal;
+package com.tngtech.java.junit.dataprovider.internal.placeholder;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public class TestNameFormatter {
+import com.tngtech.java.junit.dataprovider.DataProvider;
 
-    /**
-     * Returns a {@link String} representation of the given {@code method}, {@code idx} and {@code parameters}. The
-     * parameter conversion rules are as follows:
-     * <table>
-     * <tr>
-     * <th>Parameter value</th>
-     * <th>target {@link String}</th>
-     * </tr>
-     * <tr>
-     * <td>null</td>
-     * <td>&lt;null&gt;</td>
-     * </tr>
-     * <tr>
-     * <td>&quot;&quot; (= empty string)</td>
-     * <td>&lt;empty string&gt;</td>
-     * </tr>
-     * <tr>
-     * <td>array (e.g. String[])</td>
-     * <td>{@code "[" + format(array) + "]"}</td>
-     * </tr>
-     * <tr>
-     * <td>other</td>
-     * <td>{@link Object#toString()}</td>
-     * </tr>
-     * </table>
-     *
-     * @param parameters the parameters are converted to a regex-separated {@link String}
-     * @return a {@link String} representation of the given parameters
-     */
-    public String format(Method method, int idx, Object[] parameters) {
-        return method.getName() + '[' + idx + ": " + format(parameters) + ']';
+/**
+ * This placeholder format the parameters of a data provider test as comma-separated {@link String} according to the
+ * given index or range subscript (see {@link DataProvider#format()}. Furthermore the following parameter values are
+ * treated specially:
+ * <table>
+ * <tr>
+ * <th>Parameter value</th>
+ * <th>target {@link String}</th>
+ * </tr>
+ * <tr>
+ * <td>null</td>
+ * <td>&lt;null&gt;</td>
+ * </tr>
+ * <tr>
+ * <td>&quot;&quot; (= empty string)</td>
+ * <td>&lt;empty string&gt;</td>
+ * </tr>
+ * <tr>
+ * <td>array (e.g. String[])</td>
+ * <td>{@code "[" + formatPattern(array) + "]"}</td>
+ * </tr>
+ * <tr>
+ * <td>other</td>
+ * <td>{@link Object#toString()}</td>
+ * </tr>
+ * </table>
+ */
+public class ParameterPlaceholder extends BasePlaceholder {
+    public ParameterPlaceholder() {
+        super("%p\\[(-?[0-9]+|-?[0-9]+\\.\\.-?[0-9]+)\\]");
+    }
+
+    @Override
+    protected String getReplacementFor(String placeholder) {
+        String subscript = placeholder.substring(3, placeholder.length() - 1);
+
+        int from = Integer.MAX_VALUE;
+        int to = Integer.MIN_VALUE;
+        if (subscript.contains("..")) {
+            String[] split = subscript.split("\\.\\.");
+
+            from = Integer.parseInt(split[0]);
+            to = Integer.parseInt(split[1]);
+        } else {
+            from = Integer.parseInt(subscript);
+            to = from;
+        }
+        from = (from >= 0) ? from : parameters.length + from;
+        to = (to >= 0) ? to + 1 : parameters.length + to + 1;
+
+        return formatAll(Arrays.copyOfRange(parameters, from, to));
     }
 
     /**
-     * Returns a {@link String} representation of the given {@code parameters}. The conversion rules are as follows:
-     * <table>
-     * <tr>
-     * <th>Parameter value</th>
-     * <th>target {@link String}</th>
-     * </tr>
-     * <tr>
-     * <td>null</td>
-     * <td>&lt;null&gt;</td>
-     * </tr>
-     * <tr>
-     * <td>&quot;&quot; (= empty string)</td>
-     * <td>&lt;empty string&gt;</td>
-     * </tr>
-     * <tr>
-     * <td>array (e.g. String[])</td>
-     * <td>{@code "[" + format(array) + "]"}</td>
-     * </tr>
-     * <tr>
-     * <td>other</td>
-     * <td>{@link Object#toString()}</td>
-     * </tr>
-     * </table>
-     *
-     * @param parameters the parameters are converted to a regex-separated {@link String}
-     * @return a {@link String} representation of the given parameters
+     * <p>
+     * This method is package private (= visible) for testing.
+     * </p>
      */
-    public String format(Object[] parameters) {
-
+    String formatAll(Object[] parameters) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < parameters.length; i++) {
             Object param = parameters[i];
@@ -78,7 +73,7 @@ public class TestNameFormatter {
                 if (param.getClass().getComponentType().isPrimitive()) {
                     appendTo(stringBuilder, param);
                 } else {
-                    stringBuilder.append('[').append(format((Object[]) param)).append(']');
+                    stringBuilder.append('[').append(formatAll((Object[]) param)).append(']');
                 }
 
             } else if (param instanceof String && ((String) param).isEmpty()) {
@@ -92,7 +87,6 @@ public class TestNameFormatter {
                 stringBuilder.append(", ");
             }
         }
-
         return stringBuilder.toString();
     }
 

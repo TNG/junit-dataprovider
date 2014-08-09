@@ -135,12 +135,13 @@ public class TestGeneratorTest extends BaseTest {
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, 2, 3 });
         doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class), any(DataProvider.class));
         doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
+        doReturn("%m").when(dataProvider).format();
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
-        assertDataProviderFrameworkMethods(result, dataConverterResult);
+        assertDataProviderFrameworkMethods(result, dataConverterResult, "%m");
         verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 
@@ -151,12 +152,13 @@ public class TestGeneratorTest extends BaseTest {
                 new Object[] { 44, "55", 66L }, new Object[] { 77, "88", 99L });
         doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class), any(DataProvider.class));
         doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
+        doReturn("%c").when(dataProvider).format();
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
-        assertDataProviderFrameworkMethods(result, dataConverterResult);
+        assertDataProviderFrameworkMethods(result, dataConverterResult, "%c");
         verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 
@@ -177,12 +179,13 @@ public class TestGeneratorTest extends BaseTest {
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, "test1" });
         doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class), any(DataProvider.class));
+        doReturn("%i").when(dataProvider).format();
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
 
         // Then:
-        assertDataProviderFrameworkMethods(result, dataConverterResult);
+        assertDataProviderFrameworkMethods(result, dataConverterResult, "%i");
         verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 
@@ -192,12 +195,13 @@ public class TestGeneratorTest extends BaseTest {
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { "2a", "foo" }, new Object[] { "3b", "bar" },
                 new Object[] { "4c", "baz" });
         doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Class[].class), any(DataProvider.class));
+        doReturn("%p[0]").when(dataProvider).format();
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
 
         // Then:
-        assertDataProviderFrameworkMethods(result, dataConverterResult);
+        assertDataProviderFrameworkMethods(result, dataConverterResult, "%p[0]");
         verify(dataConverter).checkIfArgumentsMatchParameterTypes(eq(dataConverterResult), any(Class[].class));
     }
 }

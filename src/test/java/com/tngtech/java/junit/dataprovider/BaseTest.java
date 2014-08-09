@@ -60,14 +60,17 @@ public class BaseTest {
 
     // -- Assertion helper ---------------------------------------------------------------------------------------------
 
-    protected void assertDataProviderFrameworkMethods(List<FrameworkMethod> actuals, List<Object[]> expecteds) {
+    protected void assertDataProviderFrameworkMethods(List<FrameworkMethod> actuals, List<Object[]> expecteds,
+            String expectedNameFormat) {
+
         assertThat(actuals).hasSameSizeAs(expecteds);
         for (int idx = 0; idx < actuals.size(); idx++) {
-            assertThat(actuals.get(idx)).describedAs("at index " + idx).isInstanceOf(DataProviderFrameworkMethod.class);
+            assertThat(actuals.get(idx)).describedAs("at idx " + idx).isInstanceOf(DataProviderFrameworkMethod.class);
 
             DataProviderFrameworkMethod actual = (DataProviderFrameworkMethod) actuals.get(idx);
-            assertThat(actual.idx).describedAs("at index " + idx).isEqualTo(idx);
-            assertThat(actual.parameters).describedAs("at index " + idx).isEqualTo(expecteds.get(idx));
+            assertThat(actual.idx).describedAs("at idx " + idx).isEqualTo(idx);
+            assertThat(actual.parameters).describedAs("at idx " + idx).isEqualTo(expecteds.get(idx));
+            assertThat(actual.nameFormat).describedAs("at idx " + idx).isEqualTo(expectedNameFormat);
         }
     }
 

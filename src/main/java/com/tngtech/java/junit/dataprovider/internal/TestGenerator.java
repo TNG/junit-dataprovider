@@ -114,7 +114,7 @@ public class TestGenerator {
         int idx = 0;
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
         for (Object[] parameters : converted) {
-            result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters));
+            result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters, dataProvider.format()));
         }
         return result;
     }
