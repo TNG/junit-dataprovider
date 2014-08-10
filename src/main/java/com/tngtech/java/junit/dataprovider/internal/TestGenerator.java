@@ -85,10 +85,7 @@ public class TestGenerator {
                     dataProviderMethod.getName(), t.getMessage()), t);
         }
 
-        DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
-        List<Object[]> converted = dataConverter
-                .convert(data, testMethod.getMethod().getParameterTypes(), dataProvider);
-        return explodeTestMethod(testMethod, converted);
+        return explodeTestMethod(testMethod, data, dataProviderMethod.getAnnotation(DataProvider.class));
     }
 
     /**
@@ -102,14 +99,12 @@ public class TestGenerator {
      * @return a list of methods, each method bound to a parameter combination returned by the {@link DataProvider}
      */
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, DataProvider dataProvider) {
-        String[] data = dataProvider.value();
-
-        List<Object[]> converted = dataConverter
-                .convert(data, testMethod.getMethod().getParameterTypes(), dataProvider);
-        return explodeTestMethod(testMethod, converted);
+        return explodeTestMethod(testMethod, dataProvider.value(), dataProvider);
     }
 
-    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, List<Object[]> converted) {
+    private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data, DataProvider dataProvider) {
+        List<Object[]> converted = dataConverter
+                .convert(data, testMethod.getMethod().getParameterTypes(), dataProvider);
         if (converted.isEmpty()) {
             throw new IllegalArgumentException(
                     "Could not create test methods using probably 'null' or 'empty' data provider");
