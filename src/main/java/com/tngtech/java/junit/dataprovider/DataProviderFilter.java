@@ -19,6 +19,14 @@ public class DataProviderFilter extends Filter {
      */
     static final Pattern DESCRIPTION_PATTERN = Pattern.compile("([^\\[\\] ]+)" + "(\\[(\\d+):.*\\])?" + "\\((.+)\\)$");
 
+    /**
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    static final Pattern GENEROUS_DESCRIPTION_PATTERN = Pattern
+            .compile("(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+)" + "((.*))" + "\\((.+)\\)$");
+
     private static final int GROUP_METHOD_NAME = 1;
     private static final int GROUP_METHOD_PARAMS = 2;
     private static final int GROUP_METHOD_IDX = 3;
@@ -51,14 +59,24 @@ public class DataProviderFilter extends Filter {
         if (!filterDescriptionMatcher.find()) {
             return filter.shouldRun(description);
         }
+        String methodName = filterDescriptionMatcher.group(GROUP_METHOD_NAME);
+        String className = filterDescriptionMatcher.group(GROUP_CLASS);
 
         if (description.isTest()) {
             Matcher descriptionMatcher = DESCRIPTION_PATTERN.matcher(description.getDisplayName());
             if (!descriptionMatcher.matches()) {
+                if (filterDescriptionMatcher.group(GROUP_METHOD_IDX) == null) {
+                    Matcher generousDescMatcher = GENEROUS_DESCRIPTION_PATTERN.matcher(description.getDisplayName());
+                    if (generousDescMatcher.matches()) {
+                        return methodName.equals(generousDescMatcher.group(GROUP_METHOD_NAME))
+                                && className.equals(generousDescMatcher.group(GROUP_CLASS));
+                    }
+                }
                 return filter.shouldRun(description);
             }
-            if (!filterDescriptionMatcher.group(GROUP_METHOD_NAME).equals(descriptionMatcher.group(GROUP_METHOD_NAME))
-                    || !filterDescriptionMatcher.group(GROUP_CLASS).equals(descriptionMatcher.group(GROUP_CLASS))) {
+
+            if (!methodName.equals(descriptionMatcher.group(GROUP_METHOD_NAME))
+                    || !className.equals(descriptionMatcher.group(GROUP_CLASS))) {
                 return false;
             }
             return filterDescriptionMatcher.group(GROUP_METHOD_PARAMS) == null

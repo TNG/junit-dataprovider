@@ -323,8 +323,9 @@ and ```String```s are supported.
 ### Customize test method name
 
 Using this feature may break the following other features:
-* Running all tests of a data provider test method does only work if the custom ```@DataProvider#format()```
-matches ```%m[%i: .*]```
+* Running all tests for one data provider does only work if the custom ```@DataProvider#format()```
+starts with the test method name (= ```%m```) followed by a character which is not a valid java identifier,
+e.g. ``` ```, ```[```, ```(```, ```:```, or ```-```.
 * Jumping to a test method by double-clicking in [Eclipse][] does only work if and only if the customized
 test name starts with the method name followed by a character which is not a valid java identifier.
 * If test method names are not unique within its class, it can cause undeterministic behaviour!

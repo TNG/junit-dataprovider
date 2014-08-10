@@ -148,6 +148,63 @@ public class DataProviderFilterTest extends BaseTest {
     }
 
     @Test
+    public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButFilterHasIndex() {
+        // Given:
+        doReturn("Method testMain[2: ](Clazz)").when(filter).describe();
+
+        Description description = setupDescription(true, "testMain 1, 2, 3(Clazz)");
+
+        // When:
+        boolean result = underTest.shouldRun(description);
+
+        // Then:
+        assertThat(result).isFalse();
+        verify(filter).shouldRun(description);
+    }
+
+    @Test
+    public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButMethodNameIsNotTheSame() {
+        // Given:
+        doReturn("Method testMain(Clazz)").when(filter).describe();
+
+        Description description = setupDescription(true, "testOther: test, 4(Clazz)");
+
+        // When:
+        boolean result = underTest.shouldRun(description);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButClassIsNotTheSame() {
+        // Given:
+        doReturn("Method testMain(Clazz)").when(filter).describe();
+
+        Description description = setupDescription(true, "testMain 8zBZ=(qzt)487(OtherClazz)");
+
+        // When:
+        boolean result = underTest.shouldRun(description);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testShouldRunShouldReturnTrueWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClass() {
+        // Given:
+        doReturn("Method testMain(Clazz)").when(filter).describe();
+
+        Description description = setupDescription(true, "testMain 298zBZ=)& %(/$(=93A SD4)i(qzt)487 5z2 59isf&(Clazz)");
+
+        // When:
+        boolean result = underTest.shouldRun(description);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAddtionalMethodIdxAndEqualsExcatly() {
         // Given:
         doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
@@ -341,6 +398,19 @@ public class DataProviderFilterTest extends BaseTest {
         // Then:
         assertThat(result).isTrue();
         assertThatMatcherGroupsAre(matcher, "ain", null, null, "Clazz");
+    }
+
+    @Test
+    public void testGenerousDescriptionPatternShouldMatchDescriptionAndWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
+        // Given:
+        Matcher matcher = DataProviderFilter.GENEROUS_DESCRIPTION_PATTERN.matcher("testMain whatever => ignore(Clazz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isTrue();
+        assertThatMatcherGroupsAre(matcher, "testMain", " whatever => ignore", " whatever => ignore", "Clazz");
     }
 
     private Description setupDescription(boolean isTest, String descriptionDisplayName,
