@@ -358,6 +358,22 @@ test name starts with the method name followed by a character which is not a val
     // ...
 ```
 
+The result in ```[...]/TEST-com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest.xml``` would look like:
+
+```xml
+  <testcase name="testMultiply: 0 * 0 == 0"   classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.058"/>
+  <testcase name="testMultiply: -1 * 0 == 0"  classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.0"/>
+  <testcase name="testMultiply: 0 * 1 == 0"   classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.0"/>
+  <testcase name="testMultiply: 1 * 1 == 1"   classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.0"/>
+  <testcase name="testMultiply: 1 * -1 == -1" classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.001"/>
+  <testcase name="testMultiply: -1 * -1 == 1" classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.0"/>
+  <testcase name="testMultiply: 1 * 2 == 2"   classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.0"/>
+  <testcase name="testMultiply: -1 * 2 == -2" classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.0"/>
+  <testcase name="testMultiply: -1 * -2 == 2" classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.0"/>
+  <testcase name="testMultiply: -1 * -2 == 2" classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.0"/>
+  <testcase name="testMultiply: 6 * 7 == 42"  classname="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest" time="0.001"/>
+```
+
 ### Access ```FrameworkMethod``` within ```@DataProvider``` method
 
 ```java
