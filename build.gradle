@@ -165,17 +165,6 @@ uploadArchives {
                             distribution 'repo'
                         }
                     }
-
-                    developers {
-                        developer {
-                            id 'lepokle'
-                            name 'Leo von Klenze'
-                        }
-                        developer {
-                            id 'aaschmid'
-                            name 'Andreas Schmid'
-                        }
-                    }
                 }
                 whenConfigured { pom ->
                     pom.dependencies.find{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit-dep' }.with {
