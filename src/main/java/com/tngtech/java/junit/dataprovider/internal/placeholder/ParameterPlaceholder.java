@@ -58,31 +58,16 @@ public class ParameterPlaceholder extends BasePlaceholder {
     }
 
     /**
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
+     * Formats the given parameters by retrieving it's {@link String} representation and separate it by comma (=
+     * {@code ,}).
+     *
+     * @param parameters to be formatted
+     * @return the {@link String} representation of the given {@link Object}{@code []}
      */
-    String formatAll(Object[] parameters) {
+    protected String formatAll(Object[] parameters) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < parameters.length; i++) {
-            Object param = parameters[i];
-            if (param == null) {
-                stringBuilder.append("<null>");
-
-            } else if (param.getClass().isArray()) {
-                if (param.getClass().getComponentType().isPrimitive()) {
-                    appendTo(stringBuilder, param);
-                } else {
-                    stringBuilder.append('[').append(formatAll((Object[]) param)).append(']');
-                }
-
-            } else if (param instanceof String && ((String) param).isEmpty()) {
-                stringBuilder.append("<empty string>");
-
-            } else {
-                stringBuilder.append(param.toString());
-            }
-
+            stringBuilder.append(format(parameters[i]));
             if (i < parameters.length - 1) {
                 stringBuilder.append(", ");
             }
@@ -90,32 +75,51 @@ public class ParameterPlaceholder extends BasePlaceholder {
         return stringBuilder.toString();
     }
 
-    private void appendTo(StringBuilder stringBuilder, Object primitiveArray) {
+    protected String format(Object param) {
+        if (param == null) {
+            return "<null>";
+
+        } else if (param.getClass().isArray()) {
+            if (param.getClass().getComponentType().isPrimitive()) {
+                return formatPrimitiveArray(param);
+            }
+            return "[" + formatAll((Object[]) param) + "]";
+
+        } else if (param instanceof String && ((String) param).isEmpty()) {
+            return "<empty string>";
+
+        } else {
+            return param.toString();
+        }
+    }
+
+    private String formatPrimitiveArray(Object primitiveArray) {
         Class<?> componentType = primitiveArray.getClass().getComponentType();
 
         if (boolean.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((boolean[]) primitiveArray));
+            return Arrays.toString((boolean[]) primitiveArray);
 
         } else if (byte.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((byte[]) primitiveArray));
+            return Arrays.toString((byte[]) primitiveArray);
 
         } else if (char.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((char[]) primitiveArray));
+            return Arrays.toString((char[]) primitiveArray);
 
         } else if (short.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((short[]) primitiveArray));
+            return Arrays.toString((short[]) primitiveArray);
 
         } else if (int.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((int[]) primitiveArray));
+            return Arrays.toString((int[]) primitiveArray);
 
         } else if (long.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((long[]) primitiveArray));
+            return Arrays.toString((long[]) primitiveArray);
 
         } else if (float.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((float[]) primitiveArray));
+            return Arrays.toString((float[]) primitiveArray);
 
         } else if (double.class.equals(componentType)) {
-            stringBuilder.append(Arrays.toString((double[]) primitiveArray));
+            return Arrays.toString((double[]) primitiveArray);
         }
+        return "";
     }
 }
