@@ -46,7 +46,7 @@ public class DataProviders {
     }
 
     /**
-     * Creates a data provider test for each argument.
+     * Creates a dataprovider test for each argument.
      *
      * @param args which are wrapped in {@link Object} arrays and combined to {@link Object}{@code [][]}
      * @return an array which contains {@link Object} arrays for each single argument
@@ -61,7 +61,7 @@ public class DataProviders {
     }
 
     /**
-     * Creates a data provider test for each element in the given {@link Iterable}.
+     * Creates a dataprovider test for each element in the given {@link Iterable}.
      *
      * @param args which are wrapped in {@link Object} arrays and combined to {@link Object}{@code [][]}
      * @return an array which contains {@link Object} arrays for each single element in the given {@link Iterable}
@@ -80,7 +80,7 @@ public class DataProviders {
     }
 
     /**
-     * Creates a data provider test for each value in the given {@link Enum} class.
+     * Creates a dataprovider test for each value in the given {@link Enum} class.
      *
      * @param enumClass for which each value is wrapped into an array of {@link Object} arrays
      * @return an array which contains {@link Object} arrays for each single value in the given {@link Enum}

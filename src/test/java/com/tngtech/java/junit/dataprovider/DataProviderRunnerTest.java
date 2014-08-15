@@ -21,14 +21,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.manipulation.Filter;
-import org.junit.runners.ParentRunner;
-import org.junit.experimental.categories.Categories;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
-import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.ParentRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
@@ -159,7 +155,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such data provider");
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such dataprovider");
 
         verifyZeroInteractions(testValidator);
     }
@@ -223,7 +219,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such data provider");
+        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such dataprovider");
 
         verify(testValidator).validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
         verify(testValidator).validateDataProviderMethod(dataProviderMethod2, dataProvider2, errors);

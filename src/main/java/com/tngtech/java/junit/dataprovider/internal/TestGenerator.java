@@ -23,13 +23,13 @@ public class TestGenerator {
 
     /**
      * Generates the exploded list of test methods for the given {@code testMethod}. The given {@link FrameworkMethod}
-     * is checked if it uses the given data provider method, an {@code @}{@link DataProvider}, or nothing. If it uses
-     * any data provider, for each line of the {@link DataProvider}s result a specific, parameterized test method will
-     * be added. If not, the original test method is added. If the given test method is {@code null}, an empty list is
+     * is checked if it uses the given dataprovider method, an {@code @}{@link DataProvider}, or nothing. If it uses any
+     * dataprovider, for each line of the {@link DataProvider}s result a specific, parameterized test method will be
+     * added. If not, the original test method is added. If the given test method is {@code null}, an empty list is
      * returned.
      *
      * @param testMethod the original test method
-     * @param dataProviderMethod the corresponding data provider method or {@code null}
+     * @param dataProviderMethod the corresponding dataprovider method or {@code null}
      * @return the exploded list of test methods or an empty list (never {@code null})
      * @throws Error if something went wrong while exploding test methods
      */
@@ -62,14 +62,14 @@ public class TestGenerator {
     }
 
     /**
-     * Creates a list of test methods out of an existing test method and its data provider method.
+     * Creates a list of test methods out of an existing test method and its dataprovider method.
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
      *
      * @param testMethod the original test method
-     * @param dataProviderMethod the data provider method that gives the parameters
-     * @return a list of methods, each method bound to a parameter combination returned by the data provider
+     * @param dataProviderMethod the dataprovider method that gives the parameters
+     * @return a list of methods, each method bound to a parameter combination returned by the dataprovider
      */
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
         Object data;
@@ -81,7 +81,7 @@ public class TestGenerator {
                 data = dataProviderMethod.invokeExplosively(null);
             }
         } catch (Throwable t) {
-            throw new IllegalArgumentException(String.format("Exception while invoking data provider method '%s': %s",
+            throw new IllegalArgumentException(String.format("Exception while invoking dataprovider method '%s': %s",
                     dataProviderMethod.getName(), t.getMessage()), t);
         }
 
@@ -107,7 +107,7 @@ public class TestGenerator {
                 .convert(data, testMethod.getMethod().getParameterTypes(), dataProvider);
         if (converted.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Could not create test methods using probably 'null' or 'empty' data provider");
+                    "Could not create test methods using probably 'null' or 'empty' dataprovider");
         }
         dataConverter.checkIfArgumentsMatchParameterTypes(converted, testMethod.getMethod().getParameterTypes());
 

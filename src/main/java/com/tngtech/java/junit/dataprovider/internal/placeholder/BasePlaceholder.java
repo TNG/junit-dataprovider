@@ -35,8 +35,8 @@ public abstract class BasePlaceholder {
      * Sets the given arguments as context for processing or replacement generation, respectively.
      *
      * @param method - test method
-     * @param idx - index of the data provider row
-     * @param parameters of the current data provider test to be executed
+     * @param idx - index of the dataprovider row
+     * @param parameters of the current dataprovider test to be executed
      */
     public void setContext(Method method, int idx, Object[] parameters) {
         this.method = method;

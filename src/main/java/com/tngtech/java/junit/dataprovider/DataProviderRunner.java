@@ -20,7 +20,7 @@ import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
 /**
- * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like data providers. Data
+ * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like dataproviders. Data
  * providers are public, static methods that return an {@link Object}{@code [][]} (see {@link DataProvider}).
  * <p>
  * Your test method must be annotated with {@code @}{@link UseDataProvider} or {@code @}{@link DataProvider},
@@ -37,7 +37,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     };
 
     /**
-     * The {@link DataConverter} to be used to convert from supported return types of any data provider to {@link List}
+     * The {@link DataConverter} to be used to convert from supported return types of any dataprovider to {@link List}
      * {@code <}{@link Object}{@code []>} such that data can be further handled.
      * <p>
      * This field is package private (= visible) for testing.
@@ -46,7 +46,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     DataConverter dataConverter;
 
     /**
-     * The {@link TestValidator} to be used to validate all test methods to be executed as test and all data provider to
+     * The {@link TestValidator} to be used to validate all test methods to be executed as test and all dataprovider to
      * be used to explode tests.
      * <p>
      * This field is package private (= visible) for testing.
@@ -104,7 +104,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     /**
      * {@inheritDoc}
      * <p>
-     * Additionally validates data providers.
+     * Additionally validates dataproviders.
      *
      * @param errors that are added to this list
      * @throws NullPointerException if given {@code errors} is {@code null}
@@ -116,9 +116,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
 
         // This method cannot use the result of "computeTestMethods()" because the method ignores invalid test methods
-        // and data providers silently (except if a data provider method cannot be called). However, the common errors
+        // and dataproviders silently (except if a dataprovider method cannot be called). However, the common errors
         // are not raised as {@link RuntimeException} to go the JUnit way of detecting errors. This implies that we have
-        // to browse the whole class for test methods and data providers again :-(.
+        // to browse the whole class for test methods and dataproviders again :-(.
 
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(Test.class)) {
             testValidator.validateTestMethod(testMethod, errors);
@@ -126,12 +126,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
-                errors.add(new Exception("No such data provider: "
+                errors.add(new Exception("No such dataprovider: "
                         + testMethod.getAnnotation(UseDataProvider.class).value()));
             } else {
                 DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
                 if (dataProvider == null) {
-                    throw new IllegalStateException(String.format("@%s annotaion not found on data provider method %s",
+                    throw new IllegalStateException(String.format("@%s annotaion not found on dataprovider method %s",
                             DataProvider.class.getSimpleName(), dataProviderMethod.getName()));
                 }
                 testValidator.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -204,7 +204,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * {@inheritDoc}
      * <p>
      * If possible the given {@code filter} is wrapped by {@link DataProviderFilter} to enable filtering of tests using
-     * a data provider.
+     * a dataprovider.
      *
      * @param filter the {@link Filter} to be wrapped or apply, respectively
      */
@@ -266,14 +266,14 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * Returns the data provider method that belongs to the given test method or {@code null} if no such data provider
-     * exists or the test method is not marked for usage of a data provider
+     * Returns the dataprovider method that belongs to the given test method or {@code null} if no such dataprovider
+     * exists or the test method is not marked for usage of a dataprovider
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
      *
-     * @param testMethod test method that uses a data provider
-     * @return the data provider or {@code null} (if data provider does not exist or test method does not use any)
+     * @param testMethod test method that uses a dataprovider
+     * @return the dataprovider or {@code null} (if dataprovider does not exist or test method does not use any)
      * @throws IllegalArgumentException if given {@code testMethod} is {@code null}
      */
     FrameworkMethod getDataProviderMethod(FrameworkMethod testMethod) {

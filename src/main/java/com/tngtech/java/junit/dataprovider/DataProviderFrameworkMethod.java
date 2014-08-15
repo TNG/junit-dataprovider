@@ -37,10 +37,10 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     final String nameFormat;
 
     /**
-     * Create a {@link FrameworkMethod} extended with special attributes for using this test with a data provider.
+     * Create a {@link FrameworkMethod} extended with special attributes for using this test with a dataprovider.
      *
      * @param method test method for which the {@link FrameworkMethod} is created
-     * @param idx the index (row) of the used data provider
+     * @param idx the index (row) of the used dataprovider
      * @param parameters used for invoking this test method
      * @param nameFormat defines the format of the test method name according to {@code @}{@link DataProvider#format()}
      */

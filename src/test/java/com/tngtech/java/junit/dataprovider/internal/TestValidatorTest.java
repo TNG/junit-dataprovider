@@ -177,7 +177,7 @@ public class TestValidatorTest extends BaseTest {
         assertThat(errors).hasSize(1);
         assertThat(errors.get(0)).isInstanceOf(Exception.class);
         assertThat(errors.get(0).getMessage()).matches(
-                "Method testNoArg\\(\\) must have at least one argument for data provider");
+                "Method testNoArg\\(\\) must have at least one argument for dataprovider");
 
         verify(testMethod).getAnnotation(DataProvider.class);
         verify(testMethod).getAnnotation(UseDataProvider.class);

@@ -22,7 +22,7 @@ public class TestValidator {
     }
 
     /**
-     * Checks if the given {@code testMethod} is a valid test method depending on the data provider relevant annotation
+     * Checks if the given {@code testMethod} is a valid test method depending on the dataprovider relevant annotation
      * {@code @}{@link DataProvider} and {@code @}{@link UseDataProvider}. Adds {@link Exception}s to {@code errors} for
      * each invalid property. A normal test method must be is public, void instance method with no arguments. A data
      * provider test method must be is public and void instance method but have a least one argument.
@@ -52,14 +52,14 @@ public class TestValidator {
         } else {
             testMethod.validatePublicVoid(false, errors);
             if (testMethod.getMethod().getParameterTypes().length <= 0) {
-                errors.add(new Exception(String.format("Method %s() must have at least one argument for data provider",
+                errors.add(new Exception(String.format("Method %s() must have at least one argument for dataprovider",
                         testMethod.getName())));
             }
         }
     }
 
     /**
-     * Checks if the given {@code dataProviderMethod} is a valid data provider and adds a {@link Exception} to
+     * Checks if the given {@code dataProviderMethod} is a valid dataprovider and adds a {@link Exception} to
      * {@code errors} if it
      * <ul>
      * <li>is not public,</li>
@@ -92,7 +92,7 @@ public class TestValidator {
 
         Method method = dataProviderMethod.getMethod();
 
-        String messageBasePart = "Data provider method '" + dataProviderMethod.getName() + "' must";
+        String messageBasePart = "Dataprovider method '" + dataProviderMethod.getName() + "' must";
         if (!Modifier.isPublic(method.getModifiers())) {
             errors.add(new Exception(messageBasePart + " be public"));
         }

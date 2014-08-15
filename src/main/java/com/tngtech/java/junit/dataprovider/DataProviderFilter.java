@@ -7,7 +7,7 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 
 /**
- * This custom {@link Filter} filters test methods or even single data provider rows of a test class which is run by
+ * This custom {@link Filter} filters test methods or even single dataprovider rows of a test class which is run by
  * {@link DataProviderRunner}.
  */
 public class DataProviderFilter extends Filter {

@@ -9,10 +9,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Mark a method as a data provider used by a test method or use it directly at the test method and provide data via
+ * Mark a method as a dataprovider used by a test method or use it directly at the test method and provide data via
  * {@link #value()} attribute.
  * <ul>
- * <li><i>Use it on a separate method:</i> The name of the data provider is the the name of the method. The method must
+ * <li><i>Use it on a separate method:</i> The name of the dataprovider is the the name of the method. The method must
  * be static and return an {@link Object}{@code [][]}, a {@link List}{@code <List<Object>>}, or a {@link String}
  * {@code []}. The test method will be called with each "row" of this two-dimensional array. The test method must be
  * annotated with {@code @}{@link UseDataProvider}. This annotation behaves pretty much the same as the
@@ -27,11 +27,12 @@ import java.util.List;
  * {@link String}s using {@code String[] value()}.
  * <p>
  * <b>Note:</b> All parameters of the test method must be primitive types (e.g. {@code char}, {@code int},
- * {@code double}), primitive wrapper types (e.g. {@link Boolean}, {@link Long}), case-sensitive {@link Enum} values,
+ * {@code double}), primitive wrapper types (e.g. {@link Boolean}, {@link Long}), case-sensitive {@link Enum} names,
  * {@link String}s, or types having single-argument {@link String} constructor. The former two are converted using the
  * {@code valueOf(String)} methods of their corresponding wrapper classes or
  * {@code valueOf(Class<? extends Enum<?>>, String)}, respectively. This can cause {@link Exception}s at runtime. A
- * {@link String} must not contain commas! The {@link String} "null" will always be passed as {@code null}.</li>
+ * {@link String} must not contain commas! The {@link String} "null" will be passed as {@code null} or {@link String},
+ * according to {@link #convertNulls()}.</li>
  * </ul>
  * <p>
  * If the test method arguments are retrieved from a regex-separated {@link String}{@code []}, the additional annotation
@@ -81,39 +82,33 @@ public @interface DataProvider {
      * </tr>
      * <tr>
      * <td>{@code %c}</td>
-     * <td>-</td>
      * <td><i>DataProviderRunnerTest</i></td>
      * <td>Simple name of test method class (= {@link Class#getSimpleName()})</td>
      * </tr>
      * <tr>
      * <td>{@code %cc}</td>
-     * <td>-</td>
      * <td><i>com.tngtech.java .junit.dataprovider .DataProviderRunnerTest</i></td>
      * <td>Canonical name of test method class (= {@link Class#getCanonicalName()})</td>
      * </tr>
      * <tr>
      * <td>{@code %m}</td>
-     * <td>-</td>
      * <td><i>testIsEmptyString</i></td>
      * <td>Simple name of test method (= {@link Method#getName()})</td>
      * </tr>
      * <tr>
      * <td>{@code %cm}</td>
-     * <td>-</td>
      * <td><i>com.tngtech.test .java.junit.dataprovider .DataProviderJavaAcceptanceTest
      * .testIsEmptyString(java.lang.String) </i></td>
      * <td>Complete signature of test method (= {@link Method#toString()})</td>
      * </tr>
      * <tr>
      * <td>{@code %i}</td>
-     * <td>-</td>
      * <td><i>13</i></td>
-     * <td>Index of the data provider test of current test method (starting at {@code 0}). Useful to generate unique
-     * test method descriptions.</td>
+     * <td>Index of the dataprovider test of current test method (starting at {@code 0}). Useful to generate unique test
+     * method descriptions.</td>
      * </tr>
      * <tr>
      * <td>{@code %p[x]}</td>
-     * <td>-</td>
      * <td><i>test, &lt;null&gt;, 4</i></td>
      * <td>Subscripting all parameters by positive or negative index (1.) and range (2.). All indices may either be
      * positive (starting at {@code 0} and increment) to number parameters from the beginning or negative (starting from
@@ -132,7 +127,7 @@ public @interface DataProvider {
      * parameters array length</td>
      * </tr>
      * </table>
-     * *Hints:*
+     * <b>Hints:</b>
      * <ul>
      * <li>A produced test method name should be unique among all other in the same class.</li>
      * <li>Every above listed parameter can be used multiple times</li>
