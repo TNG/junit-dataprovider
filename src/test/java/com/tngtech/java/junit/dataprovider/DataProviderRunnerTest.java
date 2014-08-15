@@ -2,8 +2,11 @@ package com.tngtech.java.junit.dataprovider;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.IsSame.sameInstance;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -12,13 +15,24 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runners.ParentRunner;
+import org.junit.experimental.categories.Categories;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.Description;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -28,6 +42,9 @@ import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
 public class DataProviderRunnerTest extends BaseTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Spy
     private DataProviderRunner underTest;
@@ -214,6 +231,59 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
+    public void testClassBlockReturnNewStatement() {
+        // Given:
+        RunNotifier notifier = mock(RunNotifier.class);
+
+        // When:
+        Statement result = underTest.classBlock(notifier);
+
+        // Then:
+        assertThat(result).isNotNull();
+        verifyZeroInteractions(notifier);
+    }
+
+    @Test
+    public void testClassBlockReturnedStatementShouldRethrowKeptFailureOnEvaluate() throws Throwable {
+        // Given:
+        underTest.failure = new Throwable();
+
+        RunNotifier notifier = mock(RunNotifier.class);
+        Statement statement = underTest.classBlock(notifier);
+
+        expectedException.expect(sameInstance(underTest.failure));
+
+        // When:
+        statement.evaluate();
+
+        // Then:
+        verifyZeroInteractions(notifier);
+    }
+
+    @Test
+    public void testClassBlockShouldEvaluateChildrenInvokerStatementIfNoFailureIsKept() throws Throwable {
+        // Given:
+        underTest.failure = null;
+        final AtomicBoolean evaluatedStatement = new AtomicBoolean(false);
+
+        RunNotifier notifier = mock(RunNotifier.class);
+        doReturn(new Statement() {
+            @Override
+            public void evaluate() {
+                evaluatedStatement.set(true);
+            }
+        }).when(underTest).childrenInvoker(notifier);
+        Statement statement = underTest.classBlock(notifier); // must be after spying childrenInvoker(...)
+
+        // When:
+        statement.evaluate();
+
+        // Then:
+        assertThat(evaluatedStatement.get()).isTrue();
+        verifyZeroInteractions(notifier);
+    }
+
+
     public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
         // Given:
         underTest.computedTestMethods = null;
@@ -265,6 +335,39 @@ public class DataProviderRunnerTest extends BaseTest {
 
         Object actualFilter = getPrivateField(DataProviderFilter.class, "filter", actual);
         assertThat(actualFilter).isEqualTo(filter);
+    }
+
+    @Test
+    public void testInvokeBeforeClassShouldNotThrowButStoreFailure() throws Throwable {
+        // Given:
+        Throwable t = new Throwable();
+
+        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(BeforeClass.class);
+        doThrow(t).when(testMethod).invokeExplosively(null);
+
+        // When:
+        underTest.invokeBeforeClass();
+
+        // Then:
+        assertThat(underTest.failure).isSameAs(t);
+    }
+
+    @Test
+    public void testInvokeBeforeClassShouldRunAllFoundBeforeClassMethods() throws Throwable {
+        // Given:
+        FrameworkMethod testMethod2 = mock(FrameworkMethod.class);
+        FrameworkMethod testMethod3 = mock(FrameworkMethod.class);
+
+        doReturn(asList(testMethod, testMethod2, testMethod3)).when(testClass).getAnnotatedMethods(BeforeClass.class);
+
+        // When:
+        underTest.invokeBeforeClass();
+
+        // Then:
+        InOrder inOrder = inOrder(testMethod, testMethod2, testMethod3);
+        inOrder.verify(testMethod).invokeExplosively(null);
+        inOrder.verify(testMethod2).invokeExplosively(null);
+        inOrder.verify(testMethod3).invokeExplosively(null);
     }
 
     @Test
