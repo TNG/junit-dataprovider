@@ -18,8 +18,9 @@ import java.util.List;
  * annotated with {@code @}{@link UseDataProvider}. This annotation behaves pretty much the same as the
  * {@code @DataProvider} annotation from <a href="http://testng.org/">TestNG</a>.
  * <p>
- * <b>Note:</b> The name of the test method in the JUnit result will be the name of the test method (annotated by
- * {@code @}{@link UseDataProvider}) suffixed by the parameters.</li>
+ * <b>Note:</b> The name of the test method in the JUnit result will by default be the name of the test method
+ * (annotated by {@code @}{@link UseDataProvider}) suffixed by the parameters, can be changed by customizing
+ * {@link #format()}.</li>
  * <li>
  * <p>
  * <i>Use it directly on test method:</i> Provide all the data for the test method parameters as regex-separated
