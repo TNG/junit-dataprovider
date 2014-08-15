@@ -5,7 +5,7 @@
 junit-dataprovider
 ==================
 
-All the documenation, usage examples and further information are located in this repositories [wiki](/TNG/junit-dataprovider/wiki/) pages.
+Have a look to this repositories [Wiki](/TNG/junit-dataprovider/wiki/) pages for documenation, usage examples and further information.
 
 #### Table of contents
 
