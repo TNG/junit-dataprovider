@@ -58,7 +58,7 @@ public abstract class BasePlaceholder {
 
         Matcher matcher = pattern.matcher(formatPattern);
         while (matcher.find()) {
-            matcher.appendReplacement(sb, getReplacementFor(matcher.group()));
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(getReplacementFor(matcher.group())));
         }
         matcher.appendTail(sb);
         return sb.toString();

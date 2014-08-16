@@ -152,4 +152,28 @@ public class BasePlaceholderTest extends BaseTest {
         // Then:
         assertThat(result).isEqualTo("abc%s%sabc%s%");
     }
+
+    @Test
+    public void testProcessShouldHandleDollarSignsCorrectly() {
+        // Given:
+        BasePlaceholder underTest = new TestPlaceholder("%s", "$");
+
+        // When:
+        String result = underTest.process("%s");
+
+        // Then:
+        assertThat(result).isEqualTo("$");
+    }
+
+    @Test
+    public void testProcessShouldHandleBackslashesCorrectly() {
+        // Given:
+        BasePlaceholder underTest = new TestPlaceholder("%s", "\\");
+
+        // When:
+        String result = underTest.process("%s");
+
+        // Then:
+        assertThat(result).isEqualTo("\\");
+    }
 }
