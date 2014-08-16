@@ -450,13 +450,13 @@ public class ParameterPlaceholderTest extends BaseTest {
         // Given:
         Date now = new Date();
         // @formatter:off
-                final Object[] parameters = new Object[] {
-                        now,
-                        Double.valueOf(3.5),
-                        new StringBuilder("1").append("|2").append("|3"),
-                        new File("src/main/java/com/tngtech"),
-                    };
-                // @formatter:on
+        final Object[] parameters = new Object[] {
+                now,
+                Double.valueOf(3.5),
+                new StringBuilder("1").append("|2").append("|3"),
+                new File("src/main/java/com/tngtech"),
+            };
+        // @formatter:on
 
         // When:
         String result = underTest.formatAll(parameters);
