@@ -3,16 +3,12 @@ package com.tngtech.java.junit.dataprovider;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.internal.runners.statements.RunBefores;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
@@ -27,14 +23,6 @@ import com.tngtech.java.junit.dataprovider.internal.TestValidator;
  * additionally.
  */
 public class DataProviderRunner extends BlockJUnit4ClassRunner {
-
-    /** Empty {@link Statement} which does nothing at {@link Statement#evaluate()}. */
-    private static final Statement STATEMENT_EMPTY = new Statement() {
-        @Override
-        public void evaluate() {
-            // do nothing
-        }
-    };
 
     /**
      * The {@link DataConverter} to be used to convert from supported return types of any dataprovider to {@link List}
@@ -62,15 +50,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * </p>
      */
     TestGenerator testGenerator;
-
-    /**
-     * Stored failure within processing of {@code @}{@link BeforeClass} methods in {@link #invokeBeforeClass()} for
-     * later processing in {@link #run(RunNotifier)}.
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
-     */
-    Throwable failure;
 
     /**
      * Cached result of {@link #computeTestMethods()}.
@@ -140,46 +119,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Overridden due to {@code @}{@link BeforeClass} methods are already processed, see {@link #computeTestMethods()}
-     * and {@link #invokeBeforeClass()}. Just add a {@link Statement} which is processing potential caught
-     * {@link Throwable} while {@code @BeforeClass} methods have been executed before.
-     *
-     * @param notifier to be used while processing {@link Statement}, e.g. for setup, children and tear down
-     * @return {@code Statement} to be evaluated
-     */
-    @Override
-    protected Statement classBlock(final RunNotifier notifier) {
-        final Statement statement = childrenInvoker(notifier);
-        // Instead of calling withBeforeClasses(statement) just re-throw failure while it was processed before
-        Statement newStatement = new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                if (failure != null) {
-                    throw failure;
-                }
-                statement.evaluate();
-            }
-        };
-        newStatement = withAfterClasses(newStatement);
-        return newStatement;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Just overridden to make {@link #classBlock(RunNotifier)} testable. Just invokes {@code super}.
-     *
-     * @param notifier to be used while processing children
-     * @return {@code Statement} to be evaluated to invoke children
-     */
-    @Override
-    protected Statement childrenInvoker(RunNotifier notifier) {
-        return super.childrenInvoker(notifier);
-    }
-
-    /**
      * Generates the exploded list of methods that run tests. All methods annotated with {@code @Test} on this class and
      * super classes that are not overridden are checked if they use a {@code @}{@link DataProvider} or not. If yes, for
      * each row of the {@link DataProvider}s result a specific, parameterized test method will be added. If not, the
@@ -193,7 +132,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
         if (computedTestMethods == null) {
-            invokeBeforeClass();
             // Further method for generation is required due to stubbing of "super.computeTestMethods()" is not possible
             computedTestMethods = generateExplodedTestMethodsFor(super.computeTestMethods());
         }
@@ -219,26 +157,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      */
     TestClass getTestClassInt() {
         return getTestClass();
-    }
-
-    /**
-     * Runs {@code @}{@link BeforeClass} methods original implementation in {@link #withBeforeClasses(Statement)} and
-     * {@link #run(RunNotifier)} would do it later. Stores possible {@link Exception}s in {@link #failure} that it can
-     * be processed later in {@link #run(RunNotifier)}.
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     */
-    void invokeBeforeClass() {
-        // run @BeforeClass methods before exploding test methods
-        List<FrameworkMethod> befores = getTestClassInt().getAnnotatedMethods(BeforeClass.class);
-        if (!befores.isEmpty()) {
-            try {
-                new RunBefores(STATEMENT_EMPTY, befores, null).evaluate();
-            } catch (Throwable e) {
-                failure = e;
-            }
-        }
     }
 
     /**

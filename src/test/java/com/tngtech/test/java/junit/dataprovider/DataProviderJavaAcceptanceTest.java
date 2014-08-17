@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.FrameworkMethod;
@@ -25,15 +24,6 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 @RunWith(DataProviderRunner.class)
 public class DataProviderJavaAcceptanceTest {
-
-    private static String emptyString = null;
-    private static String notEmptyString = null;
-
-    @BeforeClass
-    public static void setup() {
-        emptyString = "";
-        notEmptyString = "notEmpty";
-    }
 
     @Test
     public void testAddWithoutDataProvider() {
@@ -66,25 +56,6 @@ public class DataProviderJavaAcceptanceTest {
 
         // Then:
         assertThat(isEmpty).isTrue();
-    }
-
-    @DataProvider
-    public static Object[][] dataProviderNotNullStringsSetInBeforeClass() {
-        // @formatter:off
-        return new Object[][] {
-                { emptyString },
-                { notEmptyString },
-        };
-        // @formatter:on
-    }
-
-    @Test
-    @UseDataProvider("dataProviderNotNullStringsSetInBeforeClass")
-    public void testNotNullStringsSetInBeforeClass(String str) {
-        // Given:
-
-        // Expected:
-        assertThat(str != null).isTrue();
     }
 
     @Test
