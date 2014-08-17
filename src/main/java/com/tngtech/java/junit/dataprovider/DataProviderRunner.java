@@ -139,6 +139,11 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
     }
 
+    @Override
+    public Statement classBlock(final RunNotifier notifier) {
+        return super.classBlock(notifier);
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -146,12 +151,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * and {@link #invokeBeforeClass()}. Just add a {@link Statement} which is processing potential caught
      * {@link Throwable} while {@code @BeforeClass} methods have been executed before.
      *
-     * @param notifier to be used while processing {@link Statement}, e.g. for setup, children and tear down
      * @return {@code Statement} to be evaluated
      */
     @Override
-    protected Statement classBlock(final RunNotifier notifier) {
-        final Statement statement = childrenInvoker(notifier);
+    protected Statement withBeforeClasses(final Statement statement) {
         // Instead of calling withBeforeClasses(statement) just re-throw failure while it was processed before
         Statement newStatement = new Statement() {
             @Override
@@ -162,7 +165,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
                 statement.evaluate();
             }
         };
-        newStatement = withAfterClasses(newStatement);
         return newStatement;
     }
 
