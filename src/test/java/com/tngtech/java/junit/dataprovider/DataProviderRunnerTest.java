@@ -319,7 +319,7 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("Does not work with JUnit 4.11 anymore")
     public void testFilterShouldWrapGivenFilterWithDataProviderFilter() throws Exception {
         // Given:
         Filter filter = Filter.ALL;
