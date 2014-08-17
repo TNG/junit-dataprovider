@@ -4,7 +4,7 @@
 
     <groupId>com.tngtech.java</groupId>
     <artifactId>junit-dataprovider</artifactId>
-    <version>1.8.1-SNAPSHOT</version>
+    <version>1.9.1</version>
     <packaging>jar</packaging>
 
     <name>junit-dataprovider</name>
