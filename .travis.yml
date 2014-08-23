@@ -1,7 +1,10 @@
 language: java
 
 script:
-  - gradle build
+  - ./gradlew build -PjunitVersion=4.8.2
+  - ./gradlew build -PjunitVersion=4.9
+  - ./gradlew build -PjunitVersion=4.10
+  - ./gradlew build -PjunitVersion=4.11
   - mvn test
   - ant test
 
@@ -11,4 +14,4 @@ jdk:
   - openjdk6
 
 after_success:
-  - gradle jacocoTestReport coveralls
+  - ./gradlew jacocoTestReport coveralls

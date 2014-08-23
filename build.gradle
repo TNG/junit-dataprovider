@@ -26,13 +26,17 @@ sourceCompatibility = '1.5'
 ext {
     isBuildOnJenkins = System.env['BUILD_TAG']?.startsWith('jenkins-') ?: false
 }
+if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
+    ext.junitVersion = '4.8.2'
+}
+println "Using junit version ${junitVersion} for current build."
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile group: 'junit', name: 'junit-dep', version: '4.8.2'
+    compile group: 'junit', name: 'junit-dep', version: junitVersion
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
     
     testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.0.8'
