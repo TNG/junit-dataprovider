@@ -9,16 +9,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.manipulation.Filter;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.ParentRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
 import org.mockito.Mock;
@@ -254,22 +249,6 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testFilterShouldWrapGivenFilterWithDataProviderFilter() throws Exception {
-        // Given:
-        Filter filter = Filter.ALL;
-
-        // When:
-        underTest.filter(filter);
-
-        // Then:
-        Object actual = getPrivateField(ParentRunner.class, "fFilter", underTest);
-        assertThat(actual).isInstanceOf(DataProviderFilter.class);
-
-        Object actualFilter = getPrivateField(DataProviderFilter.class, "filter", actual);
-        assertThat(actualFilter).isEqualTo(filter);
-    }
-
-    @Test
     public void testGenerateExplodedTestMethodsForShouldReturnEmptyListIfArgumentIsNull() {
         // Given:
 
@@ -447,13 +426,5 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(result).isNotNull();
         // assertThat(result.getJavaClass()).isEqualTo(dataProviderLocation);
         assertThat(result.getName()).isEqualTo(dataProviderLocation.getName());
-    }
-
-    // -- helper methods -----------------------------------------------------------------------------------------------
-
-    private Object getPrivateField(Class<?> clazz, String fieldName, Object instance) throws Exception {
-        Field filterField = clazz.getDeclaredField(fieldName);
-        filterField.setAccessible(true);
-        return filterField.get(instance);
     }
 }
