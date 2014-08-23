@@ -2,9 +2,9 @@ language: java
 
 script:
   - ./gradlew build
-  - ./gradlew build -PjunitVersion=4.9
-  - ./gradlew build -PjunitVersion=4.10
-  - ./gradlew build -PjunitVersion=4.11
+  - ./gradlew build -PjunitVersion=4.9  -PskipFindBugs
+  - ./gradlew build -PjunitVersion=4.10 -PskipFindBugs
+  - ./gradlew build -PjunitVersion=4.11 -PskipFindBugs
   - mvn test
   - ant test
 

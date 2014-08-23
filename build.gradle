@@ -29,7 +29,8 @@ ext {
 if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
     ext.junitVersion = '4.8.2'
 }
-println "Using junit version ${junitVersion} for current build."
+ext.skipFindBugs = hasProperty('skipFindBugs')
+println "Using junit version ${junitVersion} for current build (skipFindBugs = ${skipFindBugs})."
 
 repositories {
     mavenCentral()
@@ -101,6 +102,9 @@ jacoco {
 findbugs {
     toolVersion = '2.0.3'
     ignoreFailures = true
+}
+tasks.withType(FindBugs).each { task ->
+    task.enabled = !skipFindBugs
 }
 
 tasks.cpd {
