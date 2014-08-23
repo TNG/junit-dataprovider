@@ -2,6 +2,7 @@ package com.tngtech.test.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +45,11 @@ public class CustomPlaceholderAcceptanceTest {
     @BeforeClass
     public static void setup() {
         Placeholders.all().add(0, new StripParameterLengthPlaceholder(10));
+    }
+
+    @AfterClass
+    public static void teardown() {
+        Placeholders.reset();
     }
 
     @Test
