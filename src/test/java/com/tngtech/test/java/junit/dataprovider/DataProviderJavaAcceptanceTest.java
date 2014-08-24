@@ -26,6 +26,15 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 @RunWith(DataProviderRunner.class)
 public class DataProviderJavaAcceptanceTest {
 
+    private static String emptyString = null;
+    private static String notEmptyString = null;
+
+    @BeforeClass
+    public static void setup() {
+        emptyString = "";
+        notEmptyString = "notEmpty";
+    }
+
     @Test
     public void testAddWithoutDataProvider() {
         // Given:
@@ -57,6 +66,25 @@ public class DataProviderJavaAcceptanceTest {
 
         // Then:
         assertThat(isEmpty).isTrue();
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderNotNullStringsSetInBeforeClass() {
+        // @formatter:off
+        return new Object[][] {
+                { emptyString },
+                { notEmptyString },
+        };
+        // @formatter:on
+    }
+
+    @Test
+    @UseDataProvider("dataProviderNotNullStringsSetInBeforeClass")
+    public void testNotNullStringsSetInBeforeClass(String str) {
+        // Given:
+
+        // Expected:
+        assertThat(str != null).isTrue();
     }
 
     @Test
@@ -289,25 +317,5 @@ public class DataProviderJavaAcceptanceTest {
     public void testThatUsesUniversalDataProvider(String testData) {
         // Expect:
         assertThat(testData).isEqualTo("testdata.csv");
-    }
-
-    protected static boolean setupedBeforeClass = false;
-    protected static boolean setupedClassRule = false;
-
-    @BeforeClass
-    public static void setupClass() {
-        setupedBeforeClass = true;
-    }
-
-    @DataProvider
-    public static Object[][] dataProviderBooleanVariableFromSetup() {
-        return new Object[][] { { setupedBeforeClass } };
-    }
-
-    @Test
-    @UseDataProvider("dataProviderBooleanVariableFromSetup")
-    public void testBooleanVariablesFromSetup(boolean setuped) {
-        // Expected:
-        assertThat(setuped).as("@BeforeClass not invoked before dataprovider").isTrue();
     }
 }
