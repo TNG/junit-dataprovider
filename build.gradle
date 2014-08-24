@@ -19,20 +19,25 @@ buildscript {
 
 description = 'A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit features.'
 group = 'com.tngtech.java'
-version = '1.9.1-SNAPSHOT'
+version = '1.9.2-SNAPSHOT'
 
 sourceCompatibility = '1.5'
 
 ext {
     isBuildOnJenkins = System.env['BUILD_TAG']?.startsWith('jenkins-') ?: false
 }
+if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
+    ext.junitVersion = '4.8.2'
+}
+ext.skipFindBugs = hasProperty('skipFindBugs')
+println "Using junit version ${junitVersion} for current build (skipFindBugs = ${skipFindBugs})."
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile group: 'junit', name: 'junit-dep', version: '4.8.2'
+    compile group: 'junit', name: 'junit-dep', version: junitVersion
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
 
     testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.0.8'
@@ -99,6 +104,9 @@ findbugs {
     toolVersion = '2.0.3'
     ignoreFailures = true
 }
+tasks.withType(FindBugs).each { task ->
+    task.enabled = !skipFindBugs
+}
 
 tasks.cpd {
     minimumTokenCount = 25
@@ -164,6 +172,13 @@ uploadArchives {
                             name 'The Apache Software License, Version 2.0'
                             url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                             distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'aaschmid'
+                            name 'Andreas Schmid'
                         }
                     }
                 }
