@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.FrameworkMethod;
@@ -271,6 +272,7 @@ public class DataProviderJavaAcceptanceTest {
         }
 
         Format format();
+
         String value();
     }
 
@@ -287,5 +289,25 @@ public class DataProviderJavaAcceptanceTest {
     public void testThatUsesUniversalDataProvider(String testData) {
         // Expect:
         assertThat(testData).isEqualTo("testdata.csv");
+    }
+
+    protected static boolean setupedBeforeClass = false;
+    protected static boolean setupedClassRule = false;
+
+    @BeforeClass
+    public static void setupClass() {
+        setupedBeforeClass = true;
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderBooleanVariableFromSetup() {
+        return new Object[][] { { setupedBeforeClass } };
+    }
+
+    @Test
+    @UseDataProvider("dataProviderBooleanVariableFromSetup")
+    public void testBooleanVariablesFromSetup(boolean setuped) {
+        // Expected:
+        assertThat(setuped).as("@BeforeClass not invoked before dataprovider").isTrue();
     }
 }

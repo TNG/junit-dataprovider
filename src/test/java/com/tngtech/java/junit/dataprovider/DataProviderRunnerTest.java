@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -11,14 +12,15 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -28,6 +30,8 @@ import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
 public class DataProviderRunnerTest extends BaseTest {
+
+    private static Throwable classSetupException = null;
 
     @Spy
     private DataProviderRunner underTest;
@@ -51,8 +55,17 @@ public class DataProviderRunnerTest extends BaseTest {
     @Mock
     private DataProvider dataProvider;
 
+    @BeforeClass
+    public static void classSetup() throws Throwable {
+        if (classSetupException != null) {
+            throw classSetupException;
+        }
+    }
+
     @Before
     public void setup() throws Exception {
+        classSetupException = null;
+
         underTest = new DataProviderRunner(DataProviderRunnerTest.class);
 
         MockitoAnnotations.initMocks(this);
@@ -214,6 +227,50 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
+    public void testWithBeforeClassesShouldReturnNewStatementWrapingGivenStatementWhichShouldBeExecutedOnEvaluation()
+            throws Throwable {
+        // Given:
+        final AtomicBoolean evaluated = new AtomicBoolean(false);
+
+        Statement statement = new Statement() {
+            @Override
+            public void evaluate() {
+                evaluated.set(true);
+            }
+        };
+
+        // When:
+        Statement result = underTest.withBeforeClasses(statement);
+
+        // Then:
+        assertThat(result).isNotNull();
+        assertThat(evaluated.get()).isFalse();
+        result.evaluate();
+        assertThat(evaluated.get()).isTrue();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWithBeforeClassesShouldReturnNewStatementWrapingGivenStatementWhichThrowsStoredFailureOnEvaluation()
+            throws Throwable {
+        // Given:
+        underTest.failure = new IllegalArgumentException();
+
+        Statement statement = new Statement() {
+            @Override
+            public void evaluate() {
+                // to nothing
+            }
+        };
+
+        // When:
+        Statement result = underTest.withBeforeClasses(statement);
+
+        // Then:
+        assertThat(result).isNotNull();
+        result.evaluate();
+    }
+
+    @Test
     public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
         // Given:
         underTest.computedTestMethods = null;
@@ -226,8 +283,10 @@ public class DataProviderRunnerTest extends BaseTest {
         // Then:
         assertThat(result).isEqualTo(underTest.computedTestMethods);
 
-        verify(underTest).computeTestMethods();
-        verify(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
+        InOrder inOrder = inOrder(underTest);
+        inOrder.verify(underTest).computeTestMethods();
+        inOrder.verify(underTest).invokeBeforeClass();
+        inOrder.verify(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
         verifyNoMoreInteractions(underTest);
     }
 
@@ -252,36 +311,17 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testInvokeBeforeClassShouldNotThrowButStoreFailure() throws Throwable {
+    public void testInvokeBeforeClassShouldNotThrowButStoreFailure() {
         // Given:
         Throwable t = new Throwable();
 
-        doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(BeforeClass.class);
-        doThrow(t).when(testMethod).invokeExplosively(null);
+        classSetupException = t;
 
         // When:
         underTest.invokeBeforeClass();
 
         // Then:
         assertThat(underTest.failure).isSameAs(t);
-    }
-
-    @Test
-    public void testInvokeBeforeClassShouldRunAllFoundBeforeClassMethods() throws Throwable {
-        // Given:
-        FrameworkMethod testMethod2 = mock(FrameworkMethod.class);
-        FrameworkMethod testMethod3 = mock(FrameworkMethod.class);
-
-        doReturn(asList(testMethod, testMethod2, testMethod3)).when(testClass).getAnnotatedMethods(BeforeClass.class);
-
-        // When:
-        underTest.invokeBeforeClass();
-
-        // Then:
-        InOrder inOrder = inOrder(testMethod, testMethod2, testMethod3);
-        inOrder.verify(testMethod).invokeExplosively(null);
-        inOrder.verify(testMethod2).invokeExplosively(null);
-        inOrder.verify(testMethod3).invokeExplosively(null);
     }
 
     @Test
