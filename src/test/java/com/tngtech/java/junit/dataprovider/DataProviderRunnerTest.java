@@ -31,7 +31,8 @@ import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
 public class DataProviderRunnerTest extends BaseTest {
 
-    private static Throwable classSetupException = null;
+    // for testing exceptions in @BeforeClass
+    private static volatile Throwable classSetupException = null;
 
     @Spy
     private DataProviderRunner underTest;
@@ -62,6 +63,7 @@ public class DataProviderRunnerTest extends BaseTest {
         }
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @Before
     public void setup() throws Exception {
         classSetupException = null;
@@ -310,6 +312,7 @@ public class DataProviderRunnerTest extends BaseTest {
         verifyNoMoreInteractions(underTest);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @Test
     public void testInvokeBeforeClassShouldNotThrowButStoreFailure() {
         // Given:
