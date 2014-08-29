@@ -52,10 +52,9 @@ public class DataProviders {
      * @return an array which contains {@link Object} arrays for each single argument
      */
     public static Object[][] testForEach(Object... args) {
-        int idx = 0;
         Object[][] result = new Object[args.length][1];
-        for (Object arg : args) {
-            result[idx++][0] = arg;
+        for (int idx = 0; idx < args.length; idx++) {
+            result[idx][0] = args[idx];
         }
         return result;
     }
