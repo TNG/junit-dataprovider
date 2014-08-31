@@ -22,7 +22,6 @@ import com.tngtech.java.junit.dataprovider.internal.placeholder.SimpleMethodName
  *     static {
  *         Placeholders.all().add(0, new MyFancyParameterPlaceholder());
  *     }
- *
  *     // ...
  * }
  * </code>
