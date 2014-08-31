@@ -33,4 +33,4 @@ Have a look to this repositories [Wiki](/../../wiki/) pages for documenation, us
 Contributing
 ------------
 
-You are very welcome to contribute by providing a patch/pull request.
+You are very welcome to contribute by providing a patch/pull request, see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
