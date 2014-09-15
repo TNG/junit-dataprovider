@@ -518,6 +518,85 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
+    public void testCheckTestMethodArgumentsShouldBeAwareOfWideningPrimitiveConversionsOfByte() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5 });
+
+        Class<?>[] parameterTypes = new Class<?>[] { short.class, int.class, long.class, float.class, double.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldBeAwareOfWideningPrimitiveConversionsOfShort() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { (short) 1, (short) 2, (short) 3, (short) 4 });
+
+        Class<?>[] parameterTypes = new Class<?>[] { int.class, long.class, float.class, double.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldBeAwareOfWideningPrimitiveConversionsOfChar() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { (char) 1, (char) 2, (char) 3, (char) 4 });
+
+        Class<?>[] parameterTypes = new Class<?>[] { int.class, long.class, float.class, double.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldBeAwareOfWideningPrimitiveConversionsOfInt() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { (int) 1, (int) 2, (int) 3 });
+
+        /* int to long, float, or double */
+        Class<?>[] parameterTypes = new Class<?>[] { long.class, float.class, double.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test
+    public void testCheckTestMethodArgumentsShouldBeAwareOfWideningPrimitiveConversionsOfFloat() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { (float) 1 });
+
+        Class<?>[] parameterTypes = new Class<?>[] { float.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then:
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckTestMethodArgumentsShouldThrowExceptionForNonWideningConversionsOfLong() {
+        // Given:
+        List<Object[]> arguments = listOfArrays(new Object[] { (long) 1 });
+
+        Class<?>[] parameterTypes = new Class<?>[] { int.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then: expect exception
+    }
+
+    @Test
     public void testGetParametersForShouldCorrectlyParseAllPrimitiveTypes() {
         // Given:
         String data = "true,1,c,2,3,4,5.5,6.6";

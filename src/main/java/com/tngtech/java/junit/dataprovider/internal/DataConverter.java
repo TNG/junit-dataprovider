@@ -123,7 +123,8 @@ public class DataConverter {
                 Object object = objects[idx];
                 if (object != null) {
                     Class<?> paramType = parameterTypes[idx];
-                    if (!paramType.isInstance(object) && !isWrappedInstance(paramType, object)) {
+                    if (!paramType.isInstance(object) && !isWrappedInstance(paramType, object)
+                            && !isWideningConversion(paramType, object)) {
                         throw new IllegalArgumentException(String.format(
                                 "Parameter %d is of type %s but argument given is %s of type %s", idx,
                                 paramType.getSimpleName(), object, object.getClass().getSimpleName()));
@@ -241,6 +242,35 @@ public class DataConverter {
                 || (long.class.equals(clazz) && Long.class.isInstance(object))
                 || (short.class.equals(clazz) && Short.class.isInstance(object))
                 || (void.class.equals(clazz) && Void.class.isInstance(object));
+    }
+
+    private boolean isWideningConversion(Class<?> clazz, Object object) {
+        // byte to short, int, long, float, or double
+        if ((short.class.equals(clazz) || int.class.equals(clazz) || long.class.equals(clazz)
+                || float.class.equals(clazz) || double.class.equals(clazz))
+                && Byte.class.isInstance(object)) {
+            return true;
+        }
+
+        // short or char to int, long, float, or double
+        if ((int.class.equals(clazz) || long.class.equals(clazz) || float.class.equals(clazz) || double.class
+                .equals(clazz)) && (Short.class.isInstance(object) || Character.class.isInstance(object))) {
+            return true;
+        }
+        // int to long, float, or double
+        if ((long.class.equals(clazz) || float.class.equals(clazz) || double.class.equals(clazz))
+                && Integer.class.isInstance(object)) {
+            return true;
+        }
+        // long to float or double
+        if ((float.class.equals(clazz) || double.class.equals(clazz)) && Long.class.isInstance(object)) {
+            return true;
+        }
+        // float to double
+        if ((double.class.equals(clazz)) && Double.class.isInstance(object)) {
+            return true;
+        }
+        return false;
     }
 
     private Object convertToChar(String str, Class<?> charType) {

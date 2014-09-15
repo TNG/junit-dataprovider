@@ -153,6 +153,33 @@ public class DataProviderJavaAcceptanceTest {
     }
 
     @DataProvider
+    public static Object[][] dataProviderMinus() {
+        // @formatter:off
+        return $$(
+                $(  0,  0,  0 ),
+                $(  0,  1, -1 ),
+                $(  0, -1,  1 ),
+                $(  1,  0,  1 ),
+                $(  1,  1,  0 ),
+                $( -1,  0, -1 ),
+                $( -1, -1,  0 )
+        );
+        // @formatter:on
+    }
+
+    @Test
+    @UseDataProvider("dataProviderMinus")
+    public void testMinus(long a, long b, long expected) {
+        // Given:
+
+        // When:
+        long result = a - b;
+
+        // Then:
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @DataProvider
     public static Object[][] dataProviderWithNonConstantObjects() {
         Calendar yesterday = Calendar.getInstance();
         yesterday.add(Calendar.DAY_OF_MONTH, -1);
