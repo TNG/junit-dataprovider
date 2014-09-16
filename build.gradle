@@ -1,4 +1,4 @@
-apply plugin: 'coveralls'
+apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'eclipse'
 apply plugin: 'groovy'
 apply plugin: 'jacoco'
@@ -12,7 +12,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.4.0'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.0'
         classpath 'de.aaschmid.gradle.plugins:gradle-cpd-plugin:0.1'
     }
 }
