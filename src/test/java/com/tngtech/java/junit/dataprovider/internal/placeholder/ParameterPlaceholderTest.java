@@ -290,6 +290,66 @@ public class ParameterPlaceholderTest extends BaseTest {
     }
 
     @Test
+    public void testFormatAllReplacesCarriageReturnWithTheirPrintableCounterpart() {
+        // Given:
+        final Object[] parameters = new Object[] { "\r" };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("\\r");
+    }
+
+    @Test
+    public void testFormatAllReplacesCarriageReturnsWithTheirPrintableCounterpartEvenIfWithText() {
+        // Given:
+        final Object[] parameters = new Object[] { "test\rtest\r" };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("test\\rtest\\r");
+    }
+
+    @Test
+    public void testFormatAllReplacesLineFeedWithTheirPrintableCounterpart() {
+        // Given:
+        final Object[] parameters = new Object[] { "\n" };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("\\n");
+    }
+
+    @Test
+    public void testFormatAllReplacesLineFeedsWithTheirPrintableCounterpartEvenIfWithText() {
+        // Given:
+        final Object[] parameters = new Object[] { "1\n2\n3" };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("1\\n2\\n3");
+    }
+
+    @Test
+    public void testFormatAllReplacesCarriageReturnsAndLineFeedsWithTheirPrintableCounterpart() {
+        // Given:
+        final Object[] parameters = new Object[] { "A very\r\nlong text\nwith multiple\rdifferent newline\n\rvariations." };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("A very\\r\\nlong text\\nwith multiple\\rdifferent newline\\n\\rvariations.");
+    }
+
+    @Test
     public void testFormatAllHandleObjectArrayCorrectly() {
         // Given:
         final Object[] parameters = new Object[] { new Object[] { 7.5, "test" } };
