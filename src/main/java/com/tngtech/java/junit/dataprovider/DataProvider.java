@@ -48,7 +48,7 @@ public @interface DataProvider {
 
     /**
      * The delimiting regular expression by which the regex-separated {@link String}s given by {@link #value()} or
-     * returned by the method annotated with {@code @}{@link DataProvider} are split.
+     * returned by the method annotated with {@code @}{@link DataProvider} are split. Default is {@code ","}.
      *
      * @see String#split(String)
      */
@@ -57,13 +57,14 @@ public @interface DataProvider {
     /**
      * Determines if every "null"-{@link String} in {@link #value()} or returned by the method annotated with {@code @}
      * {@link DataProvider} should be converted to {@code null} (= {@code true} ) or used as {@link String} (=
-     * {@code false}).
+     * {@code false}). Default is {@code true}.
      */
     boolean convertNulls() default true;
 
     /**
      * {@code true} if leading and trailing whitespace should be omitted in split {@link String}s given by
      * {@link #value()} or returned by the method annotated with {@code @}{@link DataProvider}, {@code false} otherwise.
+     * Default is {@code true}.
      *
      * @see String#trim()
      */
@@ -132,6 +133,7 @@ public @interface DataProvider {
      * <li>A produced test method name should be unique among all other in the same class.</li>
      * <li>Every above listed parameter can be used multiple times</li>
      * </ul>
+     * Default is {@code "%m[%i: %p[0..-1]]"}.
      */
     String format() default "%m[%i: %p[0..-1]]";
 }
