@@ -339,7 +339,7 @@ public class DataProviderFilterTest extends BaseTest {
     }
 
     @Test
-    public void testDescriptionPatternShouldMatchescriptionWithParamsContainingParentheses() {
+    public void testDescriptionPatternShouldMatchDescriptionWithParamsContainingParentheses() {
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: (test)](Clazz)");
 
@@ -401,7 +401,7 @@ public class DataProviderFilterTest extends BaseTest {
     }
 
     @Test
-    public void testGenerousDescriptionPatternShouldMatchDescriptionAndWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
+    public void testGenerousDescriptionPatternShouldMatchDescriptionContainingCorrectMethodNameAndClazz() {
         // Given:
         Matcher matcher = DataProviderFilter.GENEROUS_DESCRIPTION_PATTERN.matcher("testMain whatever => ignore(Clazz)");
 
@@ -411,6 +411,18 @@ public class DataProviderFilterTest extends BaseTest {
         // Then:
         assertThat(result).isTrue();
         assertThatMatcherGroupsAre(matcher, "testMain", " whatever => ignore", " whatever => ignore", "Clazz");
+    }
+
+    @Test
+    public void testGenerousDescriptionPatternShouldNotMatchDescriptionContainingIncorrectClazzName() {
+        // Given:
+        Matcher matcher = DataProviderFilter.GENEROUS_DESCRIPTION_PATTERN.matcher("testMain(Cla?zz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isFalse();
     }
 
     private Description setupDescription(boolean isTest, String descriptionDisplayName,

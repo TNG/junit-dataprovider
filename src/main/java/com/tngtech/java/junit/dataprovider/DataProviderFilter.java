@@ -25,7 +25,8 @@ public class DataProviderFilter extends Filter {
      * </p>
      */
     static final Pattern GENEROUS_DESCRIPTION_PATTERN = Pattern
-            .compile("(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+)" + "((.*))" + "\\((.+)\\)$");
+            .compile("(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+)" + "((.*))"
+                    + "\\((\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+)\\)$");
 
     private static final int GROUP_METHOD_NAME = 1;
     private static final int GROUP_METHOD_PARAMS = 2;
