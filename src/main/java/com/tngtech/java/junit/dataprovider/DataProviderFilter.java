@@ -17,16 +17,17 @@ public class DataProviderFilter extends Filter {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final Pattern DESCRIPTION_PATTERN = Pattern.compile("([^\\[\\] ]+)" + "(\\[(\\d+):.*\\])?" + "\\((.+)\\)$");
+    static final Pattern DESCRIPTION_PATTERN = Pattern.compile("([^\\[\\] ]+)" + "(\\[(\\d+):.*\\])?" + "\\((.+)\\)$",
+            Pattern.DOTALL);
 
     /**
      * <p>
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final Pattern GENEROUS_DESCRIPTION_PATTERN = Pattern
-            .compile("(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+)" + "((.*))"
-                    + "\\((\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+)\\)$");
+    static final Pattern GENEROUS_DESCRIPTION_PATTERN = Pattern.compile(
+            "(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+)" + "((.*))"
+                    + "\\((\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+)\\)$", Pattern.DOTALL);
 
     private static final int GROUP_METHOD_NAME = 1;
     private static final int GROUP_METHOD_PARAMS = 2;

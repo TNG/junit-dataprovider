@@ -352,6 +352,19 @@ public class DataProviderFilterTest extends BaseTest {
     }
 
     @Test
+    public void testDescriptionPatternShouldMatchDescriptionWithParamsContainingNewline() {
+        // Given:
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: \n](Clazz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isTrue();
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: \n]", "1", "Clazz");
+    }
+
+    @Test
     public void testDescriptionPatternShouldNotMatchDescriptionWithoutParamsAndSpaceInMethodName() {
         // Given:
         Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test Main(Clazz)");
@@ -423,6 +436,19 @@ public class DataProviderFilterTest extends BaseTest {
 
         // Then:
         assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testGenerousDescriptionPatternShouldMatchDescriptionWithParamsContainingNewline() {
+        // Given:
+        Matcher matcher = DataProviderFilter.GENEROUS_DESCRIPTION_PATTERN.matcher("testMain[1: \r](Clazz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isTrue();
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: \r]", "[1: \r]", "Clazz");
     }
 
     private Description setupDescription(boolean isTest, String descriptionDisplayName,
