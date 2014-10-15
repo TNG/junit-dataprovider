@@ -93,4 +93,24 @@ public class DataProviders {
         }
         return testForEach((Object[]) enumClass.getEnumConstants());
     }
+    
+    /**
+     * Creates a dataprovider test for each combination of elements in two data providers.
+     */
+    public static Object[][] crossProduct(Object[][] rows1, Object[][] rows2) {
+        Object[][] rowsOut = new Object[rows1.length * rows2.length][];
+        int indexOut = 0;
+        for( int index1 = 0; index1 < rows1.length; index1++ ) {
+            Object[] row1 = rows1[index1];
+            for( int index2 = 0; index2 < rows2.length; index2++ ) {
+                Object[] row2 = rows2[index2];
+                Object[] rowOut = new Object[row1.length + row2.length];
+                System.arraycopy( row1, 0, rowOut, 0, row1.length );
+                System.arraycopy( row2, 0, rowOut, row1.length, row2.length );
+                rowsOut[indexOut] = rowOut;
+                indexOut++;
+            }
+        }
+        return rowsOut;
+    }
 }
