@@ -15,13 +15,19 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface UseDataProvider {
 
-    /** The required name of the dataprovider method to use test data from. */
+    /**
+     * The required name of the dataprovider method to use test data from. Required.
+     *
+     * @return the name of the dataprovider method
+     */
     String value();
 
     /**
      * Optionally specify the class holding the dataprovider method having the name given in {@link #value()}. Defaults
      * to the test class where {@code @}{@link UseDataProvider} annotation is used. (Just first class will be
-     * considered).
+     * considered). Optional.
+     *
+     * @return the class holding the dataprovider method
      */
     Class<?>[] location() default {};
 }

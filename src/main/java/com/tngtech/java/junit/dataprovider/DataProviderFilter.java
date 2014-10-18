@@ -47,6 +47,8 @@ public class DataProviderFilter extends Filter {
      * Creates a new {@link DataProviderFilter} using the textual {@link Filter#describe()} of supplied {@link Filter}
      * to determine if a test method should run or not. If given {@code filter} description can not be parsed, request
      * for {@link #shouldRun(Description)} are just forwarded to it.
+     *
+     * @param filter from which the {@link Description} is parsed and used for filtering
      */
     public DataProviderFilter(Filter filter) {
         if (filter == null) {

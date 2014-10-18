@@ -1,10 +1,10 @@
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'cpd'
 apply plugin: 'eclipse'
 apply plugin: 'groovy'
 apply plugin: 'jacoco'
 apply plugin: 'java'
 apply plugin: 'findbugs'
-apply plugin: 'cpd'
 
 buildscript {
     repositories {
@@ -17,11 +17,12 @@ buildscript {
     }
 }
 
+archivesBaseName = 'junit-dataprovider'
 description = 'A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit features.'
 group = 'com.tngtech.java'
 version = '1.9.3-SNAPSHOT'
 
-sourceCompatibility = '1.5'
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_5
 
 ext {
     isBuildOnJenkins = System.env['BUILD_TAG']?.startsWith('jenkins-') ?: false
@@ -72,6 +73,9 @@ jar {
             'Implementation-Title': 'JUnit dataprovider',
             'Implementation-Version': version,
             'Implementation-Vendor': 'TNG Technology Consulting GmbH',
+            'Issue-Tracker': 'https://github.com/TNG/junit-dataprovider/issues',
+            'Copyright': "${new Date().year} TNG Techology Consulting GmbH",
+            'License': 'Apache License v2.0, January 2004'
         )
     }
 }
@@ -100,7 +104,7 @@ jacoco {
 }
 
 findbugs {
-    toolVersion = '2.0.3'
+    toolVersion = '3.0.0'
     ignoreFailures = true
 }
 tasks.withType(FindBugs).each { task ->

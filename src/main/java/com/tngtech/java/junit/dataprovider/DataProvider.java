@@ -43,13 +43,18 @@ import java.util.List;
 @Target(ElementType.METHOD)
 public @interface DataProvider {
 
-    /** Define a list of parameters each as a regex-separated {@link String} for the annotated test method. */
+    /**
+     * Define a list of parameters each as a regex-separated {@link String} for the annotated test method. Optional.
+     *
+     * @return list of regex-separated {@link String} parameters
+     */
     String[] value() default {};
 
     /**
      * The delimiting regular expression by which the regex-separated {@link String}s given by {@link #value()} or
-     * returned by the method annotated with {@code @}{@link DataProvider} are split. Default is {@code ","}.
+     * returned by the method annotated with {@code @}{@link DataProvider} are split. Default is {@code ","}. Optional.
      *
+     * @return the regex to split {@link String} data
      * @see String#split(String)
      */
     String splitBy() default ",";
@@ -57,15 +62,18 @@ public @interface DataProvider {
     /**
      * Determines if every "null"-{@link String} in {@link #value()} or returned by the method annotated with {@code @}
      * {@link DataProvider} should be converted to {@code null} (= {@code true} ) or used as {@link String} (=
-     * {@code false}). Default is {@code true}.
+     * {@code false}). Default is {@code true}. Optional.
+     *
+     * @return {@code true} iif "null"-{@link String}s should be converted to {@code null}.
      */
     boolean convertNulls() default true;
 
     /**
      * {@code true} if leading and trailing whitespace should be omitted in split {@link String}s given by
      * {@link #value()} or returned by the method annotated with {@code @}{@link DataProvider}, {@code false} otherwise.
-     * Default is {@code true}.
+     * Default is {@code true}. Optional.
      *
+     * @return {@code true} iif regex-separated {@link String} data should be trimmed
      * @see String#trim()
      */
     boolean trimValues() default true;
@@ -74,7 +82,7 @@ public @interface DataProvider {
      * Format pattern to be used to generate test method description. The following placeholders are by default
      * available (for more information see their implementations in package
      * {@link com.tngtech.java.junit.dataprovider.internal.placeholder}:
-     * <table border="1">
+     * <table border="1" summary="Possible placeholders">
      * <tr>
      * <th>Placeholder</th>
      * <th>Aliases</th>
@@ -133,7 +141,9 @@ public @interface DataProvider {
      * <li>A produced test method name should be unique among all other in the same class.</li>
      * <li>Every above listed parameter can be used multiple times</li>
      * </ul>
-     * Default is {@code "%m[%i: %p[0..-1]]"}.
+     * Default is {@code "%m[%i: %p[0..-1]]"}. Optional.
+     *
+     * @return the format pattern to generate test method description
      */
     String format() default "%m[%i: %p[0..-1]]";
 }

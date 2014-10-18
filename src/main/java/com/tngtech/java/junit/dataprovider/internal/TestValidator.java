@@ -28,7 +28,7 @@ public class TestValidator {
      * provider test method must be is public and void instance method but have a least one argument.
      *
      * @param testMethod the test method to be validated
-     * @param errors
+     * @param errors to be "returned" and thrown as {@link InitializationError}
      * @throws IllegalArgumentException if given {@code errors} is {@code null}
      */
     public void validateTestMethod(FrameworkMethod testMethod, List<Throwable> errors) {
@@ -70,7 +70,6 @@ public class TestValidator {
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
-     * <ul>
      *
      * @param dataProviderMethod the method to check
      * @param dataProvider the {@code @}{@link DataProvider} annotation used on {@code dataProviderMethod}

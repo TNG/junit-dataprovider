@@ -19,7 +19,7 @@ public class DataConverter {
      * {@code type}s:
      * <ul>
      * <li>Object[][]</li>
-     * <li>List<List<Object>></li>
+     * <li>List&lt;List&lt;Object&gt;&gt;</li>
      * <li>String[]</li>
      * </ul>
      *

@@ -8,7 +8,7 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
  * This placeholder format the parameters of a dataprovider test as comma-separated {@link String} according to the
  * given index or range subscript (see {@link DataProvider#format()}. Furthermore the following parameter values are
  * treated specially:
- * <table>
+ * <table summary="Special {@link String} treatment">
  * <tr>
  * <th>Parameter value</th>
  * <th>target {@link String}</th>
