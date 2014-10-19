@@ -104,7 +104,11 @@ jacoco {
 }
 
 findbugs {
-    toolVersion = '3.0.0'
+    if (System.getProperty("java.version")[0..2] in [ '1.5', '1.6' ]) { // FindBugs v3.0.0 does not work with Java < v1.7 :-(
+        toolVersion = '2.0.3'
+    } else {
+        toolVersion = '3.0.0'
+    }
     ignoreFailures = true
 }
 tasks.withType(FindBugs).each { task ->
