@@ -345,4 +345,16 @@ public class DataProviderJavaAcceptanceTest {
         // Expect:
         assertThat(testData).isEqualTo("testdata.csv");
     }
+
+    @DataProvider
+    public static Object[][] dataProviderWithStringContainingTabsNewlineAndCarriageReturn() {
+        Object[][] result = { {  } };
+        return result;
+    }
+
+    @Test
+    @DataProvider({ "Do it.\nOr let it." })
+    public void testWithStringContainingTabsNewlineAndCarriageReturn(@SuppressWarnings("unused") String string) {
+        // nothing to do => Just look at the test output in Eclispe's JUnit view if it is displayed correctly
+    }
 }

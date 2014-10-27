@@ -88,6 +88,9 @@ public class ParameterPlaceholder extends BasePlaceholder {
         } else if (param instanceof String && ((String) param).isEmpty()) {
             return "<empty string>";
 
+        } else if (param instanceof String) {
+            return ((String) param).replaceAll("\\r", "\\\\r").replaceAll("\\n", "\\\\n");
+
         } else {
             return param.toString();
         }
