@@ -10,8 +10,8 @@ Have a look to this repositories [Wiki](/../../wiki/) pages for documenation, us
 #### Table of contents
 
 * [Home](/../../wiki/)
-	* [What is it](/TNG/junit-dataprovider/wiki/Home#what-is-it)
-	* [Contributing](/TNG/junit-dataprovider/wiki/Home#contributing)
+	* [What is it](/../../wiki/Home#what-is-it)
+	* [Contributing](/../../wiki/Home#contributing)
 * [Motivation, Distinction and FAQs](/../../wiki/Motivation,-Distinction-and-FAQs)
 * [Getting started](/../../wiki/Getting-started)
 	* [Requirements](/../../wiki/Getting-started#requirements)
