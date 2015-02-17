@@ -26,7 +26,7 @@ Have a look to this repositories [Wiki](/../../wiki/) pages for documenation, us
 	* [Customize test method name](/../../wiki/Features#customize-test-method-name)
 	* [Access ```FrameworkMethod``` in ```@DP```](/../../wiki/Features#access-frameworkmethod-in-dataprovider)
 	* [Utility methods](/../../wiki/Features#utility-methods)
-* [Release Notes](/../../wiki/Release-Notes)
+* [Release Notes](/../../releases)
 * [Eclipse Template](/../../wiki/Eclipse-Template)
 
 
