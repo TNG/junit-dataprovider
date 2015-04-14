@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/TNG/junit-dataprovider.png?branch=master)](https://travis-ci.org/TNG/junit-dataprovider)
 [![Coverage Status](https://coveralls.io/repos/TNG/junit-dataprovider/badge.png?branch=master)](https://coveralls.io/r/TNG/junit-dataprovider)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.tngtech.java/junit-dataprovider/badge.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.tngtech.java%22%20AND%20a%3A%22junit-dataprovider%22)
 [![Issues](https://img.shields.io/github/issues/TNG/junit-dataprovider.svg)](https://github.com/TNG/junit-dataprovider/issues)
 [![Forks](https://img.shields.io/github/forks/TNG/junit-dataprovider.svg)](https://github.com/TNG/junit-dataprovider/network)
 [![Stars](https://img.shields.io/github/stars/TNG/junit-dataprovider.svg)](https://github.com/TNG/junit-dataprovider/stargazers)
