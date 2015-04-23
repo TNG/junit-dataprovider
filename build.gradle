@@ -1,20 +1,11 @@
-apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'cpd'
-apply plugin: 'eclipse'
-apply plugin: 'groovy'
-apply plugin: 'jacoco'
-apply plugin: 'java'
-apply plugin: 'findbugs'
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.0'
-        classpath 'de.aaschmid.gradle.plugins:gradle-cpd-plugin:0.1'
-    }
+plugins {
+    id 'com.github.kt3k.coveralls' version '2.3.1'
+    id 'de.aaschmid.cpd' version '0.4'
+    id 'eclipse'
+    id 'groovy'
+    id 'jacoco'
+    id 'java'
+    id 'findbugs'
 }
 
 archivesBaseName = 'junit-dataprovider'
@@ -115,9 +106,10 @@ tasks.withType(FindBugs).each { task ->
     task.enabled = !skipFindBugs
 }
 
-tasks.cpd {
+cpdCheck {
+    ignoreFailures = true
     minimumTokenCount = 25
-    source = sourceSets.main.java.srcDirs + sourceSets.test.java.srcDirs
+    source = sourceSets.main.java.srcDirs + sourceSets.test.java.srcDirs // don't do check for groovy
 }
 
 artifacts {

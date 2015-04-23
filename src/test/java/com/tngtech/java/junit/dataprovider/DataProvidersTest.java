@@ -47,7 +47,7 @@ public class DataProvidersTest extends BaseTest {
         Object[] result = $(millis, now, "equals");
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { millis, now, "equals" });
+        assertThat(result).containsExactly(millis, now, "equals");
     }
 
     @Test
