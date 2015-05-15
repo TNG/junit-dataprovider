@@ -1,5 +1,6 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -103,18 +104,18 @@ public class TestGenerator {
     }
 
     private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data, DataProvider dataProvider) {
-        List<Object[]> converted = dataConverter
-                .convert(data, testMethod.getMethod().getParameterTypes(), dataProvider);
+        Method method = testMethod.getMethod();
+        List<Object[]> converted = dataConverter.convert(data, method.isVarArgs(), method.getParameterTypes(),
+                dataProvider); // TODO maybe build internal method wrapper to be testable!
         if (converted.isEmpty()) {
             throw new IllegalArgumentException(
                     "Could not create test methods using probably 'null' or 'empty' dataprovider");
         }
-        dataConverter.checkIfArgumentsMatchParameterTypes(converted, testMethod.getMethod().getParameterTypes());
 
         int idx = 0;
         List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
         for (Object[] parameters : converted) {
-            result.add(new DataProviderFrameworkMethod(testMethod.getMethod(), idx++, parameters, dataProvider.format()));
+            result.add(new DataProviderFrameworkMethod(method, idx++, parameters, dataProvider.format()));
         }
         return result;
     }
