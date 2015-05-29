@@ -3,6 +3,8 @@ package com.tngtech.java.junit.dataprovider;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.manipulation.Filter;
@@ -89,6 +91,24 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         testGenerator = new TestGenerator(dataConverter);
 
         super.collectInitializationErrors(errors);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Is copied from {@link BlockJUnit4ClassRunner#validateInstanceMethods} because {@link #computeTestMethods()} must
+     * not be called if validation already found errors!
+     */
+    @Override
+    @Deprecated
+    protected void validateInstanceMethods(List<Throwable> errors) {
+        validatePublicVoidNoArgMethods(After.class, false, errors);
+        validatePublicVoidNoArgMethods(Before.class, false, errors);
+        validateTestMethods(errors);
+
+        if (errors.isEmpty() && computeTestMethods().size() == 0) {
+            errors.add(new Exception("No runnable methods"));
+        }
     }
 
     /**

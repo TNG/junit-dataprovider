@@ -3,7 +3,9 @@ package com.tngtech.java.junit.dataprovider;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -24,6 +26,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
 import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
@@ -94,6 +98,38 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(underTest).isNotNull();
         assertThat(underTest.getTestClass()).isNotNull();
         assertThat(underTest.getTestClass().getJavaClass()).isEqualTo(clazz);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testValidateInstanceMethodsShouldThrowNullPointerExceptionIfErrorsIsNull() {
+        // Given:
+
+        // When:
+        underTest.validateInstanceMethods(null);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testValidateInstanceMethodsShouldNotThrowExceptionIfComputeTestMethodsWouldThrowExceptionButErrorsAlreadyExistsBefore() {
+        // Given:
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doAnswer(new Answer<Void>() {
+            @SuppressWarnings("unchecked")
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                ((List<Throwable>) invocation.getArguments()[0]).add(new Error());
+                return null;
+            }
+
+        }).when(underTest).validateTestMethods(errors);
+
+        doThrow(IllegalArgumentException.class).when(underTest).computeTestMethods();
+
+        // When:
+        underTest.validateInstanceMethods(errors);
+
+        // Then: no exception
     }
 
     @Test(expected = NullPointerException.class)
