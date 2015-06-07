@@ -21,50 +21,33 @@ public class StringConverter {
      * @throws IllegalArgumentException iif count of split data and parameter types does not match or argument cannot be
      *             converted to required type
      */
-    public Object[] convert(String data, boolean isVarArgs, Class<?>[] parameterTypes,
-            DataProvider dataProvider, int rowIdx) {
+    public Object[] convert(String data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider,
+            int rowIdx) {
         if (data == null) {
             return new Object[] { null };
         }
+        if (isVarArgs && parameterTypes.length == 1 && data.isEmpty()) {
+            return new Object[] { Array.newInstance(parameterTypes[0].getComponentType(), 0) };
+        }
+
         String[] splitData = splitBy(data, dataProvider.splitBy());
 
-        if ((isVarArgs && parameterTypes.length - 1 > splitData.length)
-                || (!isVarArgs && parameterTypes.length != splitData.length)) {
-            throw new IllegalArgumentException(String.format(
-                    "Test method expected %s %d parameters but got %d from @DataProvider row %d",
-                    (isVarArgs) ? "at least " : "", parameterTypes.length - 1, splitData.length, rowIdx));
-        }
+        checkArgumentsAndParameterCount(splitData.length, parameterTypes.length, isVarArgs, rowIdx);
+
         Object[] result = new Object[parameterTypes.length];
 
-        int nonVarArgParametersLength = parameterTypes.length - ((isVarArgs) ? 1 : 0); // TODO this is still a bit duplicate code ...
+        int nonVarArgParametersLength = parameterTypes.length - ((isVarArgs) ? 1 : 0);
         for (int idx = 0; idx < nonVarArgParametersLength; idx++) {
-            String toConvert = (dataProvider.trimValues()) ? splitData[idx].trim() : splitData[idx];
-            if (dataProvider.convertNulls() && "null".equals(toConvert)) {
-                result[idx] = null;
-            } else {
-                result[idx] = convertValue(toConvert, parameterTypes[idx]);
-            }
+            result[idx] = convertValue(splitData[idx], parameterTypes[idx], dataProvider);
         }
 
-        if (isVarArgs) { // TODO maybe integrate into above loop?
-            Object varArgArray;
-            if (splitData.length == 1
-                    && ((dataProvider.trimValues()) ? splitData[splitData.length - 1].trim()
-                            : splitData[splitData.length - 1]).isEmpty()) {
-                varArgArray = Array.newInstance(parameterTypes[nonVarArgParametersLength].getComponentType(), 0);
-            } else {
-                int varArgArrayLength = splitData.length - parameterTypes.length + 1;
-                varArgArray = Array.newInstance(parameterTypes[nonVarArgParametersLength].getComponentType(),
-                        varArgArrayLength);
-                for (int idx = nonVarArgParametersLength; idx < splitData.length; idx++) {
-                    String toConvert = (dataProvider.trimValues()) ? splitData[idx].trim() : splitData[idx];
-                    if (dataProvider.convertNulls() && "null".equals(toConvert)) {
-                        Array.set(varArgArray, idx - nonVarArgParametersLength, null);
-                    } else {
-                        Array.set(varArgArray, idx - nonVarArgParametersLength,
-                                convertValue(toConvert, parameterTypes[nonVarArgParametersLength].getComponentType()));
-                    }
-                }
+        if (isVarArgs) {
+            Class<?> varArgComponentType = parameterTypes[nonVarArgParametersLength].getComponentType();
+
+            Object varArgArray = Array.newInstance(varArgComponentType, splitData.length - parameterTypes.length + 1);
+            for (int idx = nonVarArgParametersLength; idx < splitData.length; idx++) {
+                Array.set(varArgArray, idx - nonVarArgParametersLength,
+                        convertValue(splitData[idx], varArgComponentType, dataProvider));
             }
             result[nonVarArgParametersLength] = varArgArray;
         }
@@ -80,6 +63,22 @@ public class StringConverter {
         splitData[lastItemIdx] = splitData[lastItemIdx].substring(0, splitData[lastItemIdx].length() - 1);
 
         return splitData;
+    }
+
+    private void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
+        if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount != argCount)) {
+            throw new IllegalArgumentException(String.format(
+                    "Test method expected %s %d parameters but got %d from @DataProvider row %d",
+                    (isVarArgs) ? "at least " : "", paramCount - 1, argCount, rowIdx));
+        }
+    }
+
+    private Object convertValue(String data, Class<?> targetType, DataProvider dataProvider) {
+        String toConvert = (dataProvider.trimValues()) ? data.trim() : data;
+        if (dataProvider.convertNulls() && "null".equals(toConvert)) {
+            return null;
+        }
+        return convertValue(toConvert, targetType);
     }
 
     private Object convertValue(String str, Class<?> targetType) {

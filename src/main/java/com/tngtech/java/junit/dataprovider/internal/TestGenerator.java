@@ -106,7 +106,7 @@ public class TestGenerator {
     private List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, Object data, DataProvider dataProvider) {
         Method method = testMethod.getMethod();
         List<Object[]> converted = dataConverter.convert(data, method.isVarArgs(), method.getParameterTypes(),
-                dataProvider); // TODO maybe build internal method wrapper to be testable!
+                dataProvider);
         if (converted.isEmpty()) {
             throw new IllegalArgumentException(
                     "Could not create test methods using probably 'null' or 'empty' dataprovider");

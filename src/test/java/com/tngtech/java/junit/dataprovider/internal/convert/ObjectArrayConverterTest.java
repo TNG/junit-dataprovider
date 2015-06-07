@@ -25,7 +25,7 @@ public class ObjectArrayConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes);
 
         // Then:
-        assertThat(result).isSameAs(data);
+        assertThat(result).isEqualTo(data);
     }
 
     @Test

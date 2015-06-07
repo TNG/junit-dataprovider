@@ -6,44 +6,47 @@ import java.lang.reflect.Method;
 public class ObjectArrayConverter {
 
     /**
-     * TODO javadoc
+     * Converts the given {@code data} to its corresponding arguments using the given {@code parameterTypes} and other
+     * provided information. This is mainly required vor varargs methods. Additionally checks the arguments against the
+     * given parameter types before returning.
      *
      * @param data array of arguments for test method
      * @param isVarArgs determines whether test method has a varargs parameter
-     * @param parameterTypes target types of parameters to which corresponding values in regex-separated {@code data}
-     *            should be converted
-     * @return TODO
+     * @param parameterTypes target types of parameters
+     * @return {@code Object[]} which is converted for varargs support and check against {@code parameterTypes}
+     * @throws IllegalArgumentException iif the data does not fit the varargs array component type
      */
-    public Object[] convert(Object[] data, boolean isVarArgs, Class<?>[] parameterTypes) { // TODO test and integrate into any other / consolidate with other methods?
+    public Object[] convert(Object[] data, boolean isVarArgs, Class<?>[] parameterTypes) {
         Object[] result = new Object[parameterTypes.length];
 
-        if (isVarArgs) {
-            int nonVarArgParametersLength = parameterTypes.length - 1;
-            for (int idx = 0; idx < nonVarArgParametersLength; idx++) {
-                result[idx] = data[idx];
-            }
-
-            // data.length == parameterTypes.length &&
-            if (data.length > 0
-                    && data[data.length - 1].getClass().isArray()
-                    && data[data.length - 1].getClass().getComponentType() == parameterTypes[nonVarArgParametersLength]
-                            .getComponentType()) {
-                result[nonVarArgParametersLength] = data[data.length - 1];
-            } else {
-                int varArgArrayLength = data.length - parameterTypes.length + 1;
-                Object varArgArray = Array.newInstance(parameterTypes[nonVarArgParametersLength].getComponentType(),
-                        varArgArrayLength);
-                for (int idx = nonVarArgParametersLength; idx < data.length; idx++) {
-                    Array.set(varArgArray, idx - nonVarArgParametersLength, data[idx]);
-                }
-                result[nonVarArgParametersLength] = varArgArray;
-            }
-
-        } else {
-            result = data;
+        int lastArgIdx = parameterTypes.length - 1;
+        for (int idx = 0; idx < lastArgIdx; idx++) {
+            result[idx] = data[idx];
         }
+
+        if (isVarArgs) {
+            result[lastArgIdx] = convertVarArgArgument(data, parameterTypes[lastArgIdx].getComponentType(), lastArgIdx);
+        } else {
+            result[lastArgIdx] = data[data.length - 1];
+        }
+
         checkIfArgumentsMatchParameterTypes(result, parameterTypes);
         return result;
+    }
+
+    private Object convertVarArgArgument(Object[] data, Class<?> varArgComponentType, int nonVarArgParameters) {
+        if (data.length > 0) {
+            Class<?> lastArgType = data[data.length - 1].getClass();
+            if (lastArgType.isArray() && lastArgType.getComponentType() == varArgComponentType) {
+                return data[data.length - 1];
+            }
+        }
+
+        Object varArgArray = Array.newInstance(varArgComponentType, data.length - nonVarArgParameters);
+        for (int idx = nonVarArgParameters; idx < data.length; idx++) {
+            Array.set(varArgArray, idx - nonVarArgParameters, data[idx]);
+        }
+        return varArgArray;
     }
 
     /**
