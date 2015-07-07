@@ -121,7 +121,6 @@ public class DataProviderRunnerTest extends BaseTest {
                 ((List<Throwable>) invocation.getArguments()[0]).add(new Error());
                 return null;
             }
-
         }).when(underTest).validateTestMethods(errors);
 
         doThrow(IllegalArgumentException.class).when(underTest).computeTestMethods();
