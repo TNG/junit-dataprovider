@@ -3,6 +3,7 @@ package com.tngtech.java.junit.dataprovider;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -43,7 +44,7 @@ public class DataProviderFilterTest extends BaseTest {
     public void testShouldRunShouldCallOriginalFilterShouldRunIfOriginalFilterDescriptionCannotBeParsed() {
         // Given:
         doReturn("invalid").when(filter).describe();
-        Description description = setupDescription(true, "test(Clazz)");
+        Description description = setupDescription(true, "test(com.tngtech.Clazz)");
 
         // When:
         underTest.shouldRun(description);
@@ -57,7 +58,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldCallOriginalFilterShouldRunIfIsTestAndGivenDescriptionCannotBeParsed() {
         // Given:
-        doReturn("Method test(Clazz)").when(filter).describe();
+        doReturn("Method test(com.tngtech.Clazz)").when(filter).describe();
         Description description = setupDescription(true, "invalid");
 
         // When:
@@ -72,8 +73,21 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodName() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
-        Description description = setupDescription(true, "testOther[1: ](Clazz)");
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testOther[1: ](com.tngtech.Clazz)");
+
+        // When:
+        boolean result = underTest.shouldRun(description);
+
+        // Then:
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedPackageName() {
+        // Given:
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testMain[1: ](com.tngtech.other.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -85,8 +99,8 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedClassName() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
-        Description description = setupDescription(true, "testMain[1: ](ClazzOther)");
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testMain[1: ](com.tngtech.ClazzOther)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -98,8 +112,8 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHasNoMethodIdx() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
-        Description description = setupDescription(true, "testMain(Clazz)");
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testMain(com.tngtech.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -111,8 +125,8 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodIdx() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
-        Description description = setupDescription(true, "testMain[2: ](Clazz)");
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testMain[2: ](com.tngtech.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -122,7 +136,7 @@ public class DataProviderFilterTest extends BaseTest {
     }
 
     @Test
-    public void testShouldRunShouldReturnTrueWhenDescriptionHaveOnlyMethodNameAndEqualsExactly() {
+    public void testShouldRunShouldReturnTrueWhenDescriptionHaveOnlyMethodNameAndEqualsExactlyWithoutPackage() {
         // Given:
         doReturn("Method testMain(Clazz)").when(filter).describe();
         Description description = setupDescription(true, "testMain(Clazz)");
@@ -134,11 +148,25 @@ public class DataProviderFilterTest extends BaseTest {
         assertThat(result).isTrue();
     }
 
+
+    @Test
+    public void testShouldRunShouldReturnTrueWhenDescriptionHaveOnlyMethodNameAndEqualsExactly() {
+        // Given:
+        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testMain(com.tngtech.Clazz)");
+
+        // When:
+        boolean result = underTest.shouldRun(description);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndEqualsMethodNameAndClass() {
         // Given:
-        doReturn("Method testMain(Clazz)").when(filter).describe();
-        Description description = setupDescription(true, "testMain[1: ](Clazz)");
+        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testMain[1: ](com.tngtech.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -150,9 +178,9 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButFilterHasIndex() {
         // Given:
-        doReturn("Method testMain[2: ](Clazz)").when(filter).describe();
+        doReturn("Method testMain[2: ](com.tngtech.Clazz)").when(filter).describe();
 
-        Description description = setupDescription(true, "testMain 1, 2, 3(Clazz)");
+        Description description = setupDescription(true, "testMain 1, 2, 3(com.tngtech.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -165,9 +193,9 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButMethodNameIsNotTheSame() {
         // Given:
-        doReturn("Method testMain(Clazz)").when(filter).describe();
+        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
 
-        Description description = setupDescription(true, "testOther: test, 4(Clazz)");
+        Description description = setupDescription(true, "testOther: test, 4(com.tngtech.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -179,9 +207,9 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButClassIsNotTheSame() {
         // Given:
-        doReturn("Method testMain(Clazz)").when(filter).describe();
+        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
 
-        Description description = setupDescription(true, "testMain 8zBZ=(qzt)487(OtherClazz)");
+        Description description = setupDescription(true, "testMain 8zBZ=(qzt)487(com.tngtech.OtherClazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -193,9 +221,9 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClass() {
         // Given:
-        doReturn("Method testMain(Clazz)").when(filter).describe();
+        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
 
-        Description description = setupDescription(true, "testMain 298zBZ=)& %(/$(=93A SD4)i(qzt)487 5z2 59isf&(Clazz)");
+        Description description = setupDescription(true, "testMain 298zBZ=)& %(/$(=93A SD4)i(qzt)487 5z2 59isf&(com.tngtech.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -207,8 +235,8 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAddtionalMethodIdxAndEqualsExcatly() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
-        Description description = setupDescription(true, "testMain[1: ](Clazz)");
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testMain[1: ](com.tngtech.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -220,8 +248,8 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndMethodParamsAreDifferentButIdxIsEqual() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
-        Description description = setupDescription(true, "testMain[1: test](Clazz)");
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        Description description = setupDescription(true, "testMain[1: test](com.tngtech.Clazz)");
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -233,9 +261,9 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueForMatchingChildDescription() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
 
-        Description description = setupDescription(false, "", setupDescription(true, "testMain[1: ](Clazz)"));
+        Description description = setupDescription(false, "", setupDescription(true, "testMain[1: ](com.tngtech.Clazz)"));
 
         // When:
         boolean result = underTest.shouldRun(description);
@@ -247,13 +275,13 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueForMultipleChildDescriptionWithLastMatching() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
 
         // @formatter:off
         Description description = setupDescription(false, "",
-                setupDescription(true, "testOther[1: ](ClazzOther)"),
-                setupDescription(false, "testOther[1: ](ClazzOther)"),
-                setupDescription(true, "testMain[1: ](Clazz)")
+                setupDescription(true, "testOther[1: ](com.tngtech.ClazzOther)"),
+                setupDescription(false, "testOther[1: ](com.tngtech.ClazzOther)"),
+                setupDescription(true, "testMain[1: ](com.tngtech.Clazz)")
             );
         // @formatter:on
 
@@ -267,17 +295,17 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseForMultipleChildAndFurtherChildDescriptionWithNonMatching() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
 
         // @formatter:off
-        Description description = setupDescription(false, "testMain[2: ](Clazz)",
-                setupDescription( true, "testOther[1: ](ClazzOther)"),
-                setupDescription( true,  "testMain[1: ](ClazzOther)"),
-                setupDescription(false,  "testMain[1: ](Clazz)",
-                        setupDescription( true,  "testMain[2: ](Clazz)"),
-                        setupDescription( true, "testOther[1: ](ClazzOther)")
+        Description description = setupDescription(false, "testMain[2: ](com.tngtech.Clazz)",
+                setupDescription( true, "testOther[1: ](com.tngtech.ClazzOther)"),
+                setupDescription( true,  "testMain[1: ](com.tngtech.ClazzOther)"),
+                setupDescription(false,  "testMain[1: ](com.tngtech.Clazz)",
+                        setupDescription( true,  "testMain[2: ](com.tngtech.Clazz)"),
+                        setupDescription( true, "testOther[1: ](com.tngtech.ClazzOther)")
                     ),
-                setupDescription( true, "testOther[1: ](Clazz)")
+                setupDescription( true, "testOther[1: ](com.tngtech.Clazz)")
             );
         // @formatter:on
 
@@ -291,13 +319,13 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testDescribeShouldReturnFilterDescripe() {
         // Given:
-        doReturn("Method testMain[1: ](Clazz)").when(filter).describe();
+        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
 
         // When:
         String result = underTest.describe();
 
         // Then:
-        assertThat(result).isEqualTo("Method testMain[1: ](Clazz)");
+        assertThat(result).isEqualTo("Method testMain[1: ](com.tngtech.Clazz)");
     }
 
     @Test
@@ -315,59 +343,59 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testDescriptionPatternShouldMatchDescriptionWithoutParams() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain(Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain(com.tngtech.Clazz)");
 
         // When:
         boolean result = matcher.matches();
 
         // Then:
         assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "testMain", null, null, "Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", null, null, "com.tngtech.Clazz");
     }
 
     @Test
     public void testDescriptionPatternShouldMatchDescriptionWithParams() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: test](com.tngtech.Clazz)");
 
         // When:
         boolean result = matcher.matches();
 
         // Then:
         assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "testMain", "[1: test]", "1", "Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: test]", "1", "com.tngtech.Clazz");
     }
 
     @Test
     public void testDescriptionPatternShouldMatchDescriptionWithParamsContainingParentheses() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: (test)](Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: (test)](com.tngtech.Clazz)");
 
         // When:
         boolean result = matcher.matches();
 
         // Then:
         assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "testMain", "[1: (test)]", "1", "Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: (test)]", "1", "com.tngtech.Clazz");
     }
 
     @Test
     public void testDescriptionPatternShouldMatchDescriptionWithParamsContainingNewline() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: \n](Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("testMain[1: \n](com.tngtech.Clazz)");
 
         // When:
         boolean result = matcher.matches();
 
         // Then:
         assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "testMain", "[1: \n]", "1", "Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: \n]", "1", "com.tngtech.Clazz");
     }
 
     @Test
     public void testDescriptionPatternShouldNotMatchDescriptionWithoutParamsAndSpaceInMethodName() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test Main(Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test Main(com.tngtech.Clazz)");
 
         // When:
         boolean result = matcher.matches();
@@ -379,7 +407,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testDescriptionPatternShouldNotMatchDescriptionWithParamsAndSpaceInMethodName() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test Main[1: test](Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test Main[1: test](com.tngtech.Clazz)");
 
         // When:
         boolean result = matcher.matches();
@@ -391,7 +419,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testDescriptionPatternShouldNotMatchDescriptionWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(com.tngtech.Clazz)");
 
         // When:
         boolean result = matcher.matches();
@@ -403,14 +431,14 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testDescriptionPatternShouldFindDescriptionWithMethodNameContainingBracketsAndNotHaveThemInGroup1() {
         // Given:
-        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(Clazz)");
+        Matcher matcher = DataProviderFilter.DESCRIPTION_PATTERN.matcher("Method test[M]ain(com.tngtech.Clazz)");
 
         // When:
         boolean result = matcher.find();
 
         // Then:
         assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "ain", null, null, "Clazz");
+        assertThatMatcherGroupsAre(matcher, "ain", null, null, "com.tngtech.Clazz");
     }
 
     @Test
@@ -423,7 +451,32 @@ public class DataProviderFilterTest extends BaseTest {
 
         // Then:
         assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "testMain", " whatever => ignore", " whatever => ignore", "Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", " whatever => ignore", " whatever => ignore", "Clazz", null);
+    }
+
+    @Test
+    public void testGenerousDescriptionPatternShouldMatchDescriptionContainingCorrectMethodNameAndPackageAndClazz() {
+        // Given:
+        Matcher matcher = DataProviderFilter.GENEROUS_DESCRIPTION_PATTERN.matcher("testMain whatever => ignore(com.tngtech.Clazz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isTrue();
+        assertThatMatcherGroupsAre(matcher, "testMain", " whatever => ignore", " whatever => ignore", "com.tngtech.Clazz", "tngtech.");
+    }
+
+    @Test
+    public void testGenerousDescriptionPatternShouldNotMatchDescriptionContainingIncorrectPackageName() {
+        // Given:
+        Matcher matcher = DataProviderFilter.GENEROUS_DESCRIPTION_PATTERN.matcher("testMain(com.tng?tech.Clazz)");
+
+        // When:
+        boolean result = matcher.matches();
+
+        // Then:
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -448,7 +501,7 @@ public class DataProviderFilterTest extends BaseTest {
 
         // Then:
         assertThat(result).isTrue();
-        assertThatMatcherGroupsAre(matcher, "testMain", "[1: \r]", "[1: \r]", "Clazz");
+        assertThatMatcherGroupsAre(matcher, "testMain", "[1: \r]", "[1: \r]", "Clazz", null);
     }
 
     private Description setupDescription(boolean isTest, String descriptionDisplayName,
