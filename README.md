@@ -25,6 +25,7 @@ Have a look to this repositories [Wiki](/../../wiki/) pages for documenation, us
 	* [String syntax](/../../wiki/Features#string-syntax)
 	* [List syntax](/../../wiki/Features#list-syntax)
 	* [Change ```@DataProvider``` location](/../../wiki/Features#change-dataprovider-location)
+	* [Varargs support](/../../wiki/Features#varargs-support)
 	* [```@BeforeClass``` support](/../../wiki/Features#beforeclass-support)
 	* [Customize test method name](/../../wiki/Features#customize-test-method-name)
 	* [Access ```FrameworkMethod``` in ```@DP```](/../../wiki/Features#access-frameworkmethod-in-dataprovider)
