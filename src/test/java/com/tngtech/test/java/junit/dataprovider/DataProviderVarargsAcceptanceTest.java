@@ -2,6 +2,7 @@ package com.tngtech.test.java.junit.dataprovider;
 
 import static com.tngtech.java.junit.dataprovider.DataProviders.$;
 import static com.tngtech.java.junit.dataprovider.DataProviders.$$;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
@@ -15,7 +16,7 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 public class DataProviderVarargsAcceptanceTest {
 
     @DataProvider
-    public static Object[][] dataProviderVarargs() {
+    public static Object[][] dataProviderLongVarargs() {
         // @formatter:off
         return new Object[][] {
                 {},
@@ -27,8 +28,8 @@ public class DataProviderVarargsAcceptanceTest {
     }
 
     @Test
-    @UseDataProvider("dataProviderVarargs")
-    public void testVarargs(Long... longs) {
+    @UseDataProvider("dataProviderLongVarargs")
+    public void testLongVarargs(Long... longs) {
         for (Long l : longs) {
             assertNotNull(l);
         }
@@ -42,14 +43,14 @@ public class DataProviderVarargsAcceptanceTest {
             "x, y, z",
         })
     // @formatter:on
-    public void testVarargs2(String... strings) {
+    public void testStringVarargs(String... strings) {
         for (String s : strings) {
             assertNotNull(s);
         }
     }
 
     @DataProvider
-    public static Object[][] dataProviderVarargs3() {
+    public static Object[][] dataProviderIntVarargsWithLeadingCharArgument() {
         // @formatter:off
         return $$(
                 $('a'),
@@ -60,8 +61,8 @@ public class DataProviderVarargsAcceptanceTest {
     }
 
     @Test
-    @UseDataProvider("dataProviderVarargs3")
-    public void testVarargs3(char c, int... is) {
+    @UseDataProvider("dataProviderIntVarargsWithLeadingCharArgument")
+    public void testIntVarargsWithLeadingCharArgument(char c, int... is) {
         assertNotNull(c);
         for (int i : is) {
             assertNotNull(i);
@@ -71,15 +72,16 @@ public class DataProviderVarargsAcceptanceTest {
     @Test
     // @formatter:off
     @DataProvider({
-            "a",
-            "b, 0",
-            "c, 1, 2, 3",
+            "0",
+            "1, a",
+            "3, aa, bb, cc",
         })
     // @formatter:on
-    public void testVarargs4(String s, Integer... is) {
-        assertNotNull(s);
-        for (Integer i : is) {
-            assertNotNull(i);
+    public void testStringVarargsWithLeadingSizeArgument(int i, String... strings) {
+        assertNotNull(strings);
+        assertThat(strings).hasSize(i);
+        for (String s : strings) {
+            assertNotNull(s);
         }
     }
 }
