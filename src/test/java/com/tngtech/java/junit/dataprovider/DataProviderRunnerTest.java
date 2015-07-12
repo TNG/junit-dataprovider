@@ -112,6 +112,21 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
+    public void testValidateInstanceMethodsShouldAddExceptionIfComputeTestMethodsReturnsNoTestMethods() {
+        // Given:
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(asList()).when(underTest).computeTestMethods();
+
+        // When:
+        underTest.validateInstanceMethods(errors);
+
+        // Then:
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0)).hasMessage("No runnable methods");
+    }
+
+    @Test
     public void testValidateInstanceMethodsShouldNotThrowExceptionIfComputeTestMethodsWouldThrowExceptionButErrorsAlreadyExistsBefore() {
         // Given:
         List<Throwable> errors = new ArrayList<Throwable>();
@@ -130,6 +145,20 @@ public class DataProviderRunnerTest extends BaseTest {
         underTest.validateInstanceMethods(errors);
 
         // Then: no exception
+    }
+
+    @Test
+    public void testValidateInstanceMethodsShouldNotThrowExceptionIfNoErrorsExistAndTestMethodsAreAvailable() {
+        // Given:
+        List<Throwable> errors = new ArrayList<Throwable>();
+
+        doReturn(asList(testMethod)).when(underTest).computeTestMethods();
+
+        // When:
+        underTest.validateInstanceMethods(errors);
+
+        // Then:
+        assertThat(errors).isEmpty();
     }
 
     @Test(expected = NullPointerException.class)
