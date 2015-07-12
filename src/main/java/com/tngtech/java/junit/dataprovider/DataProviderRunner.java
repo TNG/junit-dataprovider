@@ -204,6 +204,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     public void filter(Filter filter) throws NoTestsRemainException {
+        if (filter == null) {
+            throw new NullPointerException("filter must not be null");
+        }
         super.filter(new DataProviderFilter(filter));
     }
 

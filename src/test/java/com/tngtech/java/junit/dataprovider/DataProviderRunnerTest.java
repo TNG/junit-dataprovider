@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.manipulation.Filter;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
@@ -345,6 +346,28 @@ public class DataProviderRunnerTest extends BaseTest {
 
         verify(underTest).computeTestMethods();
         verifyNoMoreInteractions(underTest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testFilterShouldThrowNullPointerExceptionForNull() throws Exception {
+        // Given:
+
+        // When:
+        underTest.filter(null);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testFilterShould() throws Exception {
+        // Given:
+        Filter filter = Filter.ALL;
+
+        // When:
+        underTest.filter(filter);
+
+        // Then:
+        assertThat(underTest.getDescription().getChildren().size()).isGreaterThan(0);
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
