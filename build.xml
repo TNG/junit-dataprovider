@@ -21,7 +21,7 @@
         <include name="**/asm-*.jar" />
         <include name="**/groovy-*.jar" />
         <include name="**/hamcrest-*.jar" />
-        <include name="**/junit-*.jar" />
+        <include name="**/junit-4.12.jar" />
     </fileset>
 
     <!-- Targets -->
@@ -40,7 +40,6 @@
     </target>
 
     <target name="test" depends="init, check-libs.fileset-is-not-empty">
-
         <delete dir="${test.reports.dir}" />
         <mkdir dir="${test.reports.dir}" />
 
@@ -67,7 +66,6 @@
             <!-- single test method -->
             <test name="com.tngtech.test.java.junit.dataprovider.DataProviderJavaAcceptanceTest"
                   methods="testIsStringLengthGreaterThanTwo" />
-
         </junit>
     </target>
 </project>

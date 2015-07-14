@@ -1,10 +1,11 @@
 language: java
 
 script:
+  - ./gradlew build -PjunitVersion=4.8.2 -PskipFindBugs
+  - ./gradlew build -PjunitVersion=4.9   -PskipFindBugs
+  - ./gradlew build -PjunitVersion=4.10  -PskipFindBugs
+  - ./gradlew build -PjunitVersion=4.11  -PskipFindBugs
   - ./gradlew build
-  - ./gradlew build -PjunitVersion=4.9  -PskipFindBugs
-  - ./gradlew build -PjunitVersion=4.10 -PskipFindBugs
-  - ./gradlew build -PjunitVersion=4.11 -PskipFindBugs
   - mvn test
   - ant test
 

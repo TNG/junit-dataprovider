@@ -19,7 +19,7 @@ ext {
     isBuildOnJenkins = System.env['BUILD_TAG']?.startsWith('jenkins-') ?: false
 }
 if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
-    ext.junitVersion = '4.8.2'
+    ext.junitVersion = '4.12'
 }
 ext.skipFindBugs = hasProperty('skipFindBugs')
 println "Using junit version ${junitVersion} for current build (skipFindBugs = ${skipFindBugs})."
@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'junit', name: 'junit-dep', version: junitVersion
+    compile group: 'junit', name: 'junit', version: junitVersion
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
 
     testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.0.8'
@@ -182,8 +182,8 @@ uploadArchives {
                     }
                 }
                 whenConfigured { pom ->
-                    pom.dependencies.find{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit-dep' }.with {
-                        version = '[4.8.2,4.11]'
+                    pom.dependencies.find{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit' }.with {
+                        version = '[4.8.2,4.12]'
                         scope = 'provided'
                     }
                     pom.dependencies.removeAll(pom.dependencies.findAll{ dep -> dep.scope in [ 'compile', 'test' ] })
