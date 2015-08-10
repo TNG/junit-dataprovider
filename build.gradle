@@ -55,18 +55,34 @@ build.dependsOn(jenkinsTest)
 
 jar {
     manifest {
+        def name = 'JUnit dataprovider'
+        def company = 'TNG Technology Consulting GmbH'
+
         attributes (
             'Built-By': "Gradle ${gradle.gradleVersion}",
             'Built-Date': new Date(), // TODO destroys incremental build feature
-            'Specification-Title': 'JUnit dataprovider',
+            'Specification-Title': name,
             'Specification-Version': version,
-            'Specification-Vendor': 'TNG Technology Consulting GmbH',
-            'Implementation-Title': 'JUnit dataprovider',
+            'Specification-Vendor': company,
+            'Implementation-Title': name,
             'Implementation-Version': version,
-            'Implementation-Vendor': 'TNG Technology Consulting GmbH',
+            'Implementation-Vendor': company,
             'Issue-Tracker': 'https://github.com/TNG/junit-dataprovider/issues',
-            'Copyright': "${new Date().year} TNG Techology Consulting GmbH",
-            'License': 'Apache License v2.0, January 2004'
+            'Copyright': "${new Date()[Calendar.YEAR]} ${company}",
+            'License': 'Apache License v2.0, January 2004',
+
+            // p2 plugin
+            'Bundle-ManifestVersion': '2',
+            'Bundle-Name': name,
+            'Bundle-Description': project.description,
+            'Bundle-SymbolicName': "${project.group}.junit.dataprovider",
+            'Bundle-Version': version,
+            'Bundle-Vendor': company,
+            'Bundle-Copyright': "${new Date()[Calendar.YEAR]} ${company}",
+            'Bundle-License': 'Apache License v2.0, January 2004',
+            'Require-Bundle': 'org.junit',
+            'Import-Package': 'org.osgi.framework',
+            'Export-Package': "${project.group}.junit.dataprovider;version=${version}",
         )
     }
 }
