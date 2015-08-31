@@ -27,8 +27,15 @@ public class DataConverter {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    final StringConverter stringConverter = new StringConverter();
+    final StringConverter stringConverter;
 
+    public DataConverter() {
+    	this.stringConverter = new StringConverter();
+    }
+    
+    public DataConverter(StringConverter converter) {
+    	this.stringConverter = converter;
+    }
     /**
      * Returns {@code true} iif this {@link DataConverter} can convert the given {@code type}. Currently supported
      * {@code type}s:
