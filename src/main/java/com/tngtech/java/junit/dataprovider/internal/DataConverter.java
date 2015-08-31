@@ -30,7 +30,7 @@ public class DataConverter {
     final StringConverter stringConverter;
 
     public DataConverter() {
-    	this.stringConverter = new StringConverter();
+    	this(new StringConverter());
     }
     
     public DataConverter(StringConverter converter) {
