@@ -120,6 +120,15 @@ public class StringConverter {
             return convertToEnumValue(str, targetType);
         }
 
+        if (Class.class.equals(targetType)) {
+            try {
+                return Class.forName(str);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(
+                        String.format("Unable to instantiate %s for '%s'", targetType.getSimpleName(), str), e);
+            }
+        }
+
         Object result = tryConvertUsingSingleStringParamConstructor(str, targetType);
         if (result != null) {
             return result;

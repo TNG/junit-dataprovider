@@ -14,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.tngtech.java.junit.dataprovider.BaseTest;
 import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StringConverterTest extends BaseTest {
@@ -276,6 +277,36 @@ public class StringConverterTest extends BaseTest {
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 51);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testConvertShouldCorrectlyParseClass() {
+        // Given:
+        String data = " java.lang.Thread,  com.tngtech.java.junit.dataprovider.DataProviderRunner ";
+        Class<?>[] parameterTypes = new Class[] { Class.class, Class.class };
+
+        doReturn(",").when(dataProvider).splitBy();
+        doReturn(true).when(dataProvider).trimValues();
+
+        // When:
+        Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 50);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { Thread.class, DataProviderRunner.class });
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConvertShouldThrowIllegalArgumentExceptionIfClassNameIsInvalid() {
+        // Given:
+        String data = "String";
+        Class<?>[] parameterTypes = new Class[] { Class.class };
+
+        doReturn(",").when(dataProvider).splitBy();
+
+        // When:
+        underTest.convert(data, false, parameterTypes, dataProvider, 55);
 
         // Then: expect exception
     }
