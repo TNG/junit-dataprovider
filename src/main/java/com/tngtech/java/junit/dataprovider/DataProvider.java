@@ -44,6 +44,21 @@ import java.util.List;
 public @interface DataProvider {
 
     /**
+     * Comma delimiter to split up parameters for dataproviders using the {@link #value()}s {@link String}
+     * representation.
+     *
+     * @see #splitBy()
+     */
+    public static final String COMMA = ",";
+
+    /**
+     * Default format string containing test method name followed by an index and all parameters within square brackets.
+     *
+     * @see #format()
+     */
+    public static final String DEFAULT_FORMAT = "%m[%i: %p[0..-1]]";
+
+    /**
      * Define a list of parameters each as a regex-separated {@link String} for the annotated test method. Optional.
      *
      * @return list of regex-separated {@link String} parameters
@@ -52,12 +67,14 @@ public @interface DataProvider {
 
     /**
      * The delimiting regular expression by which the regex-separated {@link String}s given by {@link #value()} or
-     * returned by the method annotated with {@code @}{@link DataProvider} are split. Default is {@code ","}. Optional.
+     * returned by the method annotated with {@code @}{@link DataProvider} are split. Defaults to {@value #COMMA}.
+     * Optional.
      *
      * @return the regex to split {@link String} data
      * @see String#split(String)
+     * @see #COMMA
      */
-    String splitBy() default ",";
+    String splitBy() default COMMA;
 
     /**
      * Determines if every "null"-{@link String} in {@link #value()} or returned by the method annotated with {@code @}
@@ -141,9 +158,10 @@ public @interface DataProvider {
      * <li>A produced test method name should be unique among all other in the same class.</li>
      * <li>Every above listed parameter can be used multiple times</li>
      * </ul>
-     * Default is {@code "%m[%i: %p[0..-1]]"}. Optional.
+     * Defaults to {@value #DEFAULT_FORMAT}. Optional.
      *
      * @return the format pattern to generate test method description
+     * @see #DEFAULT_FORMAT
      */
-    String format() default "%m[%i: %p[0..-1]]";
+    String format() default DEFAULT_FORMAT;
 }
