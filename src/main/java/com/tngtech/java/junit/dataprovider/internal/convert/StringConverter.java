@@ -1,5 +1,7 @@
 package com.tngtech.java.junit.dataprovider.internal.convert;
 
+import static com.tngtech.java.junit.dataprovider.DataProvider.NULL;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 
@@ -75,7 +77,7 @@ public class StringConverter {
 
     private Object convertValue(String data, Class<?> targetType, DataProvider dataProvider) {
         String toConvert = (dataProvider.trimValues()) ? data.trim() : data;
-        if (dataProvider.convertNulls() && "null".equals(toConvert)) {
+        if (dataProvider.convertNulls() && NULL.equals(toConvert)) {
             return null;
         }
         return convertValue(toConvert, targetType);

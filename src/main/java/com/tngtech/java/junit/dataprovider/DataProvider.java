@@ -52,6 +52,13 @@ public @interface DataProvider {
     public static final String COMMA = ",";
 
     /**
+     * {@code null}-{@link String} value to be converted to {@code null} if {@link #convertNulls()} is {@code true}.
+     *
+     * @see #convertNulls()
+     */
+    public static final String NULL = "null";
+
+    /**
      * Default format string containing test method name followed by an index and all parameters within square brackets.
      *
      * @see #format()
@@ -77,11 +84,12 @@ public @interface DataProvider {
     String splitBy() default COMMA;
 
     /**
-     * Determines if every "null"-{@link String} in {@link #value()} or returned by the method annotated with {@code @}
-     * {@link DataProvider} should be converted to {@code null} (= {@code true} ) or used as {@link String} (=
+     * Determines if every {@value #NULL}-{@link String} in {@link #value()} or returned by the method annotated with
+     * {@code @}{@link DataProvider} should be converted to {@code null} (= {@code true} ) or used as {@link String} (=
      * {@code false}). Default is {@code true}. Optional.
      *
      * @return {@code true} iif "null"-{@link String}s should be converted to {@code null}.
+     * @see #NULL
      */
     boolean convertNulls() default true;
 
