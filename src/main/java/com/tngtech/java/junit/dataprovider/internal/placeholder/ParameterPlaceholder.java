@@ -88,12 +88,15 @@ public class ParameterPlaceholder extends BasePlaceholder {
         } else if (param instanceof String && ((String) param).isEmpty()) {
             return "<empty string>";
 
-        } else if (param instanceof String) {
-            return ((String) param).replaceAll("\\r", "\\\\r").replaceAll("\\n", "\\\\n");
-
-        } else {
-            return param.toString();
         }
+
+        String result;
+        if (param instanceof String) {
+            result = (String) param;
+        } else {
+            result = param.toString();
+        }
+        return result.replaceAll("\\r", "\\\\r").replaceAll("\\n", "\\\\n");
     }
 
     private String formatPrimitiveArray(Object primitiveArray) {

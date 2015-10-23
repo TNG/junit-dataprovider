@@ -349,6 +349,80 @@ public class ParameterPlaceholderTest extends BaseTest {
         assertThat(result).isEqualTo("A very\\r\\nlong text\\nwith multiple\\rdifferent newline\\n\\rvariations.");
     }
 
+    private static class TestToString {
+        private final String toString;
+
+        public TestToString(String toString) {
+            this.toString = toString;
+        }
+
+        @Override
+        public String toString() {
+            return toString;
+        }
+    }
+
+    @Test
+    public void testFormatForCustomObjectReplacesCarriageReturnWithTheirPrintableCounterpart() {
+        // Given:
+        final TestToString parameter = new TestToString("\r");
+
+        // When:
+        String result = underTest.format(parameter);
+
+        // Then:
+        assertThat(result).isEqualTo("\\r");
+    }
+
+    @Test
+    public void testFormatForCustomObjectReplacesCarriageReturnsWithTheirPrintableCounterpartEvenIfWithText() {
+        // Given:
+        final TestToString parameter = new TestToString("test\rtest\r");
+
+        // When:
+        String result = underTest.format(parameter);
+
+        // Then:
+        assertThat(result).isEqualTo("test\\rtest\\r");
+    }
+
+    @Test
+    public void testFormatForCustomObjectReplacesLineFeedWithTheirPrintableCounterpart() {
+        // Given:
+        final TestToString parameter = new TestToString("\n");
+
+        // When:
+        String result = underTest.format(parameter);
+
+        // Then:
+        assertThat(result).isEqualTo("\\n");
+    }
+
+    @Test
+    public void testFormatForCustomObjectReplacesLineFeedsWithTheirPrintableCounterpartEvenIfWithText() {
+        // Given:
+        final TestToString parameter = new TestToString("1\n2\n3");
+
+        // When:
+        String result = underTest.format(parameter);
+
+        // Then:
+        assertThat(result).isEqualTo("1\\n2\\n3");
+    }
+
+    @Test
+    public void testFormatForCustomObjectReplacesCarriageReturnsAndLineFeedsWithTheirPrintableCounterpart() {
+        // Given:
+        final TestToString parameter = new TestToString(
+                "A very\r\nlong text\nwith multiple\rdifferent newline\n\rvariations.");
+
+        // When:
+        String result = underTest.format(parameter);
+
+        // Then:
+        assertThat(result).isEqualTo("A very\\r\\nlong text\\nwith multiple\\rdifferent newline\\n\\rvariations.");
+    }
+
     @Test
     public void testFormatAllHandleObjectArrayCorrectly() {
         // Given:
