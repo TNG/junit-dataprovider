@@ -482,4 +482,19 @@ public class StringConverterTest extends BaseTest {
         // Then:
         assertThat(result).isEqualTo(new Object[] { "foobar", new long[] { 1, 2, 3 } });
     }
+
+    @Test
+    public void testConvertShouldNotSplitIfSingleNonVarargArgumentIsRequired() {
+        // Given:
+        String data = "VAL1";
+        Class<?>[] parameterTypes = new Class<?>[] { TestEnum.class };
+
+        doReturn("L").when(dataProvider).splitBy();
+
+        // When:
+        Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 100);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1 });
+    }
 }

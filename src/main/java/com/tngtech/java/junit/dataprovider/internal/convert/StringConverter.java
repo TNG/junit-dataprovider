@@ -28,8 +28,14 @@ public class StringConverter {
         if (data == null) {
             return new Object[] { null };
         }
-        if (isVarArgs && parameterTypes.length == 1 && data.isEmpty()) {
-            return new Object[] { Array.newInstance(parameterTypes[0].getComponentType(), 0) };
+        if (parameterTypes.length == 1) {
+            if (isVarArgs) {
+                if (data.isEmpty()) {
+                    return new Object[] { Array.newInstance(parameterTypes[0].getComponentType(), 0) };
+                }
+            } else {
+                return new Object[] { convertValue(data, parameterTypes[0], dataProvider) };
+            }
         }
 
         String[] splitData = splitBy(data, dataProvider.splitBy());
