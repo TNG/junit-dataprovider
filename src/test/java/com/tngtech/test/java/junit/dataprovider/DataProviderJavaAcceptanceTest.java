@@ -307,6 +307,24 @@ public class DataProviderJavaAcceptanceTest {
         assertThat(RoundingMode.valueOf(oldMode)).isEqualTo(expected);
     }
 
+    @DataProvider
+    public static String[] dataProviderOldModeToRoundingModeUsingRegularDataprovidert() {
+        // @formatter:off
+        return new String[] {
+            "0, UP",
+            "1, DOWN",
+            "3, FLOOR",
+        };
+        // @formatter:on
+    }
+
+    @Test
+    @UseDataProvider("dataProviderOldModeToRoundingModeUsingRegularDataprovidert")
+    public void testOldModeToRoundingModeUsingRegularDataprovider(int oldMode, RoundingMode expected) {
+        // Expect:
+        assertThat(RoundingMode.valueOf(oldMode)).isEqualTo(expected);
+    }
+
     @Test
     @DataProvider({ "null", "", })
     public void testIsEmptyString2(String str) {
