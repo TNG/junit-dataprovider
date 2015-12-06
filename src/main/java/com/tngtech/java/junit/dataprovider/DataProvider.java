@@ -172,4 +172,10 @@ public @interface DataProvider {
      * @see #DEFAULT_FORMAT
      */
     String format() default DEFAULT_FORMAT;
+
+    /**
+     * @return {@code true} if and only if the case for {@link Enum} conversion should be ignored such that searching
+     *         for the corresponding {@link Enum} values is case-insensitive. Default is {@code false}. Optional.
+     */
+    boolean ignoreEnumCase() default false;
 }

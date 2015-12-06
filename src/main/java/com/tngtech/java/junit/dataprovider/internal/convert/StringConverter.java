@@ -82,14 +82,10 @@ public class StringConverter {
     }
 
     private Object convertValue(String data, Class<?> targetType, DataProvider dataProvider) {
-        String toConvert = (dataProvider.trimValues()) ? data.trim() : data;
-        if (dataProvider.convertNulls() && NULL.equals(toConvert)) {
+        String str = (dataProvider.trimValues()) ? data.trim() : data;
+        if (dataProvider.convertNulls() && NULL.equals(str)) {
             return null;
         }
-        return convertValue(toConvert, targetType);
-    }
-
-    private Object convertValue(String str, Class<?> targetType) {
         if (String.class.equals(targetType)) {
             return str;
         }
@@ -125,7 +121,9 @@ public class StringConverter {
         }
 
         if (targetType.isEnum()) {
-            return convertToEnumValue(str, targetType);
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            Class<Enum> enumType = (Class<Enum>) targetType;
+            return convertToEnumValue(str, enumType, dataProvider.ignoreEnumCase());
         }
 
         if (Class.class.equals(targetType)) {
@@ -164,17 +162,27 @@ public class StringConverter {
         return Long.valueOf(longStr);
     }
 
-    private Object convertToEnumValue(String str, Class<?> enumType) {
-        try {
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            Enum result = Enum.valueOf((Class<Enum>) enumType, str);
-            return result;
+    @SuppressWarnings("rawtypes")
+    private Object convertToEnumValue(String str, Class<Enum> enumType, boolean ignoreEnumCase) {
+        String errorMessage = "'%s' is not a valid value of enum %s.";
+        if (ignoreEnumCase) {
+            for (Enum<?> enumConstant : enumType.getEnumConstants()) {
+                if (str.equalsIgnoreCase(enumConstant.name())) {
+                    return enumConstant;
+                }
+            }
+        } else {
+            try {
+                @SuppressWarnings("unchecked")
+                Enum result = Enum.valueOf(enumType, str);
+                return result;
 
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(String.format(
-                    "'%s' is not a valid value of enum %s. Please be aware of case sensitivity.", str,
-                    enumType.getSimpleName()));
+            } catch (IllegalArgumentException e) {
+                errorMessage += " Please be aware of case sensitivity or use 'ignoreEnumCase' of @"
+                        + DataProvider.class.getSimpleName() + ".";
+            }
         }
+        throw new IllegalArgumentException(String.format(errorMessage, str, enumType.getSimpleName()));
     }
 
     private Object tryConvertUsingSingleStringParamConstructor(String str, Class<?> targetType) {

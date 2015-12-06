@@ -268,6 +268,34 @@ public class StringConverterTest extends BaseTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void testConvertShouldThrowIllegalArgumentExceptionIfEnumValuesIsInvalid() {
+        // Given:
+        String data = "Val1";
+        Class<?>[] parameterTypes = new Class[] { TestEnum.class };
+
+        // When:
+        underTest.convert(data, false, parameterTypes, dataProvider, 51);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testConvertShouldCorrectlyParseEnumIgnoringCase() {
+        // Given:
+        String data = "Val1,val2";
+        Class<?>[] parameterTypes = new Class[] { TestEnum.class, TestEnum.class };
+
+        doReturn(",").when(dataProvider).splitBy();
+        doReturn(true).when(dataProvider).ignoreEnumCase();
+
+        // When:
+        Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 50);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1, TestEnum.VAL2 });
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void testConvertShouldThrowIllegalArgumentExceptionIfEnumValueIsInvalid() {
         // Given:
         String data = "UNKNOW_ENUM_VALUE";
