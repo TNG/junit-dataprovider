@@ -1,5 +1,7 @@
 package com.tngtech.java.junit.dataprovider.internal.placeholder;
 
+import static com.tngtech.java.junit.dataprovider.internal.placeholder.ParameterPlaceholder.STRING_EMPTY;
+import static com.tngtech.java.junit.dataprovider.internal.placeholder.ParameterPlaceholder.STRING_NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -262,7 +264,7 @@ public class ParameterPlaceholderTest extends BaseTest {
         String result = underTest.formatAll(parameters);
 
         // Then:
-        assertThat(result).isEqualTo("<null>");
+        assertThat(result).isEqualTo(STRING_NULL);
     }
 
     @Test
@@ -298,7 +300,7 @@ public class ParameterPlaceholderTest extends BaseTest {
         String result = underTest.formatAll(parameters);
 
         // Then:
-        assertThat(result).isEqualTo("<empty string>");
+        assertThat(result).isEqualTo(STRING_EMPTY);
     }
 
     @Test

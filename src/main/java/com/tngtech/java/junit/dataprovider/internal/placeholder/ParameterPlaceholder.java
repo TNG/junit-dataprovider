@@ -32,6 +32,23 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
  * </table>
  */
 public class ParameterPlaceholder extends BasePlaceholder {
+
+    /**
+     * {@link String} representation of {@code null}
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    static final String STRING_NULL = "<null>";
+
+    /**
+     * {@link String} representation of {@code ""}
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    static final String STRING_EMPTY = "<empty string>";
+
     public ParameterPlaceholder() {
         super("%p\\[(-?[0-9]+|-?[0-9]+\\.\\.-?[0-9]+)\\]");
     }
@@ -77,7 +94,7 @@ public class ParameterPlaceholder extends BasePlaceholder {
 
     protected String format(Object param) {
         if (param == null) {
-            return "<null>";
+            return STRING_NULL;
 
         } else if (param.getClass().isArray()) {
             if (param.getClass().getComponentType().isPrimitive()) {
@@ -86,7 +103,7 @@ public class ParameterPlaceholder extends BasePlaceholder {
             return "[" + formatAll((Object[]) param) + "]";
 
         } else if (param instanceof String && ((String) param).isEmpty()) {
-            return "<empty string>";
+            return STRING_EMPTY;
 
         }
 
@@ -97,7 +114,7 @@ public class ParameterPlaceholder extends BasePlaceholder {
             result = param.toString();
         }
         if (result == null) {
-            return "<null>";
+            return STRING_NULL;
         }
         return result.replaceAll("\\r", "\\\\r").replaceAll("\\n", "\\\\n");
     }
