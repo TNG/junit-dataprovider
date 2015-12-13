@@ -96,6 +96,9 @@ public class ParameterPlaceholder extends BasePlaceholder {
         } else {
             result = param.toString();
         }
+        if (result == null) {
+            return "<null>";
+        }
         return result.replaceAll("\\r", "\\\\r").replaceAll("\\n", "\\\\n");
     }
 

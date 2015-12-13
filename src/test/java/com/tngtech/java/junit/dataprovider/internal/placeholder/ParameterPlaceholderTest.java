@@ -278,6 +278,18 @@ public class ParameterPlaceholderTest extends BaseTest {
     }
 
     @Test
+    public void testFormatAllDoesNotThrowNullPointerExceptionIfParamsToStringReturningNull() {
+        // Given:
+        final Object[] parameters = new Object[] { new TestToString(null) };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("<null>");
+    }
+
+    @Test
     public void testFormatAllHandleEmtpyStringSpecially() {
         // Given:
         final Object[] parameters = new Object[] { "" };
