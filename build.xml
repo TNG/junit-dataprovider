@@ -4,14 +4,14 @@
     <!-- Folders and files -->
     <property name="src.dir" location="${basedir}/src" />
     <property name="src.main.java.dir" location="${src.dir}/main/java" />
-    <property name="src.test.java.dir" location="${src.dir}/test/java" />
+    <property name="src.test.java.dir" location="${src.dir}/integTest/java" />
 
     <property name="libs.dir" location="${user.home}/.gradle/caches/modules-2/" />
 
     <property name="build.dir" location="${basedir}/build" />
     <property name="build.classes.dir" location="${build.dir}/classes" />
     <property name="build.classes.main.dir" location="${build.classes.dir}/main" />
-    <property name="build.classes.test.dir" location="${build.classes.dir}/test" />
+    <property name="build.classes.test.dir" location="${build.classes.dir}/integTest" />
 
     <property name="test.reports.dir" location="${build.dir}/reports/ant-tests" />
 

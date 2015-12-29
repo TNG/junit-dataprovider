@@ -28,30 +28,49 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    integTest {
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+configurations {
+    integTestCompile {
+        extendsFrom testRuntime
+    }
+}
+
 dependencies {
     compile group: 'junit', name: 'junit', version: junitVersion
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
 
-    testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.0.8'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '1.2.0'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
+
+    integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.0.8'
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
-task jenkinsTest {
-    // required due to jenkins fails if test output is not up to date :(
-    // Solution found on http://www.practicalgradle.org/blog/2011/06/incremental-tests-with-jenkins/
-    inputs.files test.outputs.files
+task touchTestResultsForJenkins(type: TouchTestResults) {
+    tasks test
     enabled = isBuildOnJenkins
-    doLast {
-        def timestamp = System.currentTimeMillis()
-        test.getReports().getJunitXml().getDestination().eachFile{ it.lastModified = timestamp }
-    }
 }
-build.dependsOn(jenkinsTest)
+build.dependsOn touchTestResultsForJenkins
+
+task integTest(dependsOn: integTestClasses, type: Test, group: 'verification', description: 'Runs all integration tests.') {
+    classpath = sourceSets.integTest.runtimeClasspath
+    testClassesDir = sourceSets.integTest.output.classesDir
+    testSrcDirs = sourceSets.integTest.java.srcDirs as List
+}
+task touchIntegTestResultsForJenkins(type: TouchTestResults) {
+    tasks integTest
+    enabled = isBuildOnJenkins
+}
+build.dependsOn touchIntegTestResultsForJenkins
 
 jar {
     manifest {
@@ -204,6 +223,39 @@ uploadArchives {
                     }
                     pom.dependencies.removeAll(pom.dependencies.findAll{ dep -> dep.scope in [ 'compile', 'test' ] })
                 }
+            }
+        }
+    }
+}
+
+// -- Custom tasks ------------------------------------------------------------
+/**
+ * Task to touch all junit xml report files for all given {@link Test} {@code tasks}.
+ * This is required due to Jenkins fails if test output is created before build starts which
+ * could happen using Gradle's up-to-date feature :(
+ */
+class TouchTestResults extends DefaultTask {
+    @InputFiles
+    def tasks
+
+    @javax.inject.Inject
+    public TouchTestResults(org.gradle.internal.reflect.Instantiator instantiator) {
+        super()
+        tasks = new org.gradle.api.internal.tasks.DefaultTaskCollection(DefaultTask.class, instantiator, project)
+    }
+
+    def tasks(Test... testTasks) {
+        tasks.addAll(testTasks)
+        mustRunAfter(testTasks)
+    }
+
+    @TaskAction
+    void touch() {
+        tasks.each { test ->
+            def testResultsDir = test.reports.junitXml.destination
+            if (testResultsDir.exists()) {
+                def timestamp = System.currentTimeMillis()
+                testResultsDir.eachFile{ file -> file.lastModified = timestamp }
             }
         }
     }

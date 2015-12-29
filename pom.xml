@@ -18,6 +18,7 @@
 
     <build>
         <directory>build/maven-target</directory>
+        <testSourceDirectory>src/integTest/java</testSourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
