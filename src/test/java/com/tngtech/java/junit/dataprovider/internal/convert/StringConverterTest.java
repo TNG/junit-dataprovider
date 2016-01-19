@@ -81,7 +81,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 10);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { true, (byte) 1, 'c', (short) 2, 3, 4L, 5.5f, 6.6d });
+        assertThat(result).containsExactly(true, (byte) 1, 'c', (short) 2, 3, 4L, 5.5f, 6.6d);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 11);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { -5, 2014l, -1.234567f, -0.901d });
+        assertThat(result).containsExactly(-5, 2014l, -1.234567f, -0.901d);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 12);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { " foo", "  bar   ", "baz    " });
+        assertThat(result).containsExactly(" foo", "  bar   ", "baz    ");
     }
 
     @Test
@@ -128,7 +128,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 13);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { false, (byte) 11, 'z', (short) 22, 33, 44L, 55.55f, 66.66d });
+        assertThat(result).containsExactly(false, (byte) 11, 'z', (short) 22, 33, 44L, 55.55f, 66.66d);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 20);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { -1f, -2, 3d });
+        assertThat(result).containsExactly(-1f, -2, 3d);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 21);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { "\u00A0test\u00A0" });
+        assertThat(result).containsExactly("\u00A0test\u00A0");
     }
 
     @Test
@@ -176,7 +176,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 30);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { "", true });
+        assertThat(result).containsExactly("", true);
     }
 
     @Test
@@ -192,7 +192,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 31);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { 1, "" });
+        assertThat(result).containsExactly(1, "");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -264,7 +264,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 50);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1, TestEnum.VAL2 });
+        assertThat(result).containsExactly(TestEnum.VAL1, TestEnum.VAL2);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -292,7 +292,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 50);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1, TestEnum.VAL2 });
+        assertThat(result).containsExactly(TestEnum.VAL1, TestEnum.VAL2);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -322,7 +322,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 50);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { Thread.class, DataProviderRunner.class });
+        assertThat(result).containsExactly(Thread.class, DataProviderRunner.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -352,9 +352,9 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 60);
 
         // Then:
-        assertThat(result).isEqualTo(
-                new Object[] { Boolean.TRUE, Byte.valueOf((byte) 1), Character.valueOf('c'), Short.valueOf((short) 2),
-                        Integer.valueOf(3), Long.valueOf(4L), Float.valueOf(5.5f), Double.valueOf(6.6d) });
+        assertThat(result).containsExactly(
+                Boolean.TRUE, Byte.valueOf((byte) 1), Character.valueOf('c'), Short.valueOf((short) 2),
+                Integer.valueOf(3), Long.valueOf(4L), Float.valueOf(5.5f), Double.valueOf(6.6d));
     }
 
     @Test
@@ -369,7 +369,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 70);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { "null", "null" });
+        assertThat(result).containsExactly("null", "null");
     }
 
     @Test
@@ -385,7 +385,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 71);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { null, null, "foo" });
+        assertThat(result).containsExactly(null, null, "foo");
     }
 
     @Test
@@ -400,7 +400,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 80);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { BigInteger.valueOf(1) });
+        assertThat(result).containsExactly(BigInteger.ONE);
     }
 
     @Test
@@ -415,7 +415,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 80);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new File("home/schmida") });
+        assertThat(result).containsExactly(new File("home/schmida"));
     }
 
     @Test
@@ -430,7 +430,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 90);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new int[0] });
+        assertThat(result).containsExactly(new int[0]);
     }
 
     @Test
@@ -445,7 +445,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 91);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { "test", new int[0] });
+        assertThat(result).containsExactly("test", new int[0]);
     }
 
     @Test
@@ -460,7 +460,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 92);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new double[] { 1.0 } });
+        assertThat(result).containsExactly(new double[] { 1.0 });
     }
 
     @Test
@@ -476,7 +476,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 93);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { 'a', (byte) 2, new Double[] { 1.0, null } });
+        assertThat(result).containsExactly('a', (byte) 2, new Double[] { 1.0, null });
     }
 
     @Test
@@ -492,7 +492,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 94);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new long[] { 1, 2, 3 } });
+        assertThat(result).containsExactly(new long[] { 1, 2, 3 });
     }
 
     @Test
@@ -508,7 +508,7 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 95);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { "foobar", new long[] { 1, 2, 3 } });
+        assertThat(result).containsExactly("foobar", new long[] { 1, 2, 3 });
     }
 
     @Test
@@ -523,6 +523,6 @@ public class StringConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 100);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { TestEnum.VAL1 });
+        assertThat(result).containsExactly(TestEnum.VAL1);
     }
 }
