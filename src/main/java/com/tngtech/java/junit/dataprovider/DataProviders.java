@@ -93,9 +93,19 @@ public class DataProviders {
         }
         return testForEach((Object[]) enumClass.getEnumConstants());
     }
-    
+
     /**
-     * Creates a dataprovider test for each combination of elements in two data providers.
+     * Creates a dataprovider test for each combination of elements of the two provided data providers.
+     *
+     * <pre>
+     * <code>
+     * Object[][] r = crossProduct(dataProviderMethod1, dataProviderMethod2);
+     * </code>
+     * </pre>
+     *
+     * @param rows1 of first dataprovider which should be cross producted with the second
+     * @param rows2 of second dataprovider which should be cross producted with the first
+     * @return an {@link Object} array array containing the cross product of the given {@code rows}
      */
     public static Object[][] crossProduct(Object[][] rows1, Object[][] rows2) {
         Object[][] rowsOut = new Object[rows1.length * rows2.length][];
