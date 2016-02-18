@@ -13,7 +13,7 @@ description = 'A TestNG like dataprovider runner for JUnit having a simplified s
 group = 'com.tngtech.java'
 version = '1.10.2'
 
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_5
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
 ext {
     isBuildOnJenkins = System.env['BUILD_TAG']?.startsWith('jenkins-') ?: false
