@@ -245,8 +245,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(data[0]);
+        assertThat(result).containsExactly(data[0]);
     }
 
     @Test
@@ -259,10 +258,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(3);
-        assertThat(result.get(0)).isEqualTo(data[0]);
-        assertThat(result.get(1)).isEqualTo(data[1]);
-        assertThat(result.get(2)).isEqualTo(data[2]);
+        assertThat(result).containsExactly(data[0], data[1], data[2]);
     }
 
     @Test
@@ -276,8 +272,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(data.get(0).toArray());
+        assertThat(result).containsExactly(data.get(0).toArray());
     }
 
     @Test
@@ -291,10 +286,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(3);
-        assertThat(result.get(0)).isEqualTo(data.get(0).toArray());
-        assertThat(result.get(1)).isEqualTo(data.get(1).toArray());
-        assertThat(result.get(2)).isEqualTo(data.get(2).toArray());
+        assertThat(result).containsExactly(data.get(0).toArray(), data.get(1).toArray(), data.get(2).toArray());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -323,8 +315,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(new Object[] { "foo", true });
+        assertThat(result).containsExactly(new Object[] { "foo", true });
     }
 
     @Test
@@ -339,8 +330,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(new Object[] { "bar", false });
+        assertThat(result).containsExactly(new Object[] { "bar", false });
     }
 
     @Test
@@ -355,8 +345,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(new Object[] { "baz", 2 });
+        assertThat(result).containsExactly(new Object[] { "baz", 2 });
     }
 
     @Test
@@ -372,9 +361,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0)).isEqualTo(new Object[] { (byte) 1, 2, 3l, 4.0, 'e' });
-        assertThat(result.get(1)).isEqualTo(new Object[] { (byte) 6, 7, 8l, 9.0, 'i' });
+        assertThat(result).containsExactly(new Object[] { (byte) 1, 2, 3l, 4.0, 'e' }, new Object[] { (byte) 6, 7, 8l, 9.0, 'i' });
     }
 
     // -- methods used as Method objects -------------------------------------------------------------------------------

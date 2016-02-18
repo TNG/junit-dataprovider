@@ -38,7 +38,7 @@ public class ObjectArrayConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new int[0] });
+        assertThat(result).containsExactly(new int[0]);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ObjectArrayConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { "test", new int[0] });
+        assertThat(result).containsExactly("test", new int[0]);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ObjectArrayConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new double[] { 1.0 } });
+        assertThat(result).containsExactly(new double[] { 1.0 });
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ObjectArrayConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { 'a', (byte) 2, new double[] { 1.0 } });
+        assertThat(result).containsExactly('a', (byte) 2, new double[] { 1.0 });
     }
 
     @Test
@@ -90,7 +90,7 @@ public class ObjectArrayConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { new long[] { 1, 2, 3 } });
+        assertThat(result).containsExactly(new long[] { 1, 2, 3 });
     }
 
     @Test
@@ -103,7 +103,7 @@ public class ObjectArrayConverterTest extends BaseTest {
         Object[] result = underTest.convert(data, true, parameterTypes);
 
         // Then:
-        assertThat(result).isEqualTo(new Object[] { "foobar", new long[] { 1, 2, 3 } });
+        assertThat(result).containsExactly("foobar", new long[] { 1, 2, 3 });
     }
 
     @Test
