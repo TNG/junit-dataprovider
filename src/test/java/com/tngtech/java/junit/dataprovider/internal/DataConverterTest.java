@@ -80,7 +80,7 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testCanConvertShouldReturnFalseIfTypeIsListOfObject() {
+    public void testCanConvertShouldReturnTrueIfTypeIsListOfObject() {
         // Given:
         Type type = getMethod("methodReturningListOfObject").getGenericReturnType();
 
@@ -88,19 +88,7 @@ public class DataConverterTest extends BaseTest {
         boolean result = underTest.canConvert(type);
 
         // Then:
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    public void testCanConvertShouldReturnFalseIfTypeIsListOfIterable() {
-        // Given:
-        Type type = getMethod("methodReturningListOfIterableOfObject").getGenericReturnType();
-
-        // When:
-        boolean result = underTest.canConvert(type);
-
-        // Then:
-        assertThat(result).isFalse();
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -152,6 +140,30 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
+    public void testCanConvertShouldReturnTrueIfTypeIsObjectArray() {
+        // Given:
+        Type type = getMethod("methodReturningObjectArray").getGenericReturnType();
+
+        // When:
+        boolean result = underTest.canConvert(type);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testCanConvertShouldReturnTrueIfTypeIsStringArray() {
+        // Given:
+        Type type = getMethod("methodReturningStringArray").getGenericReturnType();
+
+        // When:
+        boolean result = underTest.canConvert(type);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
     public void testCanConvertShouldReturnTrueIfTypeIsListListObject() {
         // Given:
         Type type = getMethod("methodReturningListOfListOfObject").getGenericReturnType();
@@ -161,6 +173,18 @@ public class DataConverterTest extends BaseTest {
 
         // Then:
         assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testCanConvertShouldReturnFalseIfTypeIsListOfIterable() {
+        // Given:
+        Type type = getMethod("methodReturningListOfIterableOfObject").getGenericReturnType();
+
+        // When:
+        boolean result = underTest.canConvert(type);
+
+        // Then:
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -262,6 +286,19 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
+    public void testConvertShouldReturnMultipleElementsForObjectArrayWithMultipleElements() {
+        // Given:
+        Object[] data = new Object[] { "12", 34L, 5.6 };
+        Class<?>[] parameterTypes = new Class<?>[] { Object.class };
+
+        // When:
+        List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
+
+        // Then:
+        assertThat(result).containsExactly(new Object[] { "12" }, new Object[] { 34L }, new Object[] { 5.6 });
+    }
+
+    @Test
     public void testConvertShouldReturnOneElementForListOfListOfObjectWithOneElement() {
         // Given:
         @SuppressWarnings("unchecked")
@@ -287,6 +324,19 @@ public class DataConverterTest extends BaseTest {
 
         // Then:
         assertThat(result).containsExactly(data.get(0).toArray(), data.get(1).toArray(), data.get(2).toArray());
+    }
+
+    @Test
+    public void testConvertShouldReturnMultipleElementsForListOfObjectWithMultipleElements() {
+        // Given:
+        List<Object> data = this.<Object> list("12", 34L, 5.6);
+        Class<?>[] parameterTypes = new Class<?>[] { Object.class };
+
+        // When:
+        List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
+
+        // Then:
+        assertThat(result).containsExactly(new Object[] { "12" }, new Object[] { 34L }, new Object[] { 5.6 });
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -366,10 +416,6 @@ public class DataConverterTest extends BaseTest {
 
     // -- methods used as Method objects -------------------------------------------------------------------------------
 
-    public static List<Object> methodReturningListOfObject() {
-        return null;
-    }
-
     public static List<Iterable<Object>> methodReturningListOfIterableOfObject() {
         return null;
     }
@@ -395,7 +441,19 @@ public class DataConverterTest extends BaseTest {
         return null;
     }
 
+    public static Object[] methodReturningObjectArray() {
+        return null;
+    }
+
+    public static String[] methodReturningStringArray() {
+        return null;
+    }
+
     public static List<List<Object>> methodReturningListOfListOfObject() {
+        return null;
+    }
+
+    public static List<Object> methodReturningListOfObject() {
         return null;
     }
 

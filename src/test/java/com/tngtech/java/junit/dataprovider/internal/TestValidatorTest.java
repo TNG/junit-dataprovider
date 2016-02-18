@@ -357,7 +357,7 @@ public class TestValidatorTest extends BaseTest {
         // Then:
         assertThat(errors).hasSize(1);
         assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
+                "must either return Object[][], Object[], String[], List<List<Object>> or List<Object>");
     }
 
     @Test
@@ -403,7 +403,7 @@ public class TestValidatorTest extends BaseTest {
         assertThat(errors.get(2).getMessage()).contains(dataProviderName).containsIgnoringCase(
                 "must either have a single FrameworkMethod parameter or none");
         assertThat(errors.get(3).getMessage()).contains(dataProviderName).containsIgnoringCase(
-                "must either return Object[][] or List<List<Object>>");
+                "must either return Object[][], Object[], String[], List<List<Object>> or List<Object>");
         assertThat(errors.get(4).getMessage()).contains(dataProviderName).containsIgnoringCase(
                 "must not define @DataProvider.value()");
     }

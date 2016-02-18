@@ -104,7 +104,8 @@ public class TestValidator {
             errors.add(new Exception(messageBasePart + " either have a single FrameworkMethod parameter or none"));
         }
         if (!dataConverter.canConvert(method.getGenericReturnType())) {
-            errors.add(new Exception(messageBasePart + " either return Object[][] or List<List<Object>>"));
+            errors.add(new Exception(messageBasePart
+                    + " either return Object[][], Object[], String[], List<List<Object>> or List<Object>"));
         }
         if (dataProvider.value().length > 0) {
             errors.add(new Exception(messageBasePart + " not define @DataProvider.value()"));

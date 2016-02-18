@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.internal.convert.ObjectArrayConverter;
+import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
 
 /**
@@ -27,6 +28,13 @@ public class DataConverter {
      * This field is package private (= visible) for testing.
      * </p>
      */
+    final SingleArgConverter singleArgConverter = new SingleArgConverter();
+
+    /**
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
     final StringConverter stringConverter = new StringConverter();
 
     /**
@@ -35,6 +43,8 @@ public class DataConverter {
      * <ul>
      * <li>Object[][]</li>
      * <li>List&lt;List&lt;Object&gt;&gt;</li>
+     * <li>List&lt;Object&gt;</li>
+     * <li>Object[]</li>
      * <li>String[]</li>
      * </ul>
      *
@@ -44,16 +54,20 @@ public class DataConverter {
      */
     public boolean canConvert(Type type) {
         if (type instanceof Class) {
-            return Object[][].class.equals(type) || String[].class.equals(type);
+            return Object[][].class.equals(type) || Object[].class.equals(type) || String[].class.equals(type);
         }
 
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
-            if (List.class.isAssignableFrom((Class<?>) parameterizedType.getRawType())) {
-                if (parameterizedType.getActualTypeArguments().length == 1
-                        && parameterizedType.getActualTypeArguments()[0] instanceof ParameterizedType) {
-                    ParameterizedType innerType = (ParameterizedType) parameterizedType.getActualTypeArguments()[0];
-                    return List.class.isAssignableFrom((Class<?>) innerType.getRawType());
+            Type rawType = parameterizedType.getRawType();
+            if (List.class.isAssignableFrom((Class<?>) rawType)) {
+                if (parameterizedType.getActualTypeArguments().length == 1) {
+                    Type innerType = parameterizedType.getActualTypeArguments()[0];
+                    if (parameterizedType.getActualTypeArguments()[0] instanceof ParameterizedType) {
+                        return List.class.isAssignableFrom((Class<?>) ((ParameterizedType) innerType).getRawType());
+
+                    }
+                    return Object.class.equals(innerType);
                 }
             }
         }
@@ -75,7 +89,8 @@ public class DataConverter {
      * @throws IllegalArgumentException iif given {@code parameterTypes} is empty
      * @throws ClassCastException iif {@code data} is not a compatible type
      */
-    public List<Object[]> convert(Object data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider) {
+    public List<Object[]> convert(Object data, boolean isVarArgs, Class<?>[] parameterTypes,
+            DataProvider dataProvider) {
         if (parameterTypes == null) {
             throw new NullPointerException("parameterTypes must not be null");
         }
@@ -98,16 +113,29 @@ public class DataConverter {
                 result.add(stringConverter.convert(argString, isVarArgs, parameterTypes, dataProvider, idx++));
             }
 
+        } else if (data instanceof Object[]) {
+            for (Object argument : (Object[]) data) {
+                result.add(singleArgConverter.convert(argument, isVarArgs, parameterTypes));
+            }
+
         } else if (data instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<List<Object>> lists = (List<List<Object>>) data;
-            for (List<Object> arguments : lists) {
-                result.add(objectArrayConverter.convert(arguments.toArray(), isVarArgs, parameterTypes));
+            @SuppressWarnings("rawtypes")
+            List lists = (List) data;
+            for (Object arguments : lists) {
+                if (List.class.isInstance(arguments)) {
+                    @SuppressWarnings("rawtypes")
+                    List list = (List) arguments;
+                    result.add(objectArrayConverter.convert(list.toArray(), isVarArgs, parameterTypes));
+
+                } else {
+                    result.add(singleArgConverter.convert(arguments, isVarArgs, parameterTypes));
+                }
             }
 
         } else {
             throw new ClassCastException(String.format(
-                    "Cannot cast to either Object[][], String[], or List<List<Object>> because data was: %s", data));
+                    "Cannot cast to either Object[][], Object[], String[], List<List<Object>>, or List<Object> because data was: %s",
+                    data));
         }
         return result;
     }
