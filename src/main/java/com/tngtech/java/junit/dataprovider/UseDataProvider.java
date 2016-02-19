@@ -16,11 +16,40 @@ import java.lang.annotation.Target;
 public @interface UseDataProvider {
 
     /**
-     * The required name of the dataprovider method to use test data from. Required.
+     * This is the default value for {@link #value()}. If used the dataprovider name is tried to be guessed (=
+     * convention over configuration) in the in {@link #value()} described order.
+     */
+    String DEFAULT_VALUE = "<use_convention>";
+
+    /**
+     * The optional name of the dataprovider method to use test data from. It is tried to be found like following:
+     * <ul>
+     * <li>Explicitly configured name of @{@link DataProvider} to be used (no fallback if dataprovider could not be
+     * found)</li>
+     * <li>@{@link DataProvider} annotated method which name equals the test method name</li>
+     * <li>@{@link DataProvider} annotated method whereby prefix is replaced one out of the following table:
+     * <table border="1" summary="Prefix replacement overview.">
+     * <tr>
+     * <th>prefix</th>
+     * <th>replacement</th>
+     * </tr>
+     * <tr>
+     * <td>test</td>
+     * <td>dataProvider</td>
+     * </tr>
+     * <tr>
+     * <td>test</td>
+     * <td>data</td>
+     * </tr>
+     * </table>
+     * </li>
+     * </ul>
+     * <b>Note</b>: As long as {@link #value()} contains the default value (= {@link #DEFAULT_VALUE}), it is tried to
+     * guess the name of the dataprovider in the above described order.
      *
      * @return the name of the dataprovider method
      */
-    String value();
+    String value() default DEFAULT_VALUE;
 
     /**
      * Optionally specify the class holding the dataprovider method having the name given in {@link #value()}. Defaults

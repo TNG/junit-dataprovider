@@ -81,7 +81,11 @@ public class DataProviderRunnerTest extends BaseTest {
         doReturn(testClass).when(underTest).getTestClassInt();
 
         doReturn(anyMethod()).when(testMethod).getMethod();
+        doReturn("testMethod").when(testMethod).getName();
+
         doReturn(anyMethod()).when(dataProviderMethod).getMethod();
+
+        doReturn(UseDataProvider.DEFAULT_VALUE).when(useDataProvider).value();
     }
 
     @Test
@@ -220,7 +224,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such dataprovider");
+        assertThat(errors.get(0).getMessage()).containsIgnoringCase("no valid dataprovider");
 
         verifyZeroInteractions(testValidator);
     }
@@ -284,7 +288,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getMessage()).contains(dataProviderName).containsIgnoringCase("no such dataprovider");
+        assertThat(errors.get(0).getMessage()).containsIgnoringCase("no valid dataprovider found for test");
 
         verify(testValidator).validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
         verify(testValidator).validateDataProviderMethod(dataProviderMethod2, dataProvider2, errors);
@@ -485,7 +489,70 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testGetDataProviderMethodShouldReturnDataProviderMethodIfItExists() {
+    public void testGetDataProviderMethodShouldReturnDataProviderMethodWithSameNameAsTestIfItExists() {
+        // Given:
+        final String testMethodName = "testMethodName";
+
+        doReturn(testMethodName).when(testMethod).getName();
+
+        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
+        doReturn(testClass).when(underTest).findDataProviderLocation(useDataProvider);
+
+        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn(testMethodName).when(dataProviderMethod).getName();
+
+        // When:
+        FrameworkMethod result = underTest.getDataProviderMethod(testMethod);
+
+        // Then:
+        assertThat(result).isEqualTo(dataProviderMethod);
+    }
+
+    @Test
+    public void testGetDataProviderMethodShouldReturnDataProviderMethodWithDataProviderPrefixInsteadOfTestIfItExists() {
+        // Given:
+        final String testMethodName = "testMethodName";
+        final String dataProviderMethodName = "dataProviderMethodName";
+
+        doReturn(testMethodName).when(testMethod).getName();
+
+        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
+
+        doReturn(testClass).when(underTest).findDataProviderLocation(useDataProvider);
+
+        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+
+        // When:
+        FrameworkMethod result = underTest.getDataProviderMethod(testMethod);
+
+        // Then:
+        assertThat(result).isEqualTo(dataProviderMethod);
+    }
+
+    @Test
+    public void testGetDataProviderMethodShouldReturnDataProviderMethodWithDataPrefixInsteadOfTestIfItExists() {
+        // Given:
+        final String testMethodName = "testMethodName";
+        final String dataProviderMethodName = "dataMethodName";
+
+        doReturn(testMethodName).when(testMethod).getName();
+
+        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
+        doReturn(testClass).when(underTest).findDataProviderLocation(useDataProvider);
+
+        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+
+        // When:
+        FrameworkMethod result = underTest.getDataProviderMethod(testMethod);
+
+        // Then:
+        assertThat(result).isEqualTo(dataProviderMethod);
+    }
+
+    @Test
+    public void testGetDataProviderMethodShouldReturnDataProviderMethodWithExplicitelyGivenNameIfItExists() {
         // Given:
         final String dataProviderMethodName = "availableDataProviderMethod";
 

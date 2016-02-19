@@ -125,8 +125,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
-                errors.add(new Exception("No such dataprovider: "
-                        + testMethod.getAnnotation(UseDataProvider.class).value()));
+                errors.add(new Exception(String.format(
+                        "No valid dataprovider found for test %s. By convention the dataprovider method name must either be equal to the test methods name, have a prefix of 'dataProvider' instead of 'test' or is overridden by using @UseDataProvider#value().",
+                        testMethod.getName())));
+
             } else {
                 DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
                 if (dataProvider == null) {
@@ -227,12 +229,8 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
 
         TestClass dataProviderLocation = findDataProviderLocation(useDataProvider);
-        for (FrameworkMethod method : dataProviderLocation.getAnnotatedMethods(DataProvider.class)) {
-            if (method.getName().equals(useDataProvider.value())) {
-                return method;
-            }
-        }
-        return null;
+        List<FrameworkMethod> dataProviderMethods = dataProviderLocation.getAnnotatedMethods(DataProvider.class);
+        return findDataProviderMethod(dataProviderMethods, useDataProvider.value(), testMethod.getName());
     }
 
     /**
@@ -245,5 +243,31 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             return getTestClassInt();
         }
         return new TestClass(useDataProvider.location()[0]);
+    }
+
+    private FrameworkMethod findDataProviderMethod(List<FrameworkMethod> dataProviderMethods,
+            String useDataProviderValue, String testMethodName) {
+        if (!UseDataProvider.DEFAULT_VALUE.equals(useDataProviderValue)) {
+            return findMethod(dataProviderMethods, useDataProviderValue);
+        }
+        FrameworkMethod result = findMethod(dataProviderMethods, testMethodName);
+        if (result == null) {
+            String dataProviderMethodName = testMethodName.replaceAll("^test", "dataProvider");
+            result = findMethod(dataProviderMethods, dataProviderMethodName);
+        }
+        if (result == null) {
+            String dataProviderMethodName = testMethodName.replaceAll("^test", "data");
+            result = findMethod(dataProviderMethods, dataProviderMethodName);
+        }
+        return result;
+    }
+
+    private FrameworkMethod findMethod(List<FrameworkMethod> methods, String methodName) {
+        for (FrameworkMethod method : methods) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        return null;
     }
 }

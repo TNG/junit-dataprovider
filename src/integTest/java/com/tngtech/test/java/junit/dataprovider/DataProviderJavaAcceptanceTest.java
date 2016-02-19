@@ -37,7 +37,7 @@ public class DataProviderJavaAcceptanceTest {
     }
 
     @DataProvider
-    public static Object[][] dataProviderStringIsNullOrEmpty() {
+    public static Object[][] testIsEmptyString() {
         // @formatter:off
         return new Object[][] {
                 { null },
@@ -47,7 +47,7 @@ public class DataProviderJavaAcceptanceTest {
     }
 
     @Test
-    @UseDataProvider("dataProviderStringIsNullOrEmpty")
+    @UseDataProvider
     public void testIsEmptyString(String str) {
         // Given:
 
@@ -86,7 +86,7 @@ public class DataProviderJavaAcceptanceTest {
     }
 
     @Test
-    @UseDataProvider("dataProviderAdd")
+    @UseDataProvider
     public void testAdd(int a, int b, int expected) {
         // Given:
 
