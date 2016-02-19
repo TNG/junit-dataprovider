@@ -9,6 +9,8 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 
 public class StringConverter {
 
+    protected static final Object OBJECT_NO_CONVERSION = new Object();
+
     /**
      * Converts the given {@code data} to its corresponding arguments using the given {@code parameterTypes} and other
      * provided information.
@@ -62,7 +64,7 @@ public class StringConverter {
         return result;
     }
 
-    private String[] splitBy(String data, String regex) {
+    protected String[] splitBy(String data, String regex) {
         // add trailing null terminator that split for "regex" ending data works properly
         String[] splitData = (data + "\0").split(regex);
 
@@ -73,7 +75,7 @@ public class StringConverter {
         return splitData;
     }
 
-    private void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
+    protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
         if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount != argCount)) {
             throw new IllegalArgumentException(String.format(
                     "Test method expected %s %d parameters but got %d from @DataProvider row %d",
@@ -86,6 +88,12 @@ public class StringConverter {
         if (dataProvider.convertNulls() && NULL.equals(str)) {
             return null;
         }
+
+        Object tmp = customConvertValue(str, targetType, dataProvider);
+        if (tmp != OBJECT_NO_CONVERSION) {
+            return tmp;
+        }
+
         if (String.class.equals(targetType)) {
             return str;
         }
@@ -146,7 +154,21 @@ public class StringConverter {
                 + " values, 'String's, and types having a single 'String' parameter constructor.");
     }
 
-    private Object convertToChar(String str, Class<?> charType) {
+    /**
+     * This method purely exists as potential extension point by overriding it.
+     *
+     * @param str value to be converted
+     * @param targetType target type into which value should be converted
+     * @param dataProvider containing settings which should be used to convert given {@code data}
+     * @return to target type converted {@link String} or {@link #OBJECT_NO_CONVERSION} if no conversion was applied.
+     *         Later will imply that normal conversions try to apply.
+     */
+    @SuppressWarnings("unused")
+    protected Object customConvertValue(String str, Class<?> targetType, DataProvider dataProvider) {
+        return OBJECT_NO_CONVERSION;
+    }
+
+    protected Object convertToChar(String str, Class<?> charType) {
         if (str.length() == 1) {
             return str.charAt(0);
         }
@@ -154,7 +176,7 @@ public class StringConverter {
                 charType.getSimpleName()));
     }
 
-    private Object convertToLong(String str) {
+    protected Object convertToLong(String str) {
         String longStr = str;
         if (longStr.endsWith("l")) {
             longStr = longStr.substring(0, longStr.length() - 1);
@@ -163,7 +185,7 @@ public class StringConverter {
     }
 
     @SuppressWarnings("rawtypes")
-    private Object convertToEnumValue(String str, Class<Enum> enumType, boolean ignoreEnumCase) {
+    protected Object convertToEnumValue(String str, Class<Enum> enumType, boolean ignoreEnumCase) {
         String errorMessage = "'%s' is not a valid value of enum %s.";
         if (ignoreEnumCase) {
             for (Enum<?> enumConstant : enumType.getEnumConstants()) {
@@ -185,7 +207,7 @@ public class StringConverter {
         throw new IllegalArgumentException(String.format(errorMessage, str, enumType.getSimpleName()));
     }
 
-    private Object tryConvertUsingSingleStringParamConstructor(String str, Class<?> targetType) {
+    protected Object tryConvertUsingSingleStringParamConstructor(String str, Class<?> targetType) {
         for (Constructor<?> constructor : targetType.getConstructors()) {
             if (constructor.getParameterTypes().length == 1 && String.class.equals(constructor.getParameterTypes()[0])) {
                 try {

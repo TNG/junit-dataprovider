@@ -29,29 +29,20 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     /**
      * The {@link DataConverter} to be used to convert from supported return types of any dataprovider to {@link List}
      * {@code <}{@link Object}{@code []>} such that data can be further handled.
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
      */
-    DataConverter dataConverter;
-
-    /**
-     * The {@link TestValidator} to be used to validate all test methods to be executed as test and all dataprovider to
-     * be used to explode tests.
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
-     */
-    TestValidator testValidator;
+    protected DataConverter dataConverter;
 
     /**
      * The {@link TestGenerator} to be used to generate all framework methods to be executed as test (enhanced by data
      * providers data if desired).
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
      */
-    TestGenerator testGenerator;
+    protected TestGenerator testGenerator;
+
+    /**
+     * The {@link TestValidator} to be used to validate all test methods to be executed as test and all dataprovider to
+     * be used to explode tests.
+     */
+    protected TestValidator testValidator;
 
     /**
      * Cached result of {@link #computeTestMethods()}.
@@ -75,11 +66,18 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     protected void collectInitializationErrors(List<Throwable> errors) {
         // initialize testValidator, testGenerator and dataConverter here because "super" in constructor already calls
         // this, i.e. fields are not initialized yet but required in super.collectInitializationErrors(errors) ...
-        dataConverter = new DataConverter();
-        testValidator = new TestValidator(dataConverter);
-        testGenerator = new TestGenerator(dataConverter);
+        initializeHelpers();
 
         super.collectInitializationErrors(errors);
+    }
+
+    /**
+     * Initialize and/or override {@link DataConverter}, {@link TestGenerator} and/or {@link TestValidator} helper classes.
+     */
+    protected void initializeHelpers() {
+        dataConverter = new DataConverter();
+        testGenerator = new TestGenerator(dataConverter);
+        testValidator = new TestValidator(dataConverter);
     }
 
     /**
