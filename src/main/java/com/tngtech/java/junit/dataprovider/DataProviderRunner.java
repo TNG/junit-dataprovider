@@ -5,15 +5,12 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.ParentRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
@@ -63,14 +60,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * </p>
      */
     List<FrameworkMethod> computedTestMethods;
-
-    /**
-     * Cached exception of {@link #withClassRules(Statement)} and {@link #withBeforeClasses(Statement)} if any.
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
-     */
-    Throwable failure;
 
     /**
      * Creates a DataProviderRunner to run supplied {@code clazz}.
@@ -150,30 +139,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Overridden due to {@code @}{@link BeforeClass} methods are already processed, see {@link #computeTestMethods()}
-     * and {@link #invokeBeforeClass()}. Just add a {@link Statement} which is processing potential caught
-     * {@link Throwable} while {@code @BeforeClass} methods have been executed before.
-     *
-     * @return {@code Statement} to be evaluated
-     */
-    @Override
-    protected Statement withBeforeClasses(final Statement statement) {
-        // Instead of calling withBeforeClasses(statement) just re-throw failure while it was processed before
-        Statement newStatement = new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                if (failure != null) {
-                    throw failure;
-                }
-                statement.evaluate();
-            }
-        };
-        return newStatement;
-    }
-
-    /**
      * Generates the exploded list of methods that run tests. All methods annotated with {@code @Test} on this class and
      * super classes that are not overridden are checked if they use a {@code @}{@link DataProvider} or not. If yes, for
      * each row of the {@link DataProvider}s result a specific, parameterized test method will be added. If not, the
@@ -187,7 +152,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
         if (computedTestMethods == null) {
-            invokeBeforeClass();
             // Further method for generation is required due to stubbing of "super.computeTestMethods()" is not possible
             computedTestMethods = generateExplodedTestMethodsFor(super.computeTestMethods());
         }
@@ -216,30 +180,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      */
     TestClass getTestClassInt() {
         return getTestClass();
-    }
-
-    /**
-     * Runs all {@code @}{@link BeforeClass} methods as by using the result of
-     * {@link ParentRunner#withBeforeClasses(Statement)} and immediately invoke its {@link Statement#evaluate()}. If a
-     * {@link Throwable}s was thrown, it will be stored in {@link #failure} that it can be processed later in overridden
-     * {@link #withBeforeClasses(Statement)}.
-     * <p>
-     * This method is package private (= visible) for testing.
-     * </p>
-     */
-    void invokeBeforeClass() {
-        Statement statement = new Statement() {
-            @Override
-            public void evaluate() {
-                // nothing to do here
-            }
-        };
-        statement = super.withBeforeClasses(statement);
-        try {
-            statement.evaluate();
-        } catch (Throwable e) {
-            failure = e;
-        }
     }
 
     /**

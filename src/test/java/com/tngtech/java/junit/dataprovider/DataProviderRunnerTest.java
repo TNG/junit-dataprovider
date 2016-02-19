@@ -14,14 +14,12 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -294,50 +292,6 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
-    public void testWithBeforeClassesShouldReturnNewStatementWrapingGivenStatementWhichShouldBeExecutedOnEvaluation()
-            throws Throwable {
-        // Given:
-        final AtomicBoolean evaluated = new AtomicBoolean(false);
-
-        Statement statement = new Statement() {
-            @Override
-            public void evaluate() {
-                evaluated.set(true);
-            }
-        };
-
-        // When:
-        Statement result = underTest.withBeforeClasses(statement);
-
-        // Then:
-        assertThat(result).isNotNull();
-        assertThat(evaluated.get()).isFalse();
-        result.evaluate();
-        assertThat(evaluated.get()).isTrue();
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testWithBeforeClassesShouldReturnNewStatementWrapingGivenStatementWhichThrowsStoredFailureOnEvaluation()
-            throws Throwable {
-        // Given:
-        underTest.failure = new IllegalArgumentException();
-
-        Statement statement = new Statement() {
-            @Override
-            public void evaluate() {
-                // to nothing
-            }
-        };
-
-        // When:
-        Statement result = underTest.withBeforeClasses(statement);
-
-        // Then:
-        assertThat(result).isNotNull();
-        result.evaluate();
-    }
-
-    @Test
     public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
         // Given:
         underTest.computedTestMethods = null;
@@ -352,7 +306,6 @@ public class DataProviderRunnerTest extends BaseTest {
 
         InOrder inOrder = inOrder(underTest);
         inOrder.verify(underTest).computeTestMethods();
-        inOrder.verify(underTest).invokeBeforeClass();
         inOrder.verify(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
         verifyNoMoreInteractions(underTest);
     }
@@ -397,21 +350,6 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(underTest.getDescription().getChildren().size()).isGreaterThan(0);
-    }
-
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    @Test
-    public void testInvokeBeforeClassShouldNotThrowButStoreFailure() {
-        // Given:
-        Throwable t = new Throwable();
-
-        classSetupException = t;
-
-        // When:
-        underTest.invokeBeforeClass();
-
-        // Then:
-        assertThat(underTest.failure).isSameAs(t);
     }
 
     @Test
