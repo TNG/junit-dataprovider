@@ -49,21 +49,21 @@ public @interface DataProvider {
      *
      * @see #splitBy()
      */
-    public static final String COMMA = ",";
+    String COMMA = ",";
 
     /**
      * {@code null}-{@link String} value to be converted to {@code null} if {@link #convertNulls()} is {@code true}.
      *
      * @see #convertNulls()
      */
-    public static final String NULL = "null";
+    String NULL = "null";
 
     /**
      * Default format string containing test method name followed by an index and all parameters within square brackets.
      *
      * @see #format()
      */
-    public static final String DEFAULT_FORMAT = "%m[%i: %p[0..-1]]";
+    String DEFAULT_FORMAT = "%m[%i: %p[0..-1]]";
 
     /**
      * Define a list of parameters each as a regex-separated {@link String} for the annotated test method. Optional.
