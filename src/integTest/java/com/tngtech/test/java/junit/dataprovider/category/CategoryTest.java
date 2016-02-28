@@ -17,14 +17,14 @@ public class CategoryTest {
     @Test
     public void testNone() {
         // Expect:
-        assertThat("none".length()).isEqualTo(4);
+        assertThat("none").hasSize(4);
     }
 
     @Category(CategoryOne.class)
     @Test
     public void testOne() {
         // Expect:
-        assertThat("one".length()).isEqualTo(3);
+        assertThat("one").hasSize(3);
     }
 
     @DataProvider
@@ -43,6 +43,6 @@ public class CategoryTest {
     @UseDataProvider("dataProvider")
     public void test(String string, int expectedLength) {
         // Expect:
-        assertThat(string.length()).isEqualTo(expectedLength);
+        assertThat(string).hasSize(expectedLength);
     }
 }
