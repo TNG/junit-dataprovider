@@ -42,6 +42,19 @@ public class ObjectArrayConverterTest extends BaseTest {
     }
 
     @Test
+    public void testConvertShouldHandleNullElementAsSingleElement() throws Exception {
+        // Given:
+        Object[] data = new Object[] { null };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, int[].class };
+
+        // When:
+        Object[] result = underTest.convert(data, true, parameterTypes);
+
+        // Then:
+        assertThat(result).containsExactly(null, new int[0]);
+    }
+
+    @Test
     public void testConvertShouldCreateEmptyVarargsArrayForLastMissingVarargsArgument() {
         // Given:
         Object[] data = new Object[] { "test" };

@@ -34,9 +34,10 @@ public class ObjectArrayConverter extends AbstractObjectConverter<Object[]> {
 
     private Object convertVarArgArgument(Object[] data, Class<?> varArgComponentType, int nonVarArgParameters) {
         if (data.length > 0) {
-            Class<?> lastArgType = data[data.length - 1].getClass();
-            if (lastArgType.isArray() && lastArgType.getComponentType() == varArgComponentType) {
-                return data[data.length - 1];
+            Object date = data[data.length - 1];
+            Class<?> lastArgType = date != null ? date.getClass() : null;
+            if (lastArgType != null && lastArgType.isArray() && lastArgType.getComponentType() == varArgComponentType) {
+                return date;
             }
         }
 
