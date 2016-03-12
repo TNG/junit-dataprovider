@@ -21,21 +21,21 @@ public class DataConverter {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    final ObjectArrayConverter objectArrayConverter = new ObjectArrayConverter();
+    ObjectArrayConverter objectArrayConverter = new ObjectArrayConverter();
 
     /**
      * <p>
      * This field is package private (= visible) for testing.
      * </p>
      */
-    final SingleArgConverter singleArgConverter = new SingleArgConverter();
+    SingleArgConverter singleArgConverter = new SingleArgConverter();
 
     /**
      * <p>
      * This field is package private (= visible) for testing.
      * </p>
      */
-    final StringConverter stringConverter = new StringConverter();
+    StringConverter stringConverter = new StringConverter();
 
     /**
      * Returns {@code true} iif this {@link DataConverter} can convert the given {@code type}. Currently supported

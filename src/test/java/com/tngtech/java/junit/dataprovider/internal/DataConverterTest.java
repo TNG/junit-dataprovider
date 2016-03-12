@@ -2,14 +2,20 @@ package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -30,6 +36,9 @@ public class DataConverterTest extends BaseTest {
 
     @Mock
     private ObjectArrayConverter objectArrayConverter;
+
+    @Mock
+    private SingleArgConverter singleArgConverter;
 
     @Mock
     private StringConverter stringConverter;
@@ -260,7 +269,7 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testConvertShouldReturnOneElementForObjectArrayArrayWithOneElement() {
+    public void testConvertShouldCallObjectArrayConverterOnlyOnceForObjectArrayArrayWithOneElement() {
         // Given:
         Object[][] data = new Object[][] { { 1 } };
         Class<?>[] parameterTypes = new Class<?>[] { int.class };
@@ -269,11 +278,12 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).containsExactly(data[0]);
+        verify(objectArrayConverter).convert(data[0], false, parameterTypes);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 
     @Test
-    public void testConvertShouldReturnMultipleElementsForObjectArrayArrayWithMultipleElements() {
+    public void testConvertShouldCallObjectArrayConverterMultipleTimesForObjectArrayArrayWithMultipleElements() {
         // Given:
         Object[][] data = new Object[][] { { "11", 22L, 3.3 }, { "44", 55L, 6.6 }, { "77", 88L, 9.9 } };
         Class<?>[] parameterTypes = new Class<?>[] { String.class, long.class, double.class };
@@ -282,24 +292,15 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).containsExactly(data[0], data[1], data[2]);
+        InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
+        inOrder.verify(objectArrayConverter).convert(data[0], false, parameterTypes);
+        inOrder.verify(objectArrayConverter).convert(data[1], false, parameterTypes);
+        inOrder.verify(objectArrayConverter).convert(data[2], false, parameterTypes);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 
     @Test
-    public void testConvertShouldReturnMultipleElementsForObjectArrayWithMultipleElements() {
-        // Given:
-        Object[] data = new Object[] { "12", 34L, 5.6 };
-        Class<?>[] parameterTypes = new Class<?>[] { Object.class };
-
-        // When:
-        List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
-
-        // Then:
-        assertThat(result).containsExactly(new Object[] { "12" }, new Object[] { 34L }, new Object[] { 5.6 });
-    }
-
-    @Test
-    public void testConvertShouldReturnOneElementForListOfListOfObjectWithOneElement() {
+    public void testConvertShouldCallObjectArrayConverterOnlyOnceForListOfListOfObjectWithOneElement() {
         // Given:
         @SuppressWarnings("unchecked")
         List<List<Character>> data = list(list('a'));
@@ -309,7 +310,8 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).containsExactly(data.get(0).toArray());
+        verify(objectArrayConverter).convert(data.get(0).toArray(), false, parameterTypes);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 
     @Test
@@ -323,11 +325,61 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).containsExactly(data.get(0).toArray(), data.get(1).toArray(), data.get(2).toArray());
+        InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
+        inOrder.verify(objectArrayConverter).convert(data.get(0).toArray(), false, parameterTypes);
+        inOrder.verify(objectArrayConverter).convert(data.get(1).toArray(), false, parameterTypes);
+        inOrder.verify(objectArrayConverter).convert(data.get(2).toArray(), false, parameterTypes);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 
     @Test
-    public void testConvertShouldReturnMultipleElementsForListOfObjectWithMultipleElements() {
+    public void testConvertShouldCallSingleArgConverterOnlyOnceForObjectArrayWithSingleElement() {
+        // Given:
+        Object[] data = new Object[] { 88.99 };
+        Class<?>[] parameterTypes = new Class<?>[] { Object.class };
+
+        // When:
+        List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
+
+        // Then:
+        verify(singleArgConverter).convert(data[0], false, parameterTypes);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
+    }
+
+    @Test
+    public void testConvertShouldCallSingleArgConverterMultipleTimesForObjectArrayWithMultipleElements() {
+        // Given:
+        Object[] data = new Object[] { "12", 34L, 5.6 };
+        Class<?>[] parameterTypes = new Class<?>[] { Object.class };
+
+        // When:
+        List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
+
+        // Then:
+        InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
+        inOrder.verify(singleArgConverter).convert(data[0], false, parameterTypes);
+        inOrder.verify(singleArgConverter).convert(data[1], false, parameterTypes);
+        inOrder.verify(singleArgConverter).convert(data[2], false, parameterTypes);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
+    }
+
+    @Test
+    public void testConvertShouldCallSingleArgConverterOnlyOnceForListOfObjectWithSingleElement() {
+        // Given:
+        List<Object> data = this.<Object> list(88);
+        Class<?>[] parameterTypes = new Class<?>[] { Object.class };
+
+        // When:
+        List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
+
+        // Then:
+        verify(singleArgConverter).convert(data.get(0), false, parameterTypes);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
+        // TODO only false for varargs?
+    }
+
+    @Test
+    public void testConvertShouldCallSingleArgConverterMultipleTimesForListOfObjectWithMultipleElements() {
         // Given:
         List<Object> data = this.<Object> list("12", 34L, 5.6);
         Class<?>[] parameterTypes = new Class<?>[] { Object.class };
@@ -336,25 +388,16 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).containsExactly(new Object[] { "12" }, new Object[] { 34L }, new Object[] { 5.6 });
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testConvertShouldThrowIllegalArgumentExceptionIfLengthOfSplitDataAndTargetTypesDiffer() {
-        // Given:
-        String[] data = new String[] { "1,2" };
-        Class<?>[] parameterTypes = new Class[] { int.class };
-
-        doReturn(",").when(dataProvider).splitBy();
-
-        // When:
-        underTest.convert(data, false, parameterTypes, dataProvider);
-
-        // Then: expect exception
+        InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
+        inOrder.verify(singleArgConverter).convert(data.get(0), false, parameterTypes);
+        inOrder.verify(singleArgConverter).convert(data.get(1), false, parameterTypes);
+        inOrder.verify(singleArgConverter).convert(data.get(2), false, parameterTypes);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
+        // TODO only false for varargs?
     }
 
     @Test
-    public void testConvertShouldReturnOneElementForStringArrayWithOneElementSplitByComma() {
+    public void testConvertShouldCallStringConverterOnlyOnceForStringArrayWithOneElement() {
         // Given:
         String[] data = new String[] { "foo,true" };
         Class<?>[] parameterTypes = new Class<?>[] { String.class, boolean.class };
@@ -365,41 +408,12 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).containsExactly(new Object[] { "foo", true });
+        verify(stringConverter).convert(data[0], false, parameterTypes, dataProvider, 0);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 
     @Test
-    public void testConvertShouldReturnOneElementForStringArrayWithOneElementSplitByPipe() {
-        // Given:
-        String[] data = new String[] { "bar|false" };
-        Class<?>[] parameterTypes = new Class<?>[] { String.class, boolean.class };
-
-        doReturn("\\|").when(dataProvider).splitBy();
-
-        // When:
-        List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
-
-        // Then:
-        assertThat(result).containsExactly(new Object[] { "bar", false });
-    }
-
-    @Test
-    public void testConvertShouldReturnOneElementForStringArrayWithOneElementSplitByMultipleWhitespaces() {
-        // Given:
-        String[] data = new String[] { "baz    2" };
-        Class<?>[] parameterTypes = new Class<?>[] { String.class, int.class };
-
-        doReturn("\\s+").when(dataProvider).splitBy();
-
-        // When:
-        List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
-
-        // Then:
-        assertThat(result).containsExactly(new Object[] { "baz", 2 });
-    }
-
-    @Test
-    public void testConvertShouldReturnMultipleElementsForStringArrayWithMultipleElements() {
+    public void testConvertCallStringConverterMultipleTimesForStringArrayWithMultipleElements() {
         // Given:
         String[] data = new String[] { "1, 2, 3, 4.0, e", "6, 7, 8, 9.0, i" };
         Class<?>[] parameterTypes = new Class<?>[] { byte.class, int.class, long.class, double.class, char.class };
@@ -411,7 +425,10 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
-        assertThat(result).containsExactly(new Object[] { (byte) 1, 2, 3l, 4.0, 'e' }, new Object[] { (byte) 6, 7, 8l, 9.0, 'i' });
+        InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
+        inOrder.verify(stringConverter).convert(data[0], false, parameterTypes, dataProvider, 0);
+        inOrder.verify(stringConverter).convert(data[1], false, parameterTypes, dataProvider, 1);
+        verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 
     // -- methods used as Method objects -------------------------------------------------------------------------------
