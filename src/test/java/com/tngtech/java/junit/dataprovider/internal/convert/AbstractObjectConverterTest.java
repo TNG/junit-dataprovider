@@ -19,6 +19,16 @@ public class AbstractObjectConverterTest extends BaseTest {
     };
 
     @Test(expected = NullPointerException.class)
+    public void testCheckIfArgumentsMatchParameterTypesShouldThrowNullPointerExceptionIfArgumentsIsNull() {
+        // Given:
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(null, new Class<?>[0]);
+
+        // Then: expect exception
+    }
+
+    @Test(expected = NullPointerException.class)
     public void testCheckIfArgumentsMatchParameterTypesShouldThrowNullPointerExceptionIfParameterTypesIsNull() {
         // Given:
 
