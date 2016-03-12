@@ -2,11 +2,14 @@ package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,7 +132,7 @@ public class TestGeneratorTest extends BaseTest {
     }
 
     @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() {
+    public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() throws Throwable {
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, 2, 3 });
         doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
@@ -142,10 +145,11 @@ public class TestGeneratorTest extends BaseTest {
 
         // Then:
         assertDataProviderFrameworkMethods(result, dataConverterResult, "%m");
+        verify(dataProviderMethod).invokeExplosively(null);
     }
 
     @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataConverterReturnsMultipleRows() {
+    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataConverterReturnsMultipleRows() throws Throwable {
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 11, "22", 33L },
                 new Object[] { 44, "55", 66L }, new Object[] { 77, "88", 99L });
@@ -159,6 +163,25 @@ public class TestGeneratorTest extends BaseTest {
 
         // Then:
         assertDataProviderFrameworkMethods(result, dataConverterResult, "%c");
+        verify(dataProviderMethod).invokeExplosively(null);
+    }
+
+    @Test
+    public void testExplodeTestMethodsUseDataProviderShouldReturnFrameworkMethodInjectedToUseDataProviderMethodIfExists() throws Throwable {
+        // Given:
+        final Method method = getMethod("dataProviderMethod");
+        doReturn(method).when(dataProviderMethod).getMethod();
+
+        List<Object[]> dataConverterResult = listOfArrays(new Object[] { null });
+        doReturn(dataConverterResult).when(dataConverter).convert(any(), anyBoolean(), any(Class[].class), any(DataProvider.class));
+        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
+        doReturn(DataProvider.DEFAULT_FORMAT).when(dataProvider).format();
+
+        // When:
+        List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
+
+        // Then:
+        verify(dataProviderMethod).invokeExplosively(null, testMethod);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -202,5 +225,10 @@ public class TestGeneratorTest extends BaseTest {
 
         // Then:
         assertDataProviderFrameworkMethods(result, dataConverterResult, "%p[0]");
+    }
+
+    // -- helper methods to find non-mockable Method objects (due to final :-( ) ---------------------------------------
+    public static Object[][] dataProviderMethod(FrameworkMethod method) {
+        return new Object[][] { { method } };
     }
 }
