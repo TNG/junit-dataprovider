@@ -51,6 +51,15 @@ public class ParameterPlaceholder extends BasePlaceholder {
      */
     static final String STRING_EMPTY = "<empty string>";
 
+    /**
+     * {@link String} representation of an non-printable character
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    static final String STRING_NON_PRINTABLE = "<np>";
+
+
     public ParameterPlaceholder() {
         super("%p\\[(-?[0-9]+|-?[0-9]+\\.\\.-?[0-9]+)\\]");
     }
@@ -119,7 +128,8 @@ public class ParameterPlaceholder extends BasePlaceholder {
         if (result == null) {
             return STRING_NULL;
         }
-        return result.replaceAll("\\r", "\\\\r").replaceAll("\\n", "\\\\n");
+        result = result.replaceAll("\0", "\\\\0").replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n");
+        return replaceNonPrintableChars(result, STRING_NON_PRINTABLE);
     }
 
     private String formatPrimitiveArray(Object primitiveArray) {
@@ -150,5 +160,29 @@ public class ParameterPlaceholder extends BasePlaceholder {
             return Arrays.toString((double[]) primitiveArray);
         }
         return "";
+    }
+
+    private String replaceNonPrintableChars(String input, String replacement) {
+        StringBuilder result = new StringBuilder();
+        for (int offset = 0; offset < input.length(); ) {
+            int codePoint = input.codePointAt(offset);
+            offset += Character.charCount(codePoint);
+
+            // Replace invisible control characters and unused code points
+            switch (Character.getType(codePoint)) {
+                case Character.CONTROL:     // \p{Cc}
+                case Character.FORMAT:      // \p{Cf}
+                case Character.PRIVATE_USE: // \p{Co}
+                case Character.SURROGATE:   // \p{Cs}
+                case Character.UNASSIGNED:  // \p{Cn}
+                    result.append(replacement);
+                    break;
+
+                default:
+                    result.append(Character.toChars(codePoint));
+                    break;
+            }
+        }
+        return result.toString();
     }
 }

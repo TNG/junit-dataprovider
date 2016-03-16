@@ -1,6 +1,7 @@
 package com.tngtech.java.junit.dataprovider.internal.placeholder;
 
 import static com.tngtech.java.junit.dataprovider.internal.placeholder.ParameterPlaceholder.STRING_EMPTY;
+import static com.tngtech.java.junit.dataprovider.internal.placeholder.ParameterPlaceholder.STRING_NON_PRINTABLE;
 import static com.tngtech.java.junit.dataprovider.internal.placeholder.ParameterPlaceholder.STRING_NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -304,6 +305,30 @@ public class ParameterPlaceholderTest extends BaseTest {
     }
 
     @Test
+    public void testFormatAllReplacesNullTerminatorWithTheirPrintableCounterpart() {
+        // Given:
+        final Object[] parameters = new Object[] { "\0" };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("\\0");
+    }
+
+    @Test
+    public void testFormatAllReplacesNullTerminatorWithTheirPrintableCounterpartEvenIfWithText() {
+        // Given:
+        final Object[] parameters = new Object[] { "test\0test\0" };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("test\\0test\\0");
+    }
+
+    @Test
     public void testFormatAllReplacesCarriageReturnWithTheirPrintableCounterpart() {
         // Given:
         final Object[] parameters = new Object[] { "\r" };
@@ -349,6 +374,30 @@ public class ParameterPlaceholderTest extends BaseTest {
 
         // Then:
         assertThat(result).isEqualTo("1\\n2\\n3");
+    }
+
+    @Test
+    public void testFormatAllReplacesNonPrintableCharactersWithPredefinedPrintableCounterpart() {
+        // Given:
+        final Object[] parameters = new Object[] { "\u001F" };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo(STRING_NON_PRINTABLE);
+    }
+
+    @Test
+    public void testFormatAllReplacesNonPrintableCharactersWithPredefinedPrintableCounterpartEvenIfWithText() {
+        // Given:
+        final Object[] parameters = new Object[] { "test\btest\uFFFF" };
+
+        // When:
+        String result = underTest.formatAll(parameters);
+
+        // Then:
+        assertThat(result).isEqualTo("test" + STRING_NON_PRINTABLE + "test" + STRING_NON_PRINTABLE);
     }
 
     @Test
