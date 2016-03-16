@@ -103,6 +103,32 @@ public class DataProviderRunnerTest extends BaseTest {
         assertThat(underTest.getTestClass().getJavaClass()).isEqualTo(clazz);
     }
 
+    @Test
+    public void testInitializeHelpers() throws Exception {
+        // Given:
+        final DataConverter newDataConverter = new DataConverter();
+        final TestGenerator newTestGenerator = new TestGenerator(this.dataConverter);
+        final TestValidator newTestValidator = new TestValidator(this.dataConverter);
+
+        underTest = new DataProviderRunner(DataProviderRunnerTest.class) {
+            @Override
+            protected void initializeHelpers() {
+                super.initializeHelpers();
+                this.dataConverter = newDataConverter;
+                this.testGenerator = newTestGenerator;
+                this.testValidator = newTestValidator;
+            }
+        };
+
+        // When:
+        underTest.initializeHelpers();
+
+        // Then:
+        assertThat(underTest.dataConverter).isSameAs(newDataConverter);
+        assertThat(underTest.testGenerator).isSameAs(newTestGenerator);
+        assertThat(underTest.testValidator).isSameAs(newTestValidator);
+    }
+
     @Test(expected = NullPointerException.class)
     public void testValidateInstanceMethodsShouldThrowNullPointerExceptionIfErrorsIsNull() {
         // Given:

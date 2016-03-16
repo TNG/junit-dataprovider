@@ -1,10 +1,17 @@
 package com.tngtech.java.junit.dataprovider.internal.convert;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -389,6 +396,60 @@ public class StringConverterTest extends BaseTest {
     }
 
     @Test
+    public void testConvertShouldCallCustomConvertAndNotReturnValueIfObjectNoConversion() {
+        // Given:
+        final AtomicBoolean calledCustomConvert = new AtomicBoolean(false);
+        String data = "2016-03-11";
+        Class<?>[] parameterTypes = new Class<?>[] { Date.class };
+
+        StringConverter underTest = new StringConverter() {
+            @Override
+            protected Object customConvertValue(String str, Class<?> targetType, DataProvider dataProvider) {
+                calledCustomConvert.set(true);
+                return super.customConvertValue(str, targetType, dataProvider);
+            }
+        };
+
+        // When:
+        try{
+            underTest.convert(data, false, parameterTypes, dataProvider, 75);
+        } catch (IllegalArgumentException e) {
+            // ignore
+        }
+
+        // Then:
+        assertThat(calledCustomConvert.get()).isTrue();
+    }
+
+    @Test
+    public void testConvertShouldCallCustomConvertAndReturnValueIfNotObjectNoConversion() {
+        // Given:
+        String data = "2016-03-11";
+        Class<?>[] parameterTypes = new Class<?>[] { Date.class };
+
+        StringConverter underTest = new StringConverter() {
+            @Override
+            protected Object customConvertValue(String str, Class<?> targetType, DataProvider dataProvider) {
+                try {
+                    return new SimpleDateFormat("yyyy-MM-dd").parse(str);
+                } catch (ParseException e) {
+                    fail("Unexpected exception: " + e);
+                    return null; // fool compiler
+                }
+            }
+        };
+
+        // When:
+        Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 76);
+
+        // Then:
+        GregorianCalendar expectedDate = new GregorianCalendar();
+        expectedDate.set(2016, Calendar.MARCH, 11, 0, 0, 0);
+        expectedDate.set(Calendar.MILLISECOND, 0);
+        assertThat(result).containsExactly(expectedDate.getTime());
+    }
+
+    @Test
     public void testConvertShouldCorrectlyUseConstructorWithSingleStringArgForBigInteger() {
         // Given:
         String data = "1";
@@ -524,5 +585,18 @@ public class StringConverterTest extends BaseTest {
 
         // Then:
         assertThat(result).containsExactly(TestEnum.VAL1);
+    }
+
+    @Test
+    public void testCustomConvertShouldByDefaultReturnObjectNoConversion() {
+        // Given:
+        String data = "2016-03-11";
+        Class<?> parameterType = Date.class;
+
+        // When:
+        Object result = underTest.customConvertValue(data, parameterType, dataProvider);
+
+        // Then:
+        assertThat(result).isEqualTo(StringConverter.OBJECT_NO_CONVERSION);
     }
 }

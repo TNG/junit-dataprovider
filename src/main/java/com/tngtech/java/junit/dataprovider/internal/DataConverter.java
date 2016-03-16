@@ -16,26 +16,15 @@ import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
  */
 public class DataConverter {
 
-    /**
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
-     */
-    ObjectArrayConverter objectArrayConverter = new ObjectArrayConverter();
+    private ObjectArrayConverter objectArrayConverter;
+    private SingleArgConverter singleArgConverter;
+    private StringConverter stringConverter;
 
-    /**
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
-     */
-    SingleArgConverter singleArgConverter = new SingleArgConverter();
-
-    /**
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
-     */
-    StringConverter stringConverter = new StringConverter();
+    public DataConverter() {
+        this.objectArrayConverter = new ObjectArrayConverter();
+        this.singleArgConverter = new SingleArgConverter();
+        this.stringConverter = new StringConverter();
+    }
 
     /**
      * Returns {@code true} iif this {@link DataConverter} can convert the given {@code type}. Currently supported
@@ -138,5 +127,17 @@ public class DataConverter {
                     data));
         }
         return result;
+    }
+
+    public void setObjectArrayConverter(ObjectArrayConverter objectArrayConverter) {
+        this.objectArrayConverter = objectArrayConverter;
+    }
+
+    public void setSingleArgConverter(SingleArgConverter singleArgConverter) {
+        this.singleArgConverter = singleArgConverter;
+    }
+
+    public void setStringConverter(StringConverter stringConverter) {
+        this.stringConverter = stringConverter;
     }
 }
