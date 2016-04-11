@@ -17,6 +17,8 @@ import com.tngtech.java.junit.dataprovider.internal.DataConverter;
 import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
+import static java.lang.Character.toUpperCase;
+
 /**
  * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like dataproviders. Data
  * providers are public, static methods that return an {@link Object}{@code [][]} (see {@link DataProvider}).
@@ -248,6 +250,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         if (!UseDataProvider.DEFAULT_VALUE.equals(useDataProviderValue)) {
             return findMethod(dataProviderMethods, useDataProviderValue);
         }
+
         FrameworkMethod result = findMethod(dataProviderMethods, testMethodName);
         if (result == null) {
             String dataProviderMethodName = testMethodName.replaceAll("^test", "dataProvider");
@@ -255,6 +258,14 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
         if (result == null) {
             String dataProviderMethodName = testMethodName.replaceAll("^test", "data");
+            result = findMethod(dataProviderMethods, dataProviderMethodName);
+        }
+        if (result == null) {
+            String dataProviderMethodName = "dataProvider" + toUpperCase(testMethodName.charAt(0)) + testMethodName.substring(1);
+            result = findMethod(dataProviderMethods, dataProviderMethodName);
+        }
+        if (result == null) {
+            String dataProviderMethodName = "data" + toUpperCase(testMethodName.charAt(0)) + testMethodName.substring(1);
             result = findMethod(dataProviderMethods, dataProviderMethodName);
         }
         return result;

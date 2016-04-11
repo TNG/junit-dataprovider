@@ -43,6 +43,9 @@ public @interface UseDataProvider {
      * </tr>
      * </table>
      * </li>
+     * <li>@{@link DataProvider} annotated method whereby additional prefix "dataProvider" or "data" is given. Also the
+     * first letter of the original test method name is uppercased, e.g. {@code shouldReturnTwoForOnePlusOne} could
+     * correspond to {@code dataProviderShouldReturnTwoForOnePlusOne}.</li>
      * </ul>
      * <b>Note</b>: As long as {@link #value()} contains the default value (= {@link #DEFAULT_VALUE}), it is tried to
      * guess the name of the dataprovider in the above described order.
