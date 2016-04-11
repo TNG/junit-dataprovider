@@ -278,6 +278,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(1);
         verify(objectArrayConverter).convert(data[0], false, parameterTypes);
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
@@ -292,6 +293,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(3);
         InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
         inOrder.verify(objectArrayConverter).convert(data[0], false, parameterTypes);
         inOrder.verify(objectArrayConverter).convert(data[1], false, parameterTypes);
@@ -310,6 +312,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(1);
         verify(objectArrayConverter).convert(data.get(0).toArray(), false, parameterTypes);
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
@@ -325,6 +328,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(3);
         InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
         inOrder.verify(objectArrayConverter).convert(data.get(0).toArray(), false, parameterTypes);
         inOrder.verify(objectArrayConverter).convert(data.get(1).toArray(), false, parameterTypes);
@@ -342,6 +346,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(1);
         verify(singleArgConverter).convert(data[0], false, parameterTypes);
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
@@ -356,6 +361,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(3);
         InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
         inOrder.verify(singleArgConverter).convert(data[0], false, parameterTypes);
         inOrder.verify(singleArgConverter).convert(data[1], false, parameterTypes);
@@ -373,6 +379,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(1);
         verify(singleArgConverter).convert(data.get(0), false, parameterTypes);
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
         // TODO only false for varargs?
@@ -388,6 +395,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(3);
         InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
         inOrder.verify(singleArgConverter).convert(data.get(0), false, parameterTypes);
         inOrder.verify(singleArgConverter).convert(data.get(1), false, parameterTypes);
@@ -408,6 +416,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(1);
         verify(stringConverter).convert(data[0], false, parameterTypes, dataProvider, 0);
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
@@ -425,6 +434,7 @@ public class DataConverterTest extends BaseTest {
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then:
+        assertThat(result).hasSize(2);
         InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
         inOrder.verify(stringConverter).convert(data[0], false, parameterTypes, dataProvider, 0);
         inOrder.verify(stringConverter).convert(data[1], false, parameterTypes, dataProvider, 1);

@@ -181,6 +181,7 @@ public class TestGeneratorTest extends BaseTest {
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
+        assertThat(result).hasSize(1);
         verify(dataProviderMethod).invokeExplosively(null, testMethod);
     }
 
