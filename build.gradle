@@ -6,6 +6,7 @@ plugins {
     id 'jacoco'
     id 'java'
     id 'findbugs'
+    id 'osgi'
 }
 
 archivesBaseName = 'junit-dataprovider'
@@ -74,35 +75,28 @@ build.dependsOn touchIntegTestResultsForJenkins
 
 jar {
     manifest {
-        def name = 'JUnit dataprovider'
+        def title = 'JUnit dataprovider'
         def company = 'TNG Technology Consulting GmbH'
+        def copyright = "${new Date()[Calendar.YEAR]} ${company}"
 
         attributes (
             'Built-By': "Gradle ${gradle.gradleVersion}",
             'Built-Date': new Date(), // TODO destroys incremental build feature
-            'Specification-Title': name,
+            'Specification-Title': title,
             'Specification-Version': version,
             'Specification-Vendor': company,
-            'Implementation-Title': name,
+            'Implementation-Title': title,
             'Implementation-Version': version,
             'Implementation-Vendor': company,
             'Issue-Tracker': 'https://github.com/TNG/junit-dataprovider/issues',
-            'Copyright': "${new Date()[Calendar.YEAR]} ${company}",
-            'License': 'Apache License v2.0, January 2004',
-
-            // p2 plugin
-            'Bundle-ManifestVersion': '2',
-            'Bundle-Name': name,
-            'Bundle-Description': project.description,
-            'Bundle-SymbolicName': "${project.group}.junit.dataprovider",
-            'Bundle-Version': version,
-            'Bundle-Vendor': company,
-            'Bundle-Copyright': "${new Date()[Calendar.YEAR]} ${company}",
-            'Bundle-License': 'Apache License v2.0, January 2004',
-            'Require-Bundle': 'org.junit',
-            'Import-Package': 'org.osgi.framework',
-            'Export-Package': "${project.group}.junit.dataprovider;version=${version}",
+            'Documentation-URL': 'https://github.com/TNG/junit-dataprovider/wiki',
+            'Copyright': copyright,
+            'License': 'Apache License v2.0, January 2004'
         )
+
+        // OSGi / p2 plugin information
+        instruction 'Bundle-Vendor', company
+        instruction 'Bundle-Copyright', copyright
     }
 }
 
