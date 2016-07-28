@@ -1,6 +1,6 @@
 plugins {
     id 'com.github.kt3k.coveralls' version '2.3.1'
-    id 'de.aaschmid.cpd' version '0.4'
+    id 'de.aaschmid.cpd' version '0.5'
     id 'eclipse'
     id 'groovy'
     id 'jacoco'
