@@ -56,23 +56,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
-task touchTestResultsForJenkins(type: TouchTestResults) {
-    tasks test
-    enabled = isBuildOnJenkins
-}
-build.dependsOn touchTestResultsForJenkins
-
-task integTest(dependsOn: integTestClasses, type: Test, group: 'verification', description: 'Runs all integration tests.') {
-    classpath = sourceSets.integTest.runtimeClasspath
-    testClassesDir = sourceSets.integTest.output.classesDir
-    testSrcDirs = sourceSets.integTest.java.srcDirs as List
-}
-task touchIntegTestResultsForJenkins(type: TouchTestResults) {
-    tasks integTest
-    enabled = isBuildOnJenkins
-}
-build.dependsOn touchIntegTestResultsForJenkins
-
 jar {
     manifest {
         def title = 'JUnit dataprovider'
@@ -113,6 +96,25 @@ task sourcesJar(type: Jar) {
 test {
     ignoreFailures = isBuildOnJenkins
 }
+
+task touchTestResultsForJenkins(type: TouchTestResults) {
+    tasks test
+    enabled = isBuildOnJenkins
+}
+build.dependsOn touchTestResultsForJenkins
+
+task integTest(dependsOn: integTestClasses, type: Test, group: 'verification', description: 'Runs all integration tests.') {
+    ignoreFailures = isBuildOnJenkins
+
+    classpath = sourceSets.integTest.runtimeClasspath
+    testClassesDir = sourceSets.integTest.output.classesDir
+    testSrcDirs = sourceSets.integTest.java.srcDirs as List
+}
+task touchIntegTestResultsForJenkins(type: TouchTestResults) {
+    tasks integTest
+    enabled = isBuildOnJenkins
+}
+build.dependsOn touchIntegTestResultsForJenkins
 
 jacocoTestReport {
     reports {
