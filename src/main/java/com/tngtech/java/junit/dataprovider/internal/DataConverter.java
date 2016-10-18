@@ -50,14 +50,7 @@ public class DataConverter {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             Type rawType = parameterizedType.getRawType();
             if (List.class.isAssignableFrom((Class<?>) rawType)) {
-                if (parameterizedType.getActualTypeArguments().length == 1) {
-                    Type innerType = parameterizedType.getActualTypeArguments()[0];
-                    if (parameterizedType.getActualTypeArguments()[0] instanceof ParameterizedType) {
-                        return List.class.isAssignableFrom((Class<?>) ((ParameterizedType) innerType).getRawType());
-
-                    }
-                    return Object.class.equals(innerType);
-                }
+                return canConvertListOf(parameterizedType);
             }
         }
         return false;
@@ -90,41 +83,72 @@ public class DataConverter {
             throw new IllegalArgumentException("parameterTypes must not be empty");
         }
 
-        List<Object[]> result = new ArrayList<Object[]>();
         if (data instanceof Object[][]) {
-            for (Object[] arguments : (Object[][]) data) {
-                result.add(objectArrayConverter.convert(arguments, isVarArgs, parameterTypes));
-            }
+            return convert((Object[][]) data, isVarArgs, parameterTypes);
 
         } else if (data instanceof String[]) {
-            int idx = 0;
-            for (String argString : (String[]) data) {
-                result.add(stringConverter.convert(argString, isVarArgs, parameterTypes, dataProvider, idx++));
-            }
+            return convert((String[]) data, isVarArgs, parameterTypes, dataProvider);
 
         } else if (data instanceof Object[]) {
-            for (Object argument : (Object[]) data) {
-                result.add(singleArgConverter.convert(argument, isVarArgs, parameterTypes));
-            }
+            return convert((Object[]) data, isVarArgs, parameterTypes);
 
         } else if (data instanceof List) {
             @SuppressWarnings("rawtypes")
-            List lists = (List) data;
-            for (Object arguments : lists) {
-                if (List.class.isInstance(arguments)) {
-                    @SuppressWarnings("rawtypes")
-                    List list = (List) arguments;
-                    result.add(objectArrayConverter.convert(list.toArray(), isVarArgs, parameterTypes));
+            List listData = (List) data;
+            return convert(listData, isVarArgs, parameterTypes);
 
-                } else {
-                    result.add(singleArgConverter.convert(arguments, isVarArgs, parameterTypes));
-                }
+        }
+        throw new ClassCastException(String.format(
+                "Cannot cast to either Object[][], Object[], String[], List<List<Object>>, or List<Object> because data was: %s", data));
+    }
+
+    private boolean canConvertListOf(ParameterizedType parameterizedType) {
+        if (parameterizedType.getActualTypeArguments().length == 1) {
+            Type innerType = parameterizedType.getActualTypeArguments()[0];
+            if (parameterizedType.getActualTypeArguments()[0] instanceof ParameterizedType) {
+                return List.class.isAssignableFrom((Class<?>) ((ParameterizedType) innerType).getRawType());
             }
+            return Object.class.equals(innerType);
+        }
+        return false;
+    }
 
-        } else {
-            throw new ClassCastException(String.format(
-                    "Cannot cast to either Object[][], Object[], String[], List<List<Object>>, or List<Object> because data was: %s",
-                    data));
+    private List<Object[]> convert(Object[][] data, boolean isVarArgs, Class<?>[] parameterTypes) {
+        List<Object[]> result = new ArrayList<Object[]>();
+        for (Object[] arguments : data) {
+            result.add(objectArrayConverter.convert(arguments, isVarArgs, parameterTypes));
+        }
+        return result;
+    }
+
+    private List<Object[]> convert(String[] data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider) {
+        List<Object[]> result = new ArrayList<Object[]>();
+        int idx = 0;
+        for (String argString : data) {
+            result.add(stringConverter.convert(argString, isVarArgs, parameterTypes, dataProvider, idx++));
+        }
+        return result;
+    }
+
+    private List<Object[]> convert(Object[] data, boolean isVarArgs, Class<?>[] parameterTypes) {
+        List<Object[]> result = new ArrayList<Object[]>();
+        for (Object argument : data) {
+            result.add(singleArgConverter.convert(argument, isVarArgs, parameterTypes));
+        }
+        return result;
+    }
+
+    private List<Object[]> convert(@SuppressWarnings("rawtypes") List data, boolean isVarArgs, Class<?>[] parameterTypes) {
+        List<Object[]> result = new ArrayList<Object[]>();
+        for (Object arguments : data) {
+            if (List.class.isInstance(arguments)) {
+                @SuppressWarnings("rawtypes")
+                List list = (List) arguments;
+                result.add(objectArrayConverter.convert(list.toArray(), isVarArgs, parameterTypes));
+
+            } else {
+                result.add(singleArgConverter.convert(arguments, isVarArgs, parameterTypes));
+            }
         }
         return result;
     }

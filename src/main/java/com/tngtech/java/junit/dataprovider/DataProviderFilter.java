@@ -70,25 +70,7 @@ public class DataProviderFilter extends Filter {
         String className = filterDescriptionMatcher.group(GROUP_CLASS);
 
         if (description.isTest()) {
-            Matcher descriptionMatcher = DESCRIPTION_PATTERN.matcher(description.getDisplayName());
-            if (!descriptionMatcher.matches()) {
-                if (filterDescriptionMatcher.group(GROUP_METHOD_IDX) == null) {
-                    Matcher generousDescMatcher = GENEROUS_DESCRIPTION_PATTERN.matcher(description.getDisplayName());
-                    if (generousDescMatcher.matches()) {
-                        return methodName.equals(generousDescMatcher.group(GROUP_METHOD_NAME))
-                                && className.equals(generousDescMatcher.group(GROUP_CLASS));
-                    }
-                }
-                return filter.shouldRun(description);
-            }
-
-            if (!methodName.equals(descriptionMatcher.group(GROUP_METHOD_NAME))
-                    || !className.equals(descriptionMatcher.group(GROUP_CLASS))) {
-                return false;
-            }
-            return filterDescriptionMatcher.group(GROUP_METHOD_PARAMS) == null
-                    || filterDescriptionMatcher.group(GROUP_METHOD_IDX).equals(
-                            descriptionMatcher.group(GROUP_METHOD_IDX));
+            return shouldRunTest(description, filterDescriptionMatcher, methodName, className);
         }
 
         // explicitly check if any children should to run
@@ -103,5 +85,24 @@ public class DataProviderFilter extends Filter {
     @Override
     public String describe() {
         return filter.describe();
+    }
+
+    private boolean shouldRunTest(Description description, Matcher filterDescriptionMatcher, String methodName, String className) {
+        Matcher descriptionMatcher = DESCRIPTION_PATTERN.matcher(description.getDisplayName());
+        if (!descriptionMatcher.matches()) {
+            if (filterDescriptionMatcher.group(GROUP_METHOD_IDX) == null) {
+                Matcher generousDescMatcher = GENEROUS_DESCRIPTION_PATTERN.matcher(description.getDisplayName());
+                if (generousDescMatcher.matches()) {
+                    return methodName.equals(generousDescMatcher.group(GROUP_METHOD_NAME))
+                            && className.equals(generousDescMatcher.group(GROUP_CLASS));
+                }
+            }
+            return filter.shouldRun(description);
+        }
+        if (!methodName.equals(descriptionMatcher.group(GROUP_METHOD_NAME)) || !className.equals(descriptionMatcher.group(GROUP_CLASS))) {
+            return false;
+        }
+        return filterDescriptionMatcher.group(GROUP_METHOD_PARAMS) == null
+                || filterDescriptionMatcher.group(GROUP_METHOD_IDX).equals(descriptionMatcher.group(GROUP_METHOD_IDX));
     }
 }
