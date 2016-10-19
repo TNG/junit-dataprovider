@@ -1,6 +1,9 @@
 package com.tngtech.java.junit.dataprovider;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
@@ -14,10 +17,9 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
 
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
+import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodResolver;
 import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
-
-import static java.lang.Character.toUpperCase;
 
 /**
  * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like dataproviders. Data
@@ -125,9 +127,17 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
             FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
             if (dataProviderMethod == null) {
-                errors.add(new Exception(String.format(
-                        "No valid dataprovider found for test %s. By convention the dataprovider method name must either be equal to the test methods name, have a prefix of 'dataProvider' instead of 'test' or is overridden by using @UseDataProvider#value().",
-                        testMethod.getName())));
+                Class<? extends DataProviderMethodResolver>[] resolvers = testMethod.getAnnotation(UseDataProvider.class).resolver();
+
+                String message = "No valid dataprovider found for test '" + testMethod.getName() + "' using ";
+                if (resolvers.length == 1 && DefaultDataProviderMethodResolver.class.equals(resolvers[0])) {
+                    message += "the default resolver. By convention the dataprovider method name must either be equal to the test methods name, have a certain replaced or additional prefix (see JavaDoc of "
+                            + DefaultDataProviderMethodResolver.class + " or is explicitely set by @UseDataProvider#value()";
+                } else {
+                    message += "custom resolvers: " + Arrays.toString(resolvers)
+                            + ". Please examine their javadoc and / or implementation.";
+                }
+                errors.add(new Exception(message));
 
             } else {
                 DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
@@ -209,74 +219,53 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * Returns the dataprovider method that belongs to the given test method or {@code null} if no such dataprovider
-     * exists or the test method is not marked for usage of a dataprovider
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
-     *
-     * @param testMethod test method that uses a dataprovider
-     * @return the dataprovider or {@code null} (if dataprovider does not exist or test method does not use any)
-     * @throws IllegalArgumentException if given {@code testMethod} is {@code null}
      */
     FrameworkMethod getDataProviderMethod(FrameworkMethod testMethod) {
-        if (testMethod == null) {
-            throw new IllegalArgumentException("testMethod must not be null");
-        }
         UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
         if (useDataProvider == null) {
             return null;
         }
+        for (Class<? extends DataProviderMethodResolver> resolverClass : useDataProvider.resolver()) {
+            DataProviderMethodResolver resolver = getResolverInstanceInt(resolverClass);
 
-        TestClass dataProviderLocation = findDataProviderLocation(useDataProvider);
-        List<FrameworkMethod> dataProviderMethods = dataProviderLocation.getAnnotatedMethods(DataProvider.class);
-        return findDataProviderMethod(dataProviderMethods, useDataProvider.value(), testMethod.getName());
+            FrameworkMethod result = resolver.resolve(testMethod, useDataProvider);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     /**
+     * Returns a new instance of {@link DataProviderMethodResolver}. This method is required for testing. It calls
+     * {@link Class#newInstance()} which needs to be stubbed while testing.
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
      */
-    TestClass findDataProviderLocation(UseDataProvider useDataProvider) {
-        if (useDataProvider.location().length == 0) {
-            return getTestClassInt();
+    DataProviderMethodResolver getResolverInstanceInt(Class<? extends DataProviderMethodResolver> resolverClass) {
+        Constructor<? extends DataProviderMethodResolver> constructor;
+        try {
+            constructor = resolverClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("Could not find default constructor to instantiate resolver " + resolverClass, e);
+        } catch (SecurityException e) {
+            throw new IllegalStateException(
+                    "Security violation while trying to access default constructor to instantiate resolver " + resolverClass, e);
         }
-        return new TestClass(useDataProvider.location()[0]);
-    }
 
-    private FrameworkMethod findDataProviderMethod(List<FrameworkMethod> dataProviderMethods,
-            String useDataProviderValue, String testMethodName) {
-        if (!UseDataProvider.DEFAULT_VALUE.equals(useDataProviderValue)) {
-            return findMethod(dataProviderMethods, useDataProviderValue);
+        try {
+            return constructor.newInstance();
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Could not access default constructor to instantiate resolver " + resolverClass, e);
+        } catch (InstantiationException e) {
+            throw new IllegalStateException("Could not instantiate resolver " + resolverClass + " using default constructor", e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException("The default constructor of " + resolverClass + " has thrown an exception", e);
         }
-
-        FrameworkMethod result = findMethod(dataProviderMethods, testMethodName);
-        if (result == null) {
-            String dataProviderMethodName = testMethodName.replaceAll("^test", "dataProvider");
-            result = findMethod(dataProviderMethods, dataProviderMethodName);
-        }
-        if (result == null) {
-            String dataProviderMethodName = testMethodName.replaceAll("^test", "data");
-            result = findMethod(dataProviderMethods, dataProviderMethodName);
-        }
-        if (result == null) {
-            String dataProviderMethodName = "dataProvider" + toUpperCase(testMethodName.charAt(0)) + testMethodName.substring(1);
-            result = findMethod(dataProviderMethods, dataProviderMethodName);
-        }
-        if (result == null) {
-            String dataProviderMethodName = "data" + toUpperCase(testMethodName.charAt(0)) + testMethodName.substring(1);
-            result = findMethod(dataProviderMethods, dataProviderMethodName);
-        }
-        return result;
-    }
-
-    private FrameworkMethod findMethod(List<FrameworkMethod> methods, String methodName) {
-        for (FrameworkMethod method : methods) {
-            if (method.getName().equals(methodName)) {
-                return method;
-            }
-        }
-        return null;
     }
 }
