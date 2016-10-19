@@ -17,8 +17,8 @@ public abstract class AbstractObjectConverter<V> {
     public abstract Object[] convert(V data, boolean isVarArgs, Class<?>[] parameterTypes);
 
     /**
-     * Checks if the types of the given list of {@code arguments} matches the given test methods {@code parameterTypes}
-     * and throws an {@link Error} if not.
+     * Checks if the types of the given {@code arguments} matches the given test methods {@code parameterTypes} and throws an {@link Error}
+     * if not.
      * <p>
      * This method is package private (= visible) for testing.
      * </p>

@@ -66,7 +66,9 @@ public class DataProviders {
      * @param args which are wrapped in {@link Object} arrays and combined to {@link Object}{@code [][]}
      * @return an array which contains {@link Object} arrays for each single element in the given {@link Iterable}
      * @throws NullPointerException iif given {@code args} is {@code null}
+     * @deprecated since 1.12.0 {@link Iterable}{@code <?>} can directly be returned from any dataprovider method
      */
+    @Deprecated
     public static <T> Object[][] testForEach(Iterable<T> args) {
         if (args == null) {
             throw new NullPointerException("args must not be null");

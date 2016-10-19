@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -23,6 +21,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.tngtech.java.junit.dataprovider.BaseTest;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.internal.convert.ObjectArrayConverter;
+import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -101,27 +100,39 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testCanConvertShouldReturnFalseIfTypeIsIterableOfIterable() {
+    public void testCanConvertShouldReturnTrueIfTypeIsIterableOfQuestionMark() {
         // Given:
-        Type type = getMethod("methodReturningIterableOfIterableOfObject").getGenericReturnType();
+        Type type = getMethod("methodReturningIterableOfQuestionMark").getGenericReturnType();
 
         // When:
         boolean result = underTest.canConvert(type);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(result).isTrue();
     }
 
     @Test
-    public void testCanConvertShouldReturnFalseIfTypeIsSetOfSet() {
+    public void testCanConvertShouldReturnTrueIfTypeIsIterableOfIterable() {
         // Given:
-        Type type = getMethod("methodReturningSetOfSetOfObject").getGenericReturnType();
+        Type type = getMethod("methodReturningIterableOfIterableOfT").getGenericReturnType();
 
         // When:
         boolean result = underTest.canConvert(type);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testCanConvertShouldReturnTrueIfTypeIsSetOfSet() {
+        // Given:
+        Type type = getMethod("methodReturningSetOfSetOfQuestionMark").getGenericReturnType();
+
+        // When:
+        boolean result = underTest.canConvert(type);
+
+        // Then:
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -185,15 +196,15 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testCanConvertShouldReturnFalseIfTypeIsListOfIterable() {
+    public void testCanConvertShouldReturnTrueIfTypeIsListOfIterable() {
         // Given:
-        Type type = getMethod("methodReturningListOfIterableOfObject").getGenericReturnType();
+        Type type = getMethod("methodReturningListOfIterableOfNumber").getGenericReturnType();
 
         // When:
         boolean result = underTest.canConvert(type);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -443,15 +454,15 @@ public class DataConverterTest extends BaseTest {
 
     // -- methods used as Method objects -------------------------------------------------------------------------------
 
-    public static List<Iterable<Object>> methodReturningListOfIterableOfObject() {
+    public static List<Iterable<Number>> methodReturningListOfIterableOfNumber() {
         return null;
     }
 
-    public static Iterable<Iterable<Object>> methodReturningIterableOfIterableOfObject() {
+    public static <T extends String> Iterable<Iterable<T>> methodReturningIterableOfIterableOfT() {
         return null;
     }
 
-    public static Set<Set<Object>> methodReturningSetOfSetOfObject() {
+    public static Set<Set<?>> methodReturningSetOfSetOfQuestionMark() {
         return null;
     }
 
@@ -481,6 +492,10 @@ public class DataConverterTest extends BaseTest {
     }
 
     public static List<Object> methodReturningListOfObject() {
+        return null;
+    }
+
+    public static List<?> methodReturningIterableOfQuestionMark() {
         return null;
     }
 

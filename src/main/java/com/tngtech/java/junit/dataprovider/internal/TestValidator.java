@@ -105,7 +105,7 @@ public class TestValidator {
         }
         if (!dataConverter.canConvert(method.getGenericReturnType())) {
             errors.add(new Exception(messageBasePart
-                    + " either return Object[][], Object[], String[], List<List<Object>> or List<Object>"));
+                    + " either return Object[][], Object[], String[], Iterable<Iterable<?>>, or Iterable<?>, whereby any subtype of Iterable as well as an arbitrary inner type are also accepted"));
         }
         if (dataProvider.value().length > 0) {
             errors.add(new Exception(messageBasePart + " not define @DataProvider.value()"));

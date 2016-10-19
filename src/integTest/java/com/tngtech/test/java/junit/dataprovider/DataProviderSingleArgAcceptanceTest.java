@@ -1,7 +1,9 @@
 package com.tngtech.test.java.junit.dataprovider;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +41,22 @@ public class DataProviderSingleArgAcceptanceTest {
     @Test
     @UseDataProvider("dataProviderSingleArgListOfObject")
     public void testSingleArgListOfObject(String string) {
+        // Check output within IDE
+    }
+
+    @DataProvider
+    public static Iterable<String> dataProviderSingleArgIterableOfString() {
+        Set<String> result = new HashSet<String>();
+        result.add(null);
+        result.add("");
+        result.add("1");
+        result.add("123");
+        return result;
+    }
+
+    @Test
+    @UseDataProvider
+    public void testSingleArgIterableOfString(String string) {
         // Check output within IDE
     }
 }

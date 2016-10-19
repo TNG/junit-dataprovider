@@ -237,6 +237,22 @@ public class DataProviderJavaAcceptanceTest {
         assertThat(result).isEqualTo(expected);
     }
 
+    @DataProvider
+    public static List<? extends Number> dataProviderIsNumber() {
+        List<Number> result = new ArrayList<Number>();
+        result.add(101);
+        result.add(125L);
+        result.add(125.0);
+        return result;
+    }
+
+    @Test
+    @UseDataProvider("dataProviderIsNumber")
+    public void testIsNumber(Number number) {
+        // Expect:
+        assertThat(number).isInstanceOf(Number.class);
+    }
+
     // @formatter:off
     @Test
     @DataProvider({
