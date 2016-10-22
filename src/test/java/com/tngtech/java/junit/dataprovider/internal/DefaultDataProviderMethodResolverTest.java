@@ -1,10 +1,14 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
-import org.junit.Before;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.FrameworkMethod;
@@ -15,12 +19,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.tngtech.java.junit.dataprovider.BaseTest;
 import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunnerTest;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
-import com.tngtech.java.junit.dataprovider.internal.DataConverter;
-import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodResolver;
-import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
-import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultDataProviderMethodResolverTest extends BaseTest {
@@ -47,12 +46,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
     @Mock
     private DataProvider dataProvider;
 
-    @Before
-    public void setup() {
-        doReturn(UseDataProvider.DEFAULT_VALUE).when(useDataProvider).value();
-        doReturn(new Class[0]).when(useDataProvider).location();
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testResolveShouldThrowIllegalArgumentExceptionIfTestMethodIsNull() {
         // Given:
@@ -74,175 +67,272 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
     }
 
     @Test
-    public void testResolveShouldReturnNullForNotFoundDataProviderMethod() {
+    public void testResolveShouldReturnEmptyListForNotFoundDataProviderMethod() {
         // Given:
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn("notAvailableDataProviderMethod").when(useDataProvider).value();
+        final String testMethodName = "testMethodName";
+        final String dataProviderMethodName = "notAvailableDataProviderMethodName";
 
-        doReturn(testClass).when(underTest).findDataProviderLocation(testMethod, useDataProvider);
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn("availableDataProviderMethod").when(dataProviderMethod).getName();
+        doReturn(testMethodName).when(testMethod).getName();
+
+        doReturn(dataProviderMethodName).when(useDataProvider).value();
+        doReturn(new Class[0]).when(useDataProvider).location();
+
+        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class[0]);
+        doReturn(emptyList()).when(underTest).findDataProviderMethods(asList(testClass), testMethodName, dataProviderMethodName);
 
         // When:
-        FrameworkMethod result = underTest.resolve(testMethod, useDataProvider);
+        List<FrameworkMethod> result = underTest.resolve(testMethod, useDataProvider);
+
+        // Then:
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void testResolveShouldReturnListContainingFoundDataProviderMethods() {
+        // Given:
+        final String testMethodName = "testMethodName";
+        final String dataProviderMethodName = "availableDataProviderMethodName";
+
+        doReturn(testMethodName).when(testMethod).getName();
+
+        doReturn(dataProviderMethodName).when(useDataProvider).value();
+        doReturn(new Class[0]).when(useDataProvider).location();
+
+        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class[0]);
+        doReturn(asList(dataProviderMethod)).when(underTest).findDataProviderMethods(asList(testClass), testMethodName,
+                dataProviderMethodName);
+
+        // When:
+        List<FrameworkMethod> result = underTest.resolve(testMethod, useDataProvider);
+
+        // Then:
+        assertThat(result).containsOnly(dataProviderMethod);
+    }
+
+    @Test
+    public void testFindDataProviderLocationsShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
+        // Given:
+        doReturn(new Class<?>[0]).when(useDataProvider).location();
+        doReturn(getMethod("testFindDataProviderLocationsShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation"))
+                .when(testMethod).getMethod();
+
+        // When:
+        List<TestClass> result = underTest.findDataProviderLocations(testMethod, new Class[0]);
+
+        // Then:
+        assertThatResultContainsCorrectClassesExactlyInOrder(result, this.getClass());
+    }
+
+    @Test
+    public void testFindDataProviderLocationsShouldReturnTestClassContainingSetLocationInUseDataProviderAnnotation() {
+        // When:
+        List<TestClass> result = underTest.findDataProviderLocations(testMethod, new Class<?>[] { DataConverterTest.class });
+
+        // Then:
+        assertThatResultContainsCorrectClassesExactlyInOrder(result, DataConverterTest.class);
+    }
+
+    @Test
+    public void testFindDataProviderLocationsShouldReturnTestClassesContainingSetLocationsInUseDataProviderAnnotation() {
+        // Given:
+        final Class<?>[] locations = new Class<?>[] { DataConverterTest.class, TestGeneratorTest.class, TestValidatorTest.class };
+
+        // When:
+        List<TestClass> result = underTest.findDataProviderLocations(testMethod, locations);
+
+        // Then:
+        assertThatResultContainsCorrectClassesExactlyInOrder(result, locations);
+    }
+
+    @Test
+    public void testFindDataProviderMethodsShouldReturnEmptyListIfLocationsIsEmpty() {
+        // When:
+        List<FrameworkMethod> result = underTest.findDataProviderMethods(testClassesFor(), "testMethodName", "useDataProviderValue");
+
+        // Then:
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void testFindDataProviderMethodsShouldReturnEmptyListIfFindDataProviderMethodReturnsNull() {
+        // Given:
+        final List<TestClass> dataProviderLocations = testClassesFor(TestGeneratorTest.class);
+        final String testMethodName = "testMethodName";
+        final String useDataProviderValue = "availableDataProviderMethodName";
+
+        doReturn(new Class<?>[0]).when(useDataProvider).location();
+        doReturn(anyMethod()).when(testMethod).getMethod();
+
+        doReturn(null).when(underTest).findDataProviderMethod(dataProviderLocations.get(0), testMethodName, useDataProviderValue);
+
+        // When:
+        List<FrameworkMethod> result = underTest.findDataProviderMethods(dataProviderLocations, testMethodName, useDataProviderValue);
+
+        // Then:
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void testFindDataProviderMethodsShouldReturnNotNullTestClasses() {
+        // Given:
+        final List<TestClass> dataProviderLocations = testClassesFor(DataConverterTest.class, TestGeneratorTest.class,
+                TestValidatorTest.class);
+        final String testMethodName = "testMethodName";
+        final String useDataProviderValue = "availableDataProviderMethodName";
+
+        FrameworkMethod dataProviderMethod2 = mock(FrameworkMethod.class);
+
+        doReturn(new Class<?>[0]).when(useDataProvider).location();
+        doReturn(anyMethod()).when(testMethod).getMethod();
+
+        doReturn(dataProviderMethod).when(underTest).findDataProviderMethod(dataProviderLocations.get(0), testMethodName,
+                useDataProviderValue);
+        doReturn(null).when(underTest).findDataProviderMethod(dataProviderLocations.get(1), testMethodName, useDataProviderValue);
+        doReturn(dataProviderMethod2).when(underTest).findDataProviderMethod(dataProviderLocations.get(2), testMethodName,
+                useDataProviderValue);
+
+        // When:
+        List<FrameworkMethod> result = underTest.findDataProviderMethods(dataProviderLocations, testMethodName, useDataProviderValue);
+
+        // Then:
+        assertThat(result).containsExactly(dataProviderMethod, dataProviderMethod2);
+    }
+
+    @Test
+    public void testFindDataProviderMethodShouldReturnNullForNotFoundDataProviderMethod() {
+        // Given:
+        final String testMethodName = "testMethodName";
+        final String dataProviderMethodName = "availableDataProviderMethodName";
+
+        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn(testMethodName).when(testMethod).getName();
+        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+
+        // When:
+        FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, "notAvailableDataProviderMethodName");
 
         // Then:
         assertThat(result).isNull();
     }
 
     @Test
-    public void testResolveShouldReturnDataProviderMethodWithSameNameAsTestIfItExists() {
+    public void testFindDataProviderMethodShouldReturnDataProviderMethodHavingSameNameAsTestMethodIfItExists() {
         // Given:
         final String testMethodName = "testMethodName";
-
-        doReturn(testMethodName).when(testMethod).getName();
-
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(testClass).when(underTest).findDataProviderLocation(testMethod, useDataProvider);
+        final String dataProviderMethodName = "testMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(testMethodName).when(dataProviderMethod).getName();
+        doReturn(testMethodName).when(testMethod).getName();
+        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
-        FrameworkMethod result = underTest.resolve(testMethod, useDataProvider);
+        FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
 
         // Then:
         assertThat(result).isEqualTo(dataProviderMethod);
     }
 
     @Test
-    public void testResolveShouldReturnDataProviderMethodWithDataProviderPrefixInsteadOfTestIfItExists() {
+    public void testFindDataProviderMethodShouldReturnListContainingDataProviderMethodHavingDataProviderPrefixInsteadOfTestIfItExists() {
         // Given:
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "dataProviderMethodName";
 
-        doReturn(testMethodName).when(testMethod).getName();
-
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-
-        doReturn(testClass).when(underTest).findDataProviderLocation(testMethod, useDataProvider);
-
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
-        FrameworkMethod result = underTest.resolve(testMethod, useDataProvider);
+        FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
 
         // Then:
         assertThat(result).isEqualTo(dataProviderMethod);
     }
 
     @Test
-    public void testResolveShouldReturnDataProviderMethodWithDataPrefixInsteadOfTestIfItExists() {
+    public void testFindDataProviderMethodShouldReturnListContainingDataProviderMethodHavingDataPrefixInsteadOfTestIfItExists() {
         // Given:
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "dataMethodName";
 
-        doReturn(testMethodName).when(testMethod).getName();
-
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(testClass).when(underTest).findDataProviderLocation(testMethod, useDataProvider);
-
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
-        FrameworkMethod result = underTest.resolve(testMethod, useDataProvider);
+        FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
 
         // Then:
         assertThat(result).isEqualTo(dataProviderMethod);
     }
 
     @Test
-    public void testResolveShouldReturnDataProviderMethodWithDataProviderPrefixIfItExists() {
+    public void testFindDataProviderMethodShouldReturnListContainingDataProviderMethodHavingDataProviderPrefixIfItExists() {
         // Given:
         final String testMethodName = "methodName";
         final String dataProviderMethodName = "dataProviderMethodName";
 
-        doReturn(testMethodName).when(testMethod).getName();
-
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-
-        doReturn(testClass).when(underTest).findDataProviderLocation(testMethod, useDataProvider);
-
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
-        FrameworkMethod result = underTest.resolve(testMethod, useDataProvider);
+        FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
 
         // Then:
         assertThat(result).isEqualTo(dataProviderMethod);
     }
 
     @Test
-    public void testResolveShouldReturnDataProviderMethodWithDataPrefixIfItExists() {
+    public void testFindDataProviderMethodShouldReturnListContainingDataProviderMethodHavingDataPrefixIfItExists() {
         // Given:
         final String testMethodName = "methodName";
         final String dataProviderMethodName = "dataMethodName";
 
+        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
         doReturn(testMethodName).when(testMethod).getName();
-
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(testClass).when(underTest).findDataProviderLocation(testMethod, useDataProvider);
-
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
-        FrameworkMethod result = underTest.resolve(testMethod, useDataProvider);
+        FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
 
         // Then:
         assertThat(result).isEqualTo(dataProviderMethod);
     }
 
     @Test
-    public void testResolveShouldReturnDataProviderMethodWithExplicitelyGivenNameIfItExists() {
+    public void testFindDataProviderMethodShouldReturnListContainingDataProviderMethodHavingExplicitelyGivenNameIfItExists() {
         // Given:
-        final String dataProviderMethodName = "availableDataProviderMethod";
-
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(dataProviderMethodName).when(useDataProvider).value();
-
-        doReturn(testClass).when(underTest).findDataProviderLocation(testMethod, useDataProvider);
+        final String testMethodName = "testMethodName";
+        final String dataProviderMethodName = "availableDataProviderMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
+        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
+        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class[0]);
+
         // When:
-        FrameworkMethod result = underTest.resolve(testMethod, useDataProvider);
+        FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, dataProviderMethodName);
 
         // Then:
         assertThat(result).isEqualTo(dataProviderMethod);
     }
 
-    @Test
-    public void testFindDataProviderLocationShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
-        // Given:
-        doReturn(new Class<?>[0]).when(useDataProvider).location();
-        doReturn(getMethod("testFindDataProviderLocationShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation"))
-                .when(testMethod).getMethod();
-
-        // When:
-        TestClass result = underTest.findDataProviderLocation(testMethod, useDataProvider);
-
-        // Then:
-        assertThat(result.getJavaClass()).isEqualTo(DefaultDataProviderMethodResolverTest.class);
+    private List<TestClass> testClassesFor(Class<?>... classes) {
+        List<TestClass> result = new ArrayList<TestClass>();
+        for (Class<?> clazz : classes) {
+            result.add(new TestClass(clazz));
+        }
+        return result;
     }
 
-    @Test
-    public void testFindDataProviderLocationShouldReturnTestClassContainingSetLocationInUseDataProviderAnnotation() {
-        // Given:
-        final Class<?> dataProviderLocation = DataProviderRunnerTest.class;
+    private void assertThatResultContainsCorrectClassesExactlyInOrder(List<TestClass> result, Class<?>... expectedClasses) {
+        assertThat(result).hasSameSizeAs(expectedClasses);
 
-        doReturn(new Class<?>[] { dataProviderLocation }).when(useDataProvider).location();
-
-        // When:
-        TestClass result = underTest.findDataProviderLocation(testMethod, useDataProvider);
-
-        // Then:
-        assertThat(result).isNotNull();
-        // assertThat(result.getJavaClass()).isEqualTo(dataProviderLocation);
-        assertThat(result.getName()).isEqualTo(dataProviderLocation.getName());
+        for (int idx = 0; idx < expectedClasses.length; idx++) {
+            assertThat(result.get(idx).getJavaClass()).isEqualTo(expectedClasses[idx]);
+            assertThat(result.get(idx).getName()).isEqualTo(expectedClasses[idx].getName());
+        }
     }
 }

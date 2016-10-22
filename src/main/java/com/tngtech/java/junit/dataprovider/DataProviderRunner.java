@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.After;
@@ -16,6 +17,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
 
+import com.tngtech.java.junit.dataprovider.UseDataProvider.ResolveStrategy;
 import com.tngtech.java.junit.dataprovider.internal.DataConverter;
 import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodResolver;
 import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
@@ -125,8 +127,8 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             testValidator.validateTestMethod(testMethod, errors);
         }
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
-            FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
-            if (dataProviderMethod == null) {
+            List<FrameworkMethod> dataProviderMethods = getDataProviderMethods(testMethod);
+            if (dataProviderMethods.isEmpty()) {
                 Class<? extends DataProviderMethodResolver>[] resolvers = testMethod.getAnnotation(UseDataProvider.class).resolver();
 
                 String message = "No valid dataprovider found for test '" + testMethod.getName() + "' using ";
@@ -135,17 +137,19 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
                             + DefaultDataProviderMethodResolver.class + " or is explicitely set by @UseDataProvider#value()";
                 } else {
                     message += "custom resolvers: " + Arrays.toString(resolvers)
-                            + ". Please examine their javadoc and / or implementation.";
+                    + ". Please examine their javadoc and / or implementation.";
                 }
                 errors.add(new Exception(message));
 
             } else {
-                DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
-                if (dataProvider == null) {
-                    throw new IllegalStateException(String.format("@%s annotaion not found on dataprovider method %s",
-                            DataProvider.class.getSimpleName(), dataProviderMethod.getName()));
+                for (FrameworkMethod dataProviderMethod : dataProviderMethods) {
+                    DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
+                    if (dataProvider == null) {
+                        throw new IllegalStateException(String.format("@%s annotation not found on dataprovider method %s",
+                                DataProvider.class.getSimpleName(), dataProviderMethod.getName()));
+                    }
+                    testValidator.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
                 }
-                testValidator.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
             }
         }
     }
@@ -212,8 +216,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             return result;
         }
         for (FrameworkMethod testMethod : testMethods) {
-            FrameworkMethod dataProviderMethod = getDataProviderMethod(testMethod);
-            result.addAll(testGenerator.generateExplodedTestMethodsFor(testMethod, dataProviderMethod));
+            for (FrameworkMethod dataProviderMethod : getDataProviderMethods(testMethod)) {
+                result.addAll(testGenerator.generateExplodedTestMethodsFor(testMethod, dataProviderMethod));
+            }
         }
         return result;
     }
@@ -223,20 +228,26 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * This method is package private (= visible) for testing.
      * </p>
      */
-    FrameworkMethod getDataProviderMethod(FrameworkMethod testMethod) {
+    List<FrameworkMethod> getDataProviderMethods(FrameworkMethod testMethod) {
         UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
         if (useDataProvider == null) {
-            return null;
+            return Collections.singletonList(null);
         }
+
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
         for (Class<? extends DataProviderMethodResolver> resolverClass : useDataProvider.resolver()) {
             DataProviderMethodResolver resolver = getResolverInstanceInt(resolverClass);
 
-            FrameworkMethod result = resolver.resolve(testMethod, useDataProvider);
-            if (result != null) {
-                return result;
+            List<FrameworkMethod> dataProviderMethods = resolver.resolve(testMethod, useDataProvider);
+            if (ResolveStrategy.UNTIL_FIRST_MATCH.equals(useDataProvider.resolveStrategy()) && !dataProviderMethods.isEmpty()) {
+                result.addAll(dataProviderMethods);
+                break;
+
+            } else if (ResolveStrategy.AGGREGATE_ALL_MATCHES.equals(useDataProvider.resolveStrategy())) {
+                result.addAll(dataProviderMethods);
             }
         }
-        return null;
+        return result;
     }
 
     /**

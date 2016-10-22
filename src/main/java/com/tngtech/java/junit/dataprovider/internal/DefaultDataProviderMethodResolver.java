@@ -1,7 +1,9 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
 import static java.lang.Character.toUpperCase;
+import static java.util.Collections.singletonList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.runners.model.FrameworkMethod;
@@ -14,10 +16,12 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 /**
  * Default implementation to resolve the dataprovider method for a test method using {@link UseDataProvider} annotation.
  * <p>
- * It is being tried to resolve the dataprovider method using various strategies. The <b>location</b> of the dataprovider can optionally
+ * It is being tried to resolve the dataprovider method using various strategies. The <b>location</b>s of the dataprovider can optionally
  * specified using {@link UseDataProvider#location()}. If no specific location is specified, test class itself is used (= where
- * {@code @}{@link UseDataProvider} annotation is used). If multiple locations are specified, only the first class will be considered. The
- * <b>name</b> of the dataprovider method can be explicitly set via {@link UseDataProvider#value()} or derived by convention. The first
+ * {@code @}{@link UseDataProvider} annotation is used). If multiple locations are specified, each is searched for an appropriate
+ * dataprovider.
+ * <p>
+ * The <b>name</b> of the dataprovider method can be explicitly set via {@link UseDataProvider#value()} or derived by convention. The first
  * found dataprovider method will be used. Here are the applied strategies:
  * <ul>
  * <li>Explicitly configured name using {@link UseDataProvider#value()}. (no fallback if dataprovider could not be found)</li>
@@ -50,10 +54,11 @@ public class DefaultDataProviderMethodResolver implements DataProviderMethodReso
      * <p>
      * Look at the classes java doc for detailed description of the applied strategies.
      *
+     * @return the resolved dataprovider method or an empty {@link List} if dataprovider could not be found (never null)
      * @see DefaultDataProviderMethodResolver
      */
     @Override
-    public FrameworkMethod resolve(FrameworkMethod testMethod, UseDataProvider useDataProvider) {
+    public List<FrameworkMethod> resolve(FrameworkMethod testMethod, UseDataProvider useDataProvider) {
         if (testMethod == null) {
             throw new IllegalArgumentException("testMethod must not be null");
         }
@@ -61,20 +66,36 @@ public class DefaultDataProviderMethodResolver implements DataProviderMethodReso
             throw new IllegalArgumentException("useDataProvider must not be null");
         }
 
-        TestClass dataProviderClass = findDataProviderLocation(testMethod, useDataProvider);
-        List<FrameworkMethod> dataProviderMethods = dataProviderClass.getAnnotatedMethods(DataProvider.class);
-        return findDataProviderMethod(dataProviderMethods, useDataProvider.value(), testMethod.getName());
+        List<TestClass> dataProviderLocations = findDataProviderLocations(testMethod, useDataProvider.location());
+        return findDataProviderMethods(dataProviderLocations, testMethod.getName(), useDataProvider.value());
     }
 
-    protected TestClass findDataProviderLocation(FrameworkMethod testMethod, UseDataProvider useDataProvider) {
-        if (useDataProvider.location().length == 0) {
-            return new TestClass(testMethod.getMethod().getDeclaringClass());
+    protected List<TestClass> findDataProviderLocations(FrameworkMethod testMethod, Class<?>[] useDataProviderLocation) {
+        if (useDataProviderLocation.length == 0) {
+            return singletonList(new TestClass(testMethod.getMethod().getDeclaringClass()));
         }
-        return new TestClass(useDataProvider.location()[0]);
+
+        List<TestClass> result = new ArrayList<TestClass>();
+        for (Class<?> location : useDataProviderLocation) {
+            result.add(new TestClass(location));
+        }
+        return result;
     }
 
-    private FrameworkMethod findDataProviderMethod(List<FrameworkMethod> dataProviderMethods, String useDataProviderValue,
-            String testMethodName) {
+    protected List<FrameworkMethod> findDataProviderMethods(List<TestClass> locations, String testMethodName, String useDataProviderValue) {
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+        for (TestClass location : locations) {
+            FrameworkMethod method = findDataProviderMethod(location, testMethodName, useDataProviderValue);
+            if (method != null) {
+                result.add(method);
+            }
+        }
+        return result;
+    }
+
+    protected FrameworkMethod findDataProviderMethod(TestClass location, String testMethodName, String useDataProviderValue) {
+        List<FrameworkMethod> dataProviderMethods = location.getAnnotatedMethods(DataProvider.class);
+
         if (!UseDataProvider.DEFAULT_VALUE.equals(useDataProviderValue)) {
             return findMethod(dataProviderMethods, useDataProviderValue);
         }
