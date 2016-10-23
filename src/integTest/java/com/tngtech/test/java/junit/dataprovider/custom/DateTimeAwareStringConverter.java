@@ -1,12 +1,12 @@
 package com.tngtech.test.java.junit.dataprovider.custom;
 
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
 
 public class DateTimeAwareStringConverter extends StringConverter {
 

@@ -94,7 +94,7 @@ public class DataProviderResolverAcceptanceTest {
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test
     @UseDataProvider(resolver = DataProviderStartWithTestMethodNameResolver.class)
-    public void testNumber(Number number) {
+    public void testNumber(@SuppressWarnings("unused") Number number) {
         // When:
         @SuppressWarnings("unused")
         int count = counter.incrementAndGet();

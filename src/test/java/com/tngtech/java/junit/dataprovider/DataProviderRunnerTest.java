@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.Mockito.doAnswer;
@@ -555,7 +554,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).hasSize(1).containsNull();
-        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
+        assertThat(underTest.dataProviderMethods).containsEntry(testMethod, result);
     }
 
     @Test
@@ -574,11 +573,11 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).isEmpty();
-        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
+        assertThat(underTest.dataProviderMethods).containsEntry(testMethod, result);
     }
 
     @Test
-    public void testGetDataProviderMethodShouldReturnEmptyListIfUseDataProviderResolversAreEmpty() throws Exception {
+    public void testGetDataProviderMethodShouldReturnEmptyListIfUseDataProviderResolversAreEmpty() {
         // Given:
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
 
@@ -589,7 +588,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).isEmpty();
-        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
+        assertThat(underTest.dataProviderMethods).containsEntry(testMethod, result);
     }
 
     @Test
@@ -617,7 +616,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).containsExactlyElementsOf(expected2);
-        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
+        assertThat(underTest.dataProviderMethods).containsEntry(testMethod, result);
     }
 
     @Test
@@ -645,7 +644,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).hasSize(3).containsAll(expected2).containsAll(expected3);
-        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
+        assertThat(underTest.dataProviderMethods).containsEntry(testMethod, result);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -714,7 +713,6 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     private static class PrivateDefaultConstructor implements DataProviderMethodResolver {
-        @SuppressWarnings("unused")
         private PrivateDefaultConstructor() {
             // unused
         }

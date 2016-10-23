@@ -452,7 +452,7 @@ public class DataConverterTest extends BaseTest {
         return null;
     }
 
-    public static <T extends String> Iterable<Iterable<T>> methodReturningIterableOfIterableOfT() {
+    public static <T extends CharSequence> Iterable<Iterable<T>> methodReturningIterableOfIterableOfT() {
         return null;
     }
 

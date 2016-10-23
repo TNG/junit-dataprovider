@@ -1,5 +1,7 @@
 package com.tngtech.test.java.junit.dataprovider;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +32,8 @@ public class DataProviderSingleArgAcceptanceTest {
     @Test
     @UseDataProvider("dataProviderSingleArgObjectArray")
     public void testSingleArgObjectArray(String string) {
-        // Check output within IDE
+        // Expected:
+        assertThat(string).isNotEqualTo("1234");
     }
 
     @DataProvider
@@ -41,7 +44,8 @@ public class DataProviderSingleArgAcceptanceTest {
     @Test
     @UseDataProvider("dataProviderSingleArgListOfObject")
     public void testSingleArgListOfObject(String string) {
-        // Check output within IDE
+        // Expected:
+        assertThat(string).isNotEqualTo("1234");
     }
 
     @DataProvider
@@ -57,6 +61,7 @@ public class DataProviderSingleArgAcceptanceTest {
     @Test
     @UseDataProvider
     public void testSingleArgIterableOfString(String string) {
-        // Check output within IDE
+        // Expected:
+        assertThat(string).isNotEqualTo("1234");
     }
 }

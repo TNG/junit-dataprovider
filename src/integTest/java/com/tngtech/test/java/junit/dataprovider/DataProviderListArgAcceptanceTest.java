@@ -1,13 +1,16 @@
 package com.tngtech.test.java.junit.dataprovider;
 
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.DataProviderRunner;
+import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 @RunWith(DataProviderRunner.class)
 public class DataProviderListArgAcceptanceTest {
@@ -24,7 +27,8 @@ public class DataProviderListArgAcceptanceTest {
     @Test
     @UseDataProvider
     public void testListArg(List<String> list, String string) {
-        // Check output within IDE
+        // Expected:
+        assertThat(list).doesNotContain(string);
     }
 
     @DataProvider
@@ -37,5 +41,7 @@ public class DataProviderListArgAcceptanceTest {
     @Test
     @UseDataProvider("stringsData")
     public void test(List<String> strings, String expectedValue) {
+        // Expected:
+        assertThat(strings).contains(expectedValue);
     }
 }

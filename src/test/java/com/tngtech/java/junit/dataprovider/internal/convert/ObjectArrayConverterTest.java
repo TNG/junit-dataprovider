@@ -42,7 +42,7 @@ public class ObjectArrayConverterTest extends BaseTest {
     }
 
     @Test
-    public void testConvertShouldHandleNullElementAsSingleElement() throws Exception {
+    public void testConvertShouldHandleNullElementAsSingleElement() {
         // Given:
         Object[] data = new Object[] { null };
         Class<?>[] parameterTypes = new Class<?>[] { String.class, int[].class };
