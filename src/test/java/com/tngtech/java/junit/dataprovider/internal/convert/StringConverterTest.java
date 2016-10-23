@@ -38,8 +38,6 @@ public class StringConverterTest extends BaseTest {
         String data = null;
         Class<?>[] parameterTypes = new Class<?>[] { Integer.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 1);
 
@@ -160,7 +158,6 @@ public class StringConverterTest extends BaseTest {
         String data = "\u00A0test\u00A0";
         Class<?>[] parameterTypes = new Class[] { String.class };
 
-        doReturn(",").when(dataProvider).splitBy();
         doReturn(true).when(dataProvider).trimValues();
 
         // When:
@@ -208,8 +205,6 @@ public class StringConverterTest extends BaseTest {
         String data = "noChar";
         Class<?>[] parameterTypes = new Class[] { char.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 40);
 
@@ -221,8 +216,6 @@ public class StringConverterTest extends BaseTest {
         // Given:
         String data = "noInt";
         Class<?>[] parameterTypes = new Class[] { int.class };
-
-        doReturn(",").when(dataProvider).splitBy();
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 41);
@@ -236,8 +229,6 @@ public class StringConverterTest extends BaseTest {
         String data = "noInt";
         Class<?>[] parameterTypes = new Class[] { BigInteger.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 42);
 
@@ -249,8 +240,6 @@ public class StringConverterTest extends BaseTest {
         // Given:
         String data = "noObject";
         Class<?>[] parameterTypes = new Class[] { Object.class };
-
-        doReturn(",").when(dataProvider).splitBy();
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 43);
@@ -308,8 +297,6 @@ public class StringConverterTest extends BaseTest {
         String data = "UNKNOW_ENUM_VALUE";
         Class<?>[] parameterTypes = new Class[] { TestEnum.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 51);
 
@@ -337,8 +324,6 @@ public class StringConverterTest extends BaseTest {
         // Given:
         String data = "String";
         Class<?>[] parameterTypes = new Class[] { Class.class };
-
-        doReturn(",").when(dataProvider).splitBy();
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 55);
@@ -455,8 +440,6 @@ public class StringConverterTest extends BaseTest {
         String data = "1";
         Class<?>[] parameterTypes = new Class<?>[] { BigInteger.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 80);
 
@@ -470,8 +453,6 @@ public class StringConverterTest extends BaseTest {
         String data = "home/schmida";
         Class<?>[] parameterTypes = new Class<?>[] { File.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 80);
 
@@ -484,8 +465,6 @@ public class StringConverterTest extends BaseTest {
         // Given:
         String data = "";
         Class<?>[] parameterTypes = new Class<?>[] { int[].class };
-
-        doReturn(",").when(dataProvider).splitBy();
 
         // When:
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 90);
@@ -577,8 +556,6 @@ public class StringConverterTest extends BaseTest {
         // Given:
         String data = "VAL1";
         Class<?>[] parameterTypes = new Class<?>[] { TestEnum.class };
-
-        doReturn("L").when(dataProvider).splitBy();
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 100);

@@ -1,11 +1,12 @@
 package com.tngtech.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 
@@ -119,19 +120,25 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         Placeholders.all().add(placeholder2);
         Placeholders.all().add(placeholder3);
 
-        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 21, parameters, "%cm");
+        when(placeholder.process(any(String.class))).thenReturn("%cm2");
+        when(placeholder2.process(any(String.class))).thenReturn("%cm3");
+        when(placeholder3.process(any(String.class))).thenReturn("%cm4");
+
+        DataProviderFrameworkMethod underTest = new DataProviderFrameworkMethod(method, 21, parameters, "%cm1");
 
         // When:
-        underTest.getName();
+        String result = underTest.getName();
 
         // Then:
+        assertThat(result).isEqualTo("%cm4");
+
         InOrder inOrder = inOrder(placeholder, placeholder2, placeholder3);
         inOrder.verify(placeholder).setContext(method, 21, parameters);
-        inOrder.verify(placeholder).process(anyString());
+        inOrder.verify(placeholder).process("%cm1");
         inOrder.verify(placeholder2).setContext(method, 21, parameters);
-        inOrder.verify(placeholder2).process(anyString());
+        inOrder.verify(placeholder2).process("%cm2");
         inOrder.verify(placeholder3).setContext(method, 21, parameters);
-        inOrder.verify(placeholder3).process(anyString());
+        inOrder.verify(placeholder3).process("%cm3");
         verifyNoMoreInteractions(placeholder, placeholder2, placeholder3);
     }
 

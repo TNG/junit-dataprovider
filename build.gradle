@@ -47,7 +47,7 @@ dependencies {
 
     testCompile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.7'
 
     integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.7'
 }

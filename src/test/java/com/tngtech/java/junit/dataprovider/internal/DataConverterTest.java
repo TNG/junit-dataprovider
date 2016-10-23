@@ -1,7 +1,6 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -421,8 +420,6 @@ public class DataConverterTest extends BaseTest {
         String[] data = new String[] { "foo,true" };
         Class<?>[] parameterTypes = new Class<?>[] { String.class, boolean.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-
         // When:
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);
 
@@ -437,9 +434,6 @@ public class DataConverterTest extends BaseTest {
         // Given:
         String[] data = new String[] { "1, 2, 3, 4.0, e", "6, 7, 8, 9.0, i" };
         Class<?>[] parameterTypes = new Class<?>[] { byte.class, int.class, long.class, double.class, char.class };
-
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
 
         // When:
         List<Object[]> result = underTest.convert(data, false, parameterTypes, dataProvider);

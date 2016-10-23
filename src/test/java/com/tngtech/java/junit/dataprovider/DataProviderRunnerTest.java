@@ -5,8 +5,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -172,6 +172,7 @@ public class DataProviderRunnerTest extends BaseTest {
         List<Throwable> errors = new ArrayList<Throwable>();
 
         doAnswer(new Answer<Void>() {
+            @Override
             @SuppressWarnings("unchecked")
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 ((List<Throwable>) invocation.getArguments()[0]).add(new Error());
@@ -601,10 +602,11 @@ public class DataProviderRunnerTest extends BaseTest {
         final List<FrameworkMethod> expected3 = Arrays.asList(mock(FrameworkMethod.class));
 
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(new Class[] { null, null, null }).when(useDataProvider).resolver();
+        doReturn(new Class[] { DataProviderMethodResolver.class, DataProviderMethodResolver.class, DataProviderMethodResolver.class })
+                .when(useDataProvider).resolver();
         doReturn(ResolveStrategy.UNTIL_FIRST_MATCH).when(useDataProvider).resolveStrategy();
 
-        doReturn(dataProviderMethodResolver).doReturn(resolver2).doReturn(resolver3).when(underTest).getResolverInstanceInt(any(Class.class));
+        doReturn(dataProviderMethodResolver, resolver2, resolver3).when(underTest).getResolverInstanceInt(any(Class.class));
 
         doReturn(emptyList()).when(dataProviderMethodResolver).resolve(testMethod, useDataProvider);
         doReturn(expected2).when(resolver2).resolve(testMethod, useDataProvider);
@@ -628,10 +630,11 @@ public class DataProviderRunnerTest extends BaseTest {
         final List<FrameworkMethod> expected3 = Arrays.asList(mock(FrameworkMethod.class));
 
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(new Class[] { null, null, null }).when(useDataProvider).resolver();
+        doReturn(new Class[] { DataProviderMethodResolver.class, DataProviderMethodResolver.class, DataProviderMethodResolver.class })
+        .when(useDataProvider).resolver();
         doReturn(ResolveStrategy.AGGREGATE_ALL_MATCHES).when(useDataProvider).resolveStrategy();
 
-        doReturn(dataProviderMethodResolver).doReturn(resolver2).doReturn(resolver3).when(underTest).getResolverInstanceInt(any(Class.class));
+        doReturn(dataProviderMethodResolver, resolver2, resolver3).when(underTest).getResolverInstanceInt(any(Class.class));
 
         doReturn(emptyList()).when(dataProviderMethodResolver).resolve(testMethod, useDataProvider);
         doReturn(expected2).when(resolver2).resolve(testMethod, useDataProvider);

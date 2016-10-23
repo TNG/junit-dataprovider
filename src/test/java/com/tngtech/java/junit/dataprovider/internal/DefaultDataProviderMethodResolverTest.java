@@ -112,7 +112,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
     @Test
     public void testFindDataProviderLocationsShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
         // Given:
-        doReturn(new Class<?>[0]).when(useDataProvider).location();
         doReturn(getMethod("testFindDataProviderLocationsShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation"))
                 .when(testMethod).getMethod();
 
@@ -160,9 +159,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "testMethodName";
         final String useDataProviderValue = "availableDataProviderMethodName";
 
-        doReturn(new Class<?>[0]).when(useDataProvider).location();
-        doReturn(anyMethod()).when(testMethod).getMethod();
-
         doReturn(null).when(underTest).findDataProviderMethod(dataProviderLocations.get(0), testMethodName, useDataProviderValue);
 
         // When:
@@ -181,9 +177,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String useDataProviderValue = "availableDataProviderMethodName";
 
         FrameworkMethod dataProviderMethod2 = mock(FrameworkMethod.class);
-
-        doReturn(new Class<?>[0]).when(useDataProvider).location();
-        doReturn(anyMethod()).when(testMethod).getMethod();
 
         doReturn(dataProviderMethod).when(underTest).findDataProviderMethod(dataProviderLocations.get(0), testMethodName,
                 useDataProviderValue);
@@ -205,7 +198,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String dataProviderMethodName = "availableDataProviderMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
@@ -222,7 +214,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String dataProviderMethodName = "testMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
@@ -239,7 +230,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String dataProviderMethodName = "dataProviderMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
@@ -256,7 +246,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String dataProviderMethodName = "dataMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
@@ -273,7 +262,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String dataProviderMethodName = "dataProviderMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
@@ -290,7 +278,6 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String dataProviderMethodName = "dataMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
 
         // When:
@@ -307,10 +294,7 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String dataProviderMethodName = "availableDataProviderMethodName";
 
         doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(testMethodName).when(testMethod).getName();
         doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
-
-        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class[0]);
 
         // When:
         FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, dataProviderMethodName);
