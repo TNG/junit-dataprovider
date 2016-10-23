@@ -23,6 +23,8 @@ import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodResolver;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 // @FixMethodOrder(MethodSorters.NAME_ASCENDING) // since 4.11
 @RunWith(DataProviderRunner.class)
 public class DataProviderResolverAcceptanceTest {
@@ -89,10 +91,12 @@ public class DataProviderResolverAcceptanceTest {
         return result;
     }
 
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test
     @UseDataProvider(resolver = DataProviderStartWithTestMethodNameResolver.class)
     public void testNumber(Number number) {
         // When:
+        @SuppressWarnings("unused")
         int count = counter.incrementAndGet();
 
         // Then:

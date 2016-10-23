@@ -18,6 +18,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @RunWith(MockitoJUnitRunner.class)
 public class DataProviderFrameworkMethodTest extends BaseTest {
 
@@ -31,7 +33,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         Placeholders.reset();
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
     public void testDataProviderFrameworkMethodShouldThrowIllegalArgumentExceptionIfParameterIsNull() {
         // Given:
@@ -43,7 +45,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         // Then: expect exception
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
     public void testDataProviderFrameworkMethodShouldThrowIllegalArgumentExceptionIfDataProviderIsNull() {
         // Given:
@@ -55,7 +57,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
         // Then: expect exception
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = IllegalArgumentException.class)
     public void testDataProviderFrameworkMethodShouldThrowIllegalArgumentExceptionIfParameterIsEmpty() {
         // Given:

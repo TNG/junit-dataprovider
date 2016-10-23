@@ -24,6 +24,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.tngtech.java.junit.dataprovider.BaseTest;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @RunWith(MockitoJUnitRunner.class)
 public class TestGeneratorTest extends BaseTest {
 
@@ -45,7 +47,7 @@ public class TestGeneratorTest extends BaseTest {
         doReturn(anyMethod()).when(dataProviderMethod).getMethod();
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
     public void testTestGeneratorShouldThrowNullPointerExceptionIfDataConverterIsNull() {
         // Given:

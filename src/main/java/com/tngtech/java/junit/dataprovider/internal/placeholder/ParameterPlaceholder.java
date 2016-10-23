@@ -4,8 +4,6 @@ import java.util.Arrays;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-
 /**
  * This placeholder format the parameters of a dataprovider test as comma-separated {@link String} according to the
  * given index or range subscript (see {@link DataProvider#format()}. Furthermore the following parameter values are
@@ -103,7 +101,6 @@ public class ParameterPlaceholder extends BasePlaceholder {
         return stringBuilder.toString();
     }
 
-    @SuppressWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
     protected String format(Object param) {
         if (param == null) {
             return STRING_NULL;

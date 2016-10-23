@@ -21,6 +21,8 @@ import com.tngtech.java.junit.dataprovider.BaseTest;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @RunWith(MockitoJUnitRunner.class)
 public class TestValidatorTest extends BaseTest {
 
@@ -38,7 +40,7 @@ public class TestValidatorTest extends BaseTest {
     @Mock
     private DataProvider dataProvider;
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
     public void testTestValidatorShouldThrowNullPointerExceptionIfDataConverterIsNull() {
         // Given:

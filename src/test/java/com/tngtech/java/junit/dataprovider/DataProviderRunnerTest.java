@@ -41,6 +41,8 @@ import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodRes
 import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class DataProviderRunnerTest extends BaseTest {
 
     // for testing exceptions in @BeforeClass
@@ -76,7 +78,7 @@ public class DataProviderRunnerTest extends BaseTest {
         }
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @Before
     public void setup() throws Exception {
         classSetupException = null;

@@ -19,6 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @RunWith(MockitoJUnitRunner.class)
 public class DataProviderFilterTest extends BaseTest {
 
@@ -28,7 +30,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Mock
     private Filter filter;
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DLS_DEAD_LOCAL_STORE")
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
     public void testDataProviderFilterShouldThrowNullPointerExceptionWhenFilterIsNull() {
         // Given:

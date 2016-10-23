@@ -1,6 +1,6 @@
 plugins {
     id 'com.github.kt3k.coveralls' version '2.3.1'
-    id 'de.aaschmid.cpd' version '0.5'
+    id 'de.aaschmid.cpd' version '1.0'
     id 'eclipse'
     id 'groovy'
     id 'jacoco'
@@ -44,16 +44,16 @@ configurations {
 
 dependencies {
     compile group: 'junit', name: 'junit', version: junitVersion
-    compile group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.1'
 
+    testCompile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
 
-    integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.0.8'
+    integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.7'
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+    gradleVersion = '2.14.1'
 }
 
 jar {
@@ -108,7 +108,6 @@ task integTest(dependsOn: integTestClasses, type: Test, group: 'verification', d
 
     classpath = sourceSets.integTest.runtimeClasspath
     testClassesDir = sourceSets.integTest.output.classesDir
-    testSrcDirs = sourceSets.integTest.java.srcDirs as List
 }
 task touchIntegTestResultsForJenkins(type: TouchTestResults) {
     tasks integTest
@@ -122,14 +121,22 @@ jacocoTestReport {
     }
 }
 jacoco {
-    toolVersion = '0.7.1.201405082137'
+    toolVersion = '0.7.7.201606060606'
+}
+
+cpd {
+    if (System.getProperty("java.version")[0..2] in [ '1.5', '1.6' ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
+        toolVersion = '5.3.7'
+    } else {
+        toolVersion = '5.5.1'
+    }
 }
 
 findbugs {
     if (System.getProperty("java.version")[0..2] in [ '1.5', '1.6' ]) { // FindBugs v3.0.0 does not work with Java < v1.7 :-(
         toolVersion = '2.0.3'
     } else {
-        toolVersion = '3.0.0'
+        toolVersion = '3.0.1'
     }
     ignoreFailures = true
 }
