@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doAnswer;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Before;
@@ -512,6 +514,35 @@ public class DataProviderRunnerTest extends BaseTest {
     }
 
     @Test
+    public void testGetDataProviderMethodShouldInitializeMapUsedForCaching() {
+        // Given:
+        doReturn(null).when(testMethod).getAnnotation(UseDataProvider.class);
+
+        underTest.dataProviderMethods = null;
+
+        // When:
+        underTest.getDataProviderMethods(testMethod);
+
+        // Then:
+        assertThat(underTest.dataProviderMethods).isNotNull();
+    }
+
+    @Test
+    public void testGetDataProviderMethodShouldReturnedChachedValueIfExists() {
+        // Given:
+        final List<FrameworkMethod> expected = asList(dataProviderMethod, testMethod);
+
+        underTest.dataProviderMethods = new HashMap<FrameworkMethod, List<FrameworkMethod>>();
+        underTest.dataProviderMethods.put(testMethod, expected);
+
+        // When:
+        List<FrameworkMethod> result = underTest.getDataProviderMethods(testMethod);
+
+        // Then:
+        assertThat(result).isSameAs(expected);
+    }
+
+    @Test
     public void testGetDataProviderMethodShouldReturnSingletonListContainingNullForNotFoundUseDataProviderAnnotation() {
         // Given:
         doReturn(null).when(testMethod).getAnnotation(UseDataProvider.class);
@@ -521,6 +552,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).hasSize(1).containsNull();
+        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
     }
 
     @Test
@@ -539,6 +571,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).isEmpty();
+        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
     }
 
     @Test
@@ -553,6 +586,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).isEmpty();
+        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
     }
 
     @Test
@@ -579,6 +613,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).containsExactlyElementsOf(expected2);
+        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
     }
 
     @Test
@@ -605,6 +640,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         // Then:
         assertThat(result).hasSize(3).containsAll(expected2).containsAll(expected3);
+        assertThat(underTest.dataProviderMethods).contains(entry(testMethod, result));
     }
 
     @Test(expected = IllegalStateException.class)

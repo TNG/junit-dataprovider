@@ -4,8 +4,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -57,6 +58,14 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * </p>
      */
     List<FrameworkMethod> computedTestMethods;
+
+    /**
+     * Cached result of {@link #getDataProviderMethods(FrameworkMethod)}.
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    Map<FrameworkMethod, List<FrameworkMethod>> dataProviderMethods;
 
     /**
      * Creates a DataProviderRunner to run supplied {@code clazz}.
@@ -229,24 +238,33 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * </p>
      */
     List<FrameworkMethod> getDataProviderMethods(FrameworkMethod testMethod) {
+        // initialize field here as this method is called via constructors super(...) => fields are not initialized yet
+        if (dataProviderMethods == null) {
+            dataProviderMethods = new HashMap<FrameworkMethod, List<FrameworkMethod>>();
+        }
+        if (dataProviderMethods.containsKey(testMethod)) {
+            return dataProviderMethods.get(testMethod);
+        }
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+
         UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
         if (useDataProvider == null) {
-            return Collections.singletonList(null);
-        }
+            result.add(null);
+        } else {
+            for (Class<? extends DataProviderMethodResolver> resolverClass : useDataProvider.resolver()) {
+                DataProviderMethodResolver resolver = getResolverInstanceInt(resolverClass);
 
-        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
-        for (Class<? extends DataProviderMethodResolver> resolverClass : useDataProvider.resolver()) {
-            DataProviderMethodResolver resolver = getResolverInstanceInt(resolverClass);
+                List<FrameworkMethod> dataProviderMethods = resolver.resolve(testMethod, useDataProvider);
+                if (ResolveStrategy.UNTIL_FIRST_MATCH.equals(useDataProvider.resolveStrategy()) && !dataProviderMethods.isEmpty()) {
+                    result.addAll(dataProviderMethods);
+                    break;
 
-            List<FrameworkMethod> dataProviderMethods = resolver.resolve(testMethod, useDataProvider);
-            if (ResolveStrategy.UNTIL_FIRST_MATCH.equals(useDataProvider.resolveStrategy()) && !dataProviderMethods.isEmpty()) {
-                result.addAll(dataProviderMethods);
-                break;
-
-            } else if (ResolveStrategy.AGGREGATE_ALL_MATCHES.equals(useDataProvider.resolveStrategy())) {
-                result.addAll(dataProviderMethods);
+                } else if (ResolveStrategy.AGGREGATE_ALL_MATCHES.equals(useDataProvider.resolveStrategy())) {
+                    result.addAll(dataProviderMethods);
+                }
             }
         }
+        dataProviderMethods.put(testMethod, result);
         return result;
     }
 
