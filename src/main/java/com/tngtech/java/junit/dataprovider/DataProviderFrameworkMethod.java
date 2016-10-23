@@ -66,8 +66,10 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     public String getName() {
         String result = nameFormat;
         for (BasePlaceholder placeHolder : Placeholders.all()) {
-            placeHolder.setContext(getMethod(), idx, Arrays.copyOf(parameters, parameters.length));
-            result = placeHolder.process(result);
+            synchronized (placeHolder) {
+                placeHolder.setContext(getMethod(), idx, Arrays.copyOf(parameters, parameters.length));
+                result = placeHolder.process(result);
+            }
         }
         return result;
     }
