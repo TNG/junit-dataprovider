@@ -1,5 +1,8 @@
 package com.tngtech.java.junit.dataprovider.internal.convert;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkArgument;
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.lang.reflect.Method;
 
 public abstract class AbstractObjectConverter<V> {
@@ -29,18 +32,11 @@ public abstract class AbstractObjectConverter<V> {
      * @throws IllegalArgumentException iif test methods parameter types does not match the given {@code arguments}
      */
     protected void checkIfArgumentsMatchParameterTypes(Object[] arguments, Class<?>[] parameterTypes) {
-        if (arguments == null) {
-            throw new NullPointerException("arguments must not be null");
-        }
-        if (parameterTypes == null) {
-            throw new NullPointerException("testMethod must not be null");
-        }
+        checkNotNull(arguments, "arguments must not be null");
+        checkNotNull(parameterTypes, "testMethod must not be null");
+        checkArgument(parameterTypes.length == arguments.length, "Expected %s arguments for test method but got %s parameters.",
+                parameterTypes.length, arguments.length);
 
-        if (parameterTypes.length != arguments.length) {
-            throw new IllegalArgumentException(String.format(
-                    "Expected %s arguments for test method but got %s parameters.", parameterTypes.length,
-                    arguments.length));
-        }
         for (int idx = 0; idx < arguments.length; idx++) {
             Object object = arguments[idx];
             if (object != null) {

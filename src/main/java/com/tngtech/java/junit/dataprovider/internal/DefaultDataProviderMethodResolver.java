@@ -1,5 +1,6 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
 import static java.lang.Character.toUpperCase;
 import static java.util.Collections.singletonList;
 
@@ -59,12 +60,8 @@ public class DefaultDataProviderMethodResolver implements DataProviderMethodReso
      */
     @Override
     public List<FrameworkMethod> resolve(FrameworkMethod testMethod, UseDataProvider useDataProvider) {
-        if (testMethod == null) {
-            throw new IllegalArgumentException("testMethod must not be null");
-        }
-        if (useDataProvider == null) {
-            throw new IllegalArgumentException("useDataProvider must not be null");
-        }
+        checkNotNull(testMethod, "testMethod must not be null");
+        checkNotNull(useDataProvider, "useDataProvider must not be null");
 
         List<TestClass> dataProviderLocations = findDataProviderLocations(testMethod, useDataProvider.location());
         return findDataProviderMethods(dataProviderLocations, testMethod.getName(), useDataProvider.value());

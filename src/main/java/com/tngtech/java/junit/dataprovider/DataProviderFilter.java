@@ -1,5 +1,7 @@
 package com.tngtech.java.junit.dataprovider;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,10 +56,7 @@ public class DataProviderFilter extends Filter {
      * @param filter from which the {@link Description} is parsed and used for filtering
      */
     public DataProviderFilter(Filter filter) {
-        if (filter == null) {
-            throw new NullPointerException("supplied filter must not be null");
-        }
-        this.filter = filter;
+        this.filter = checkNotNull(filter, "supplied filter must not be null");
     }
 
     @Override

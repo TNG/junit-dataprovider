@@ -1,5 +1,7 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,10 +18,7 @@ public class TestGenerator {
     private final DataConverter dataConverter;
 
     public TestGenerator(DataConverter dataConverter) {
-        if (dataConverter == null) {
-            throw new NullPointerException("dataConverter must not be null");
-        }
-        this.dataConverter = dataConverter;
+        this.dataConverter = checkNotNull(dataConverter, "dataConverter must not be null");
     }
 
     /**
@@ -108,8 +107,7 @@ public class TestGenerator {
         List<Object[]> converted = dataConverter.convert(data, method.isVarArgs(), method.getParameterTypes(),
                 dataProvider);
         if (converted.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Could not create test methods using probably 'null' or 'empty' dataprovider");
+            throw new IllegalArgumentException("Could not create test methods using probably 'null' or 'empty' dataprovider");
         }
 
         int idx = 0;

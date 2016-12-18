@@ -1,5 +1,8 @@
 package com.tngtech.java.junit.dataprovider;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkArgument;
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -47,15 +50,9 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters, String nameFormat) {
         super(method);
 
-        if (parameters == null) {
-            throw new NullPointerException("parameter must not be null");
-        }
-        if (nameFormat == null) {
-            throw new NullPointerException("nameFormat must not be null");
-        }
-        if (parameters.length == 0) {
-            throw new IllegalArgumentException("parameter must not be empty");
-        }
+        checkNotNull(parameters, "parameter must not be null");
+        checkNotNull(nameFormat, "nameFormat must not be null");
+        checkArgument(parameters.length != 0, "parameter must not be empty");
 
         this.idx = idx;
         this.parameters = Arrays.copyOf(parameters, parameters.length);

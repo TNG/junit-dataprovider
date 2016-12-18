@@ -36,7 +36,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
 
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
-    public void testDataProviderFrameworkMethodShouldThrowIllegalArgumentExceptionIfParameterIsNull() {
+    public void testDataProviderFrameworkMethodShouldThrowNullPointerExceptionIfParameterIsNull() {
         // Given:
 
         // When:
@@ -48,7 +48,7 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
 
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test(expected = NullPointerException.class)
-    public void testDataProviderFrameworkMethodShouldThrowIllegalArgumentExceptionIfDataProviderIsNull() {
+    public void testDataProviderFrameworkMethodShouldThrowNullPointerExceptionIfDataProviderIsNull() {
         // Given:
 
         // When:

@@ -46,8 +46,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
     @Mock
     private DataProvider dataProvider;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testResolveShouldThrowIllegalArgumentExceptionIfTestMethodIsNull() {
+    @Test(expected = NullPointerException.class)
+    public void testResolveShouldThrowNullPointerExceptionIfTestMethodIsNull() {
         // Given:
 
         // When:
@@ -56,8 +56,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testResolveShouldThrowIllegalArgumentExceptionIfUseDataProviderIsNull() {
+    @Test(expected = NullPointerException.class)
+    public void testResolveShouldThrowNullPointerExceptionIfUseDataProviderIsNull() {
         // Given:
 
         // When:

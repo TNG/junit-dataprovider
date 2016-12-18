@@ -1,5 +1,7 @@
 package com.tngtech.java.junit.dataprovider;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,9 +72,7 @@ public class DataProviders {
      */
     @Deprecated
     public static <T> Object[][] testForEach(Iterable<T> args) {
-        if (args == null) {
-            throw new NullPointerException("args must not be null");
-        }
+        checkNotNull(args, "args must not be null");
 
         List<T> list = new ArrayList<T>();
         for (T arg : args) {
@@ -90,9 +90,7 @@ public class DataProviders {
      * @throws NullPointerException iif given {@code enumClass} is {@code null}
      */
     public static <E extends Enum<E>> Object[][] testForEach(Class<E> enumClass) {
-        if (enumClass == null) {
-            throw new NullPointerException("enumClass must not be null");
-        }
+        checkNotNull(enumClass, "enumClass must not be null");
         return testForEach((Object[]) enumClass.getEnumConstants());
     }
 

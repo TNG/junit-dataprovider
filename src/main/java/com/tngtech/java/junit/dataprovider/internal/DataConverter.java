@@ -1,5 +1,8 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkArgument;
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -74,17 +77,10 @@ public class DataConverter {
      * @throws IllegalArgumentException iif given {@code parameterTypes} is empty
      * @throws ClassCastException iif {@code data} is not a compatible type
      */
-    public List<Object[]> convert(Object data, boolean isVarArgs, Class<?>[] parameterTypes,
-            DataProvider dataProvider) {
-        if (parameterTypes == null) {
-            throw new NullPointerException("parameterTypes must not be null");
-        }
-        if (dataProvider == null) {
-            throw new NullPointerException("dataProvider must not be null");
-        }
-        if (parameterTypes.length == 0) {
-            throw new IllegalArgumentException("parameterTypes must not be empty");
-        }
+    public List<Object[]> convert(Object data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider) {
+        checkNotNull(parameterTypes, "parameterTypes must not be null");
+        checkNotNull(dataProvider, "dataProvider must not be null");
+        checkArgument(parameterTypes.length != 0, "parameterTypes must not be empty");
 
         if (data instanceof Object[][]) {
             return convert((Object[][]) data, isVarArgs, parameterTypes);

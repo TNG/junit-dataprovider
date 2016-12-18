@@ -1,5 +1,7 @@
 package com.tngtech.java.junit.dataprovider;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -123,9 +125,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     protected void validateTestMethods(List<Throwable> errors) {
-        if (errors == null) {
-            throw new NullPointerException("errors must not be null");
-        }
+        checkNotNull(errors, "errors must not be null");
 
         // This method cannot use the result of "computeTestMethods()" because the method ignores invalid test methods
         // and dataproviders silently (except if a dataprovider method cannot be called). However, the common errors
@@ -193,9 +193,7 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     public void filter(Filter filter) throws NoTestsRemainException {
-        if (filter == null) {
-            throw new NullPointerException("filter must not be null");
-        }
+        checkNotNull(filter, "filter must not be null");
         super.filter(new DataProviderFilter(filter));
     }
 

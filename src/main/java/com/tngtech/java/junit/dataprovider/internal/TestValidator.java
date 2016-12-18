@@ -1,5 +1,7 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -15,10 +17,7 @@ public class TestValidator {
     private final DataConverter dataConverter;
 
     public TestValidator(DataConverter dataConverter) {
-        if (dataConverter == null) {
-            throw new NullPointerException("dataConverter must not be null");
-        }
-        this.dataConverter = dataConverter;
+        this.dataConverter = checkNotNull(dataConverter, "dataConverter must not be null");
     }
 
     /**
@@ -32,12 +31,8 @@ public class TestValidator {
      * @throws IllegalArgumentException if given {@code errors} is {@code null}
      */
     public void validateTestMethod(FrameworkMethod testMethod, List<Throwable> errors) {
-        if (testMethod == null) {
-            throw new NullPointerException("testMethod must not be null");
-        }
-        if (errors == null) {
-            throw new NullPointerException("errors must not be null");
-        }
+        checkNotNull(testMethod, "testMethod must not be null");
+        checkNotNull(errors, "errors must not be null");
 
         UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
         DataProvider dataProvider = testMethod.getAnnotation(DataProvider.class);
@@ -79,15 +74,9 @@ public class TestValidator {
     public void validateDataProviderMethod(FrameworkMethod dataProviderMethod, DataProvider dataProvider,
             List<Throwable> errors) {
 
-        if (dataProviderMethod == null) {
-            throw new NullPointerException("dataProviderMethod must not be null");
-        }
-        if (dataProvider == null) {
-            throw new NullPointerException("dataProvider must not be null");
-        }
-        if (errors == null) {
-            throw new NullPointerException("errors must not be null");
-        }
+        checkNotNull(dataProviderMethod, "dataProviderMethod must not be null");
+        checkNotNull(dataProvider, "dataProvider must not be null");
+        checkNotNull(errors, "errors must not be null");
 
         Method method = dataProviderMethod.getMethod();
 
