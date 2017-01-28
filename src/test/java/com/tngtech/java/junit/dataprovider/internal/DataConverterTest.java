@@ -99,9 +99,21 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testCanConvertShouldReturnTrueIfTypeIsIterableOfQuestionMark() {
+    public void testCanConvertShouldReturnTrueIfTypeIsIterableOfWildcard() {
         // Given:
-        Type type = getMethod("methodReturningIterableOfQuestionMark").getGenericReturnType();
+        Type type = getMethod("methodReturningIterableOfWildcard").getGenericReturnType();
+
+        // When:
+        boolean result = underTest.canConvert(type);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testCanConvertShouldReturnTrueIfTypeIsListOfWildcard() {
+        // Given:
+        Type type = getMethod("methodReturningListOfWildcard").getGenericReturnType();
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -125,7 +137,7 @@ public class DataConverterTest extends BaseTest {
     @Test
     public void testCanConvertShouldReturnTrueIfTypeIsSetOfSet() {
         // Given:
-        Type type = getMethod("methodReturningSetOfSetOfQuestionMark").getGenericReturnType();
+        Type type = getMethod("methodReturningSetOfSetOfWildcard").getGenericReturnType();
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -183,9 +195,21 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
-    public void testCanConvertShouldReturnTrueIfTypeIsListListObject() {
+    public void testCanConvertShouldReturnTrueIfTypeIsListOfListOfObject() {
         // Given:
         Type type = getMethod("methodReturningListOfListOfObject").getGenericReturnType();
+
+        // When:
+        boolean result = underTest.canConvert(type);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testCanConvertShouldReturnTrueIfTypeIsListOfListOfWildcard() {
+        // Given:
+        Type type = getMethod("methodReturningListOfListOfWildcard").getGenericReturnType();
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -448,6 +472,14 @@ public class DataConverterTest extends BaseTest {
 
     // -- methods used as Method objects -------------------------------------------------------------------------------
 
+    public static List<List<Object>> methodReturningListOfListOfObject() {
+        return null;
+    }
+
+    public static List<List<?>> methodReturningListOfListOfWildcard() {
+        return null;
+    }
+
     public static List<Iterable<Number>> methodReturningListOfIterableOfNumber() {
         return null;
     }
@@ -456,7 +488,7 @@ public class DataConverterTest extends BaseTest {
         return null;
     }
 
-    public static Set<Set<?>> methodReturningSetOfSetOfQuestionMark() {
+    public static Set<Set<?>> methodReturningSetOfSetOfWildcard() {
         return null;
     }
 
@@ -481,15 +513,15 @@ public class DataConverterTest extends BaseTest {
         return null;
     }
 
-    public static List<List<Object>> methodReturningListOfListOfObject() {
-        return null;
-    }
-
     public static List<Object> methodReturningListOfObject() {
         return null;
     }
 
-    public static List<?> methodReturningIterableOfQuestionMark() {
+    public static List<?> methodReturningIterableOfWildcard() {
+        return null;
+    }
+
+    public static List<?> methodReturningListOfWildcard() {
         return null;
     }
 
