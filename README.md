@@ -36,7 +36,7 @@ Have a look to this repositories [Wiki](/../../wiki/) pages for documenation, us
     * [Convention over configuration](/../../wiki/Features#convention-over-configuration)
     * [OSGi compatible ```MANIFEST.MF```](/../../wiki/Features#osgi-compatible-manifestmf)
 * [Tips and Tricks](/../../wiki/Tips-and-Tricks)
-* [Release Notes](/TNG/junit-dataprovider/releases)
+* [Release Notes](/../../releases)
 * [Eclipse Template](/../../wiki/Eclipse-Template)
 
 Contributing
