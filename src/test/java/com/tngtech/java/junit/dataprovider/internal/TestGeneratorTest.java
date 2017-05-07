@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -97,8 +98,8 @@ public class TestGeneratorTest extends BaseTest {
     public void testGenerateExplodedTestMethodsForShouldCatchExceptionUsingDataProviderAndReThrowAsError() {
         // Given:
         doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
-        doThrow(IllegalArgumentException.class).when(dataConverter).convert(any(), any(Boolean.class),
-                any(Class[].class), eq(dataProvider));
+        doThrow(IllegalArgumentException.class).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
+                eq(dataProvider));
 
         // When:
         List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(testMethod, null);
@@ -145,17 +146,38 @@ public class TestGeneratorTest extends BaseTest {
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
+        assertThat(underTest.dataProviderDataCache).hasSize(1).containsKey(dataProviderMethod);
         assertDataProviderFrameworkMethods(result, dataConverterResult, "%m");
         verify(dataProviderMethod).invokeExplosively(null);
     }
 
     @Test
-    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataConverterReturnsMultipleRows() throws Throwable {
+    public void testExplodeTestMethodsUseDataProviderShouldUseCachedDataProviderResultIfAvailable() {
         // Given:
-        List<Object[]> dataConverterResult = listOfArrays(new Object[] { 11, "22", 33L },
-                new Object[] { 44, "55", 66L }, new Object[] { 77, "88", 99L });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
+        Object data = new Object[][] { { 1 } };
+        underTest.dataProviderDataCache.put(dataProviderMethod, data);
+
+        doReturn(listOfArrays(new Object[] { 1 })).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
                 any(DataProvider.class));
+        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
+        doReturn("%m").when(dataProvider).format();
+
+        // When:
+        underTest.explodeTestMethod(testMethod, dataProviderMethod);
+
+        // Then:
+        verify(dataProviderMethod).getAnnotation(DataProvider.class);
+        verify(dataConverter).convert(eq(data), eq(false), any(Class[].class), eq(dataProvider));
+        verifyNoMoreInteractions(dataProviderMethod, dataConverter);
+    }
+
+    @Test
+    public void testExplodeTestMethodsUseDataProviderShouldReturnMultipleDataProviderFrameworkMethodIfDataConverterReturnsMultipleRows()
+            throws Throwable {
+        // Given:
+        List<Object[]> dataConverterResult = listOfArrays(new Object[] { 11, "22", 33L }, new Object[] { 44, "55", 66L },
+                new Object[] { 77, "88", 99L });
+        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class));
         doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
         doReturn("%c").when(dataProvider).format();
 
@@ -163,6 +185,7 @@ public class TestGeneratorTest extends BaseTest {
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
+        assertThat(underTest.dataProviderDataCache).hasSize(1).containsKey(dataProviderMethod);
         assertDataProviderFrameworkMethods(result, dataConverterResult, "%c");
         verify(dataProviderMethod).invokeExplosively(null);
     }
@@ -182,6 +205,7 @@ public class TestGeneratorTest extends BaseTest {
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
+        assertThat(underTest.dataProviderDataCache).hasSize(1).containsKey(dataProviderMethod);
         assertThat(result).hasSize(1);
         verify(dataProviderMethod).invokeExplosively(null, testMethod);
     }
