@@ -193,35 +193,35 @@ public class DataProvidersTest extends BaseTest {
         // Then:
         assertThat(result).isEqualTo(new Object[][] { { TestEnum.VAL1 }, { TestEnum.VAL2 }, { TestEnum.VAL3 } });
     }
-    
+
     @Test
     public void testCrossProductShouldReturnEmptyWhenLeftSideIsEmpty() {
         // Given:
 
         // When:
-    	Object[][] result = crossProduct(testForEach(1,2,3), testForEach());
+        Object[][] result = crossProduct(testForEach(1,2,3), testForEach());
 
         // Then:
         assertThat(result).isEqualTo(new Object[][] { });
     }
-    
+
     @Test
     public void testCrossProductShouldReturnEmptyWhenRightSideIsEmpty() {
         // Given:
 
         // When:
-    	Object[][] result = crossProduct(testForEach(), testForEach(1,2,3));
+        Object[][] result = crossProduct(testForEach(), testForEach(1,2,3));
 
         // Then:
         assertThat(result).isEqualTo(new Object[][] { });
     }
-    
+
     @Test
     public void testCrossProductShouldReturnTheCrossProductOfBothSides() {
         // Given:
 
         // When:
-    	Object[][] result = crossProduct(testForEach(1,2,3), testForEach(4,5));
+        Object[][] result = crossProduct(testForEach(1,2,3), testForEach(4,5));
 
         // Then:
         assertThat(result).isEqualTo(new Object[][] { {1, 4}, { 1, 5 }, { 2, 4 }, { 2, 5 }, { 3, 4 }, { 3, 5 } });
