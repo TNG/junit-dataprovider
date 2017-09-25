@@ -8,7 +8,7 @@ script:
   - ./gradlew build
   - cd ./junit4/
   - mvn test
-  - ant test
+#  - ant test
 
 jdk:
   - oraclejdk8
