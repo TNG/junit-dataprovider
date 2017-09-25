@@ -10,7 +10,7 @@ ext.skipFindBugs = hasProperty('skipFindBugs')
 println "Using skipFindBugs = ${skipFindBugs} for current build."
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
+    gradleVersion = '4.1'
 }
 
 allprojects {
