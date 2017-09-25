@@ -6,6 +6,7 @@ script:
   - ./gradlew build -PjunitVersion=4.10  -PskipFindBugs
   - ./gradlew build -PjunitVersion=4.11  -PskipFindBugs
   - ./gradlew build
+  - cd ./junit4/
   - mvn test
   - ant test
 
