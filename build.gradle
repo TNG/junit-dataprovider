@@ -75,36 +75,25 @@ subprojects {
     }
     build.dependsOn touchTestResultsForJenkins
 
-    jacocoTestReport {
-        reports {
-            xml.enabled = true // coveralls plugin depends on xml format report
-        }
-    }
-    jacoco {
-        toolVersion = '0.7.7.201606060606'
-    }
-
-    findbugs {
-        if (System.getProperty("java.version")[0..2] in [ '1.5', '1.6' ]) { // FindBugs v3.0.0 does not work with Java < v1.7 :-(
-            toolVersion = '2.0.3'
-        } else {
-            toolVersion = '3.0.1'
-        }
-        ignoreFailures = true
-    }
-
-    plugins.withType(JavaBasePlugin) {
-        check.dependsOn(rootProject.cpdCheck)
-    }
-
-    tasks.withType(FindBugs).each { task ->
-        task.enabled = !skipFindBugs
-    }
-
     artifacts {
         archives jar
         archives javadocJar
         archives sourcesJar
+    }
+}
+
+project(':core') {
+    archivesBaseName = 'junit-dataprovider-core'
+    description = 'The common core for a TestNG like dataprovider runner for JUnit.'
+    group = 'com.tngtech'
+    version = '2.0-SNAPSHOT'
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+
+        testCompile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+        testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.7'
     }
 }
 
@@ -157,6 +146,35 @@ project(':junit4') {
     build.dependsOn touchIntegTestResultsForJenkins
 }
 
+subprojects {
+    // configure after integTests etc. are added
+    jacocoTestReport {
+        reports {
+            xml.enabled = true // coveralls plugin depends on xml format report
+        }
+    }
+    jacoco {
+        toolVersion = '0.7.7.201606060606'
+    }
+
+    findbugs {
+        if (System.getProperty("java.version")[0..2] in [ '1.5', '1.6' ]) { // FindBugs v3.0.0 does not work with Java < v1.7 :-(
+            toolVersion = '2.0.3'
+        } else {
+            toolVersion = '3.0.1'
+        }
+        ignoreFailures = true
+    }
+
+    plugins.withType(JavaBasePlugin) {
+        check.dependsOn(rootProject.cpdCheck)
+    }
+
+    tasks.withType(FindBugs).each { task ->
+        task.enabled = !rootProject.skipFindBugs
+    }
+}
+
 cpd {
     if (System.getProperty("java.version")[0..2] in [ '1.5', '1.6' ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
         toolVersion = '5.3.7'
@@ -179,7 +197,7 @@ if (!hasProperty('sonatypePassword')) {
     ext.sonatypePassword = ''
 }
 
-project(':junit4') {
+subprojects {
     apply plugin: 'maven'
     apply plugin: 'signing'
 
@@ -207,9 +225,9 @@ project(':junit4') {
 
                 pom {
                     project {
-                        name 'junit-dataprovider'
+                        name project.archivesBaseName
                         packaging 'jar'
-                        description 'A TestNG like dataprovider runner for JUnit'
+                        description project.description
                         url 'https://github.com/TNG/junit-dataprovider'
 
                         scm {
@@ -234,11 +252,13 @@ project(':junit4') {
                         }
                     }
                     whenConfigured { pom ->
-                        pom.dependencies.find{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit' }.with {
-                            version = '[4.8.2,4.12]'
-                            scope = 'provided'
+                        pom.dependencies.findAll{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit' &&
+                                dep.scope == 'compile' }.each{ dep ->
+                            dep.version = '[4.8.2,4.12]'
+                            dep.scope = 'provided'
                         }
-                        pom.dependencies.removeAll(pom.dependencies.findAll{ dep -> dep.scope in [ 'compile', 'test' ] })
+                        pom.dependencies.removeAll{ dep -> dep.scope in [ 'compile', 'test' ] &&
+                                !(dep.groupId == 'com.tngtech' && dep.artifactId == 'junit-dataprovider-core') }
                     }
                 }
             }

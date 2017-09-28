@@ -1,1 +1,1 @@
-include 'junit4'
+include 'core', 'junit4'
