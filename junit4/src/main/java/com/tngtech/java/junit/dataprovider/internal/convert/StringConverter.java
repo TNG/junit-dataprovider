@@ -1,15 +1,13 @@
 package com.tngtech.java.junit.dataprovider.internal.convert;
 
-import static com.tngtech.java.junit.dataprovider.DataProvider.NULL;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
+import java.lang.annotation.Annotation;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.junit.dataprovider.convert.ConverterContext;
 
-public class StringConverter {
+public class StringConverter extends com.tngtech.junit.dataprovider.convert.StringConverter {
 
-    protected static final Object OBJECT_NO_CONVERSION = new Object();
+    protected static final Object OBJECT_NO_CONVERSION = com.tngtech.junit.dataprovider.convert.StringConverter.OBJECT_NO_CONVERSION;
 
     /**
      * Converts the given {@code data} to its corresponding arguments using the given {@code parameterTypes} and other
@@ -27,108 +25,25 @@ public class StringConverter {
      */
     public Object[] convert(String data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider,
             int rowIdx) {
-        if (data == null) {
-            return new Object[] { null };
-        }
-        if (parameterTypes.length == 1) {
-            if (isVarArgs) {
-                if (data.isEmpty()) {
-                    return new Object[] { Array.newInstance(parameterTypes[0].getComponentType(), 0) };
-                }
-            } else {
-                return new Object[] { convertValue(data, parameterTypes[0], dataProvider) };
-            }
-        }
-
-        String[] splitData = splitBy(data, dataProvider.splitBy());
-
-        checkArgumentsAndParameterCount(splitData.length, parameterTypes.length, isVarArgs, rowIdx);
-
-        return convert(splitData, isVarArgs, parameterTypes, dataProvider);
+        ConverterContext context = new ConverterContext(dataProvider.splitBy(), dataProvider.convertNulls(),
+                dataProvider.trimValues(), dataProvider.ignoreEnumCase());
+        return super.convert(data, isVarArgs, parameterTypes, context, rowIdx);
     }
 
+    @Override
     protected String[] splitBy(String data, String regex) {
-        // add trailing null terminator that split for "regex" ending data works properly
-        String[] splitData = (data + "\0").split(regex);
-
-        // remove added null terminator
-        int lastItemIdx = splitData.length - 1;
-        splitData[lastItemIdx] = splitData[lastItemIdx].substring(0, splitData[lastItemIdx].length() - 1);
-
-        return splitData;
+        return super.splitBy(data, regex);
     }
 
+    @Override
     protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
-        if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount != argCount)) {
-            throw new IllegalArgumentException(String.format("Test method expected %s %d parameters but got %d from @DataProvider row %d",
-                    (isVarArgs) ? "at least " : "", paramCount - 1, argCount, rowIdx));
-        }
+        super.checkArgumentsAndParameterCount(argCount, paramCount, isVarArgs, rowIdx);
     }
 
-    private Object[] convert(String[] splitData, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider) {
-        Object[] result = new Object[parameterTypes.length];
-
-        int nonVarArgParametersLength = parameterTypes.length - ((isVarArgs) ? 1 : 0);
-        for (int idx = 0; idx < nonVarArgParametersLength; idx++) {
-            result[idx] = convertValue(splitData[idx], parameterTypes[idx], dataProvider);
-        }
-
-        if (isVarArgs) {
-            Class<?> varArgComponentType = parameterTypes[nonVarArgParametersLength].getComponentType();
-
-            Object varArgArray = Array.newInstance(varArgComponentType, splitData.length - parameterTypes.length + 1);
-            for (int idx = nonVarArgParametersLength; idx < splitData.length; idx++) {
-                Array.set(varArgArray, idx - nonVarArgParametersLength, convertValue(splitData[idx], varArgComponentType, dataProvider));
-            }
-            result[nonVarArgParametersLength] = varArgArray;
-        }
-        return result;
-    }
-
-    private Object convertValue(String data, Class<?> targetType, DataProvider dataProvider) {
-        String str = (dataProvider.trimValues()) ? data.trim() : data;
-        if (dataProvider.convertNulls() && NULL.equals(str)) {
-            return null;
-        }
-
-        Object tmp = customConvertValue(str, targetType, dataProvider);
-        if (tmp != OBJECT_NO_CONVERSION) {
-            return tmp;
-        }
-
-        if (String.class.equals(targetType)) {
-            return str;
-        }
-
-        Object primaryOrWrapper = convertPrimaryOrWrapper(str, targetType);
-        if (primaryOrWrapper != null) {
-            return primaryOrWrapper;
-        }
-
-        if (targetType.isEnum()) {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            Class<Enum> enumType = (Class<Enum>) targetType;
-            return convertToEnumValue(str, enumType, dataProvider.ignoreEnumCase());
-        }
-
-        if (Class.class.equals(targetType)) {
-            try {
-                return Class.forName(str);
-            } catch (Exception e) {
-                throw new IllegalArgumentException(
-                        String.format("Unable to instantiate %s for '%s'", targetType.getSimpleName(), str), e);
-            }
-        }
-
-        Object result = tryConvertUsingSingleStringParamConstructor(str, targetType);
-        if (result != null) {
-            return result;
-        }
-
-        throw new IllegalArgumentException("'" + targetType.getSimpleName()
-                + "' is not supported as parameter type of test methods"
-                + ". Supported types are primitive types and their wrappers, case-sensitive 'Enum'"
-                + " values, 'String's, and types having a single 'String' parameter constructor.");
+    @Override
+    protected Object customConvertValue(String str, Class<?> targetType, ConverterContext context) {
+        DataProvider dataProvider = createProxyDataProvider(context);
+        return customConvertValue(str, targetType, dataProvider);
     }
 
     /**
@@ -144,85 +59,65 @@ public class StringConverter {
         return OBJECT_NO_CONVERSION;
     }
 
+    @Override
     protected Object convertPrimaryOrWrapper(String str, Class<?> targetType) {
-        try {
-            if (boolean.class.equals(targetType) || Boolean.class.equals(targetType)) {
-                return Boolean.valueOf(str);
-            }
-            if (byte.class.equals(targetType) || Byte.class.equals(targetType)) {
-                return Byte.valueOf(str);
-            }
-            if (char.class.equals(targetType) || Character.class.equals(targetType)) {
-                if (str.length() == 1) {
-                    return str.charAt(0);
-                }
-                throw new IllegalArgumentException(String.format("'%s' cannot be converted to %s.", str, targetType.getSimpleName()));
-            }
-            if (short.class.equals(targetType) || Short.class.equals(targetType)) {
-                return Short.valueOf(str);
-            }
-            if (int.class.equals(targetType) || Integer.class.equals(targetType)) {
-                return Integer.valueOf(str);
-            }
-            if (long.class.equals(targetType) || Long.class.equals(targetType)) {
-                return convertToLong(str);
-            }
-            if (float.class.equals(targetType) || Float.class.equals(targetType)) {
-                return Float.valueOf(str);
-            }
-            if (double.class.equals(targetType) || Double.class.equals(targetType)) {
-                return Double.valueOf(str);
-            }
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(String.format("Cannot convert %s to %s", str, targetType.getSimpleName()));
-        }
-        return null;
+        return super.convertPrimaryOrWrapper(str, targetType);
     }
 
+    @Override
     protected Object convertToLong(String str) {
-        String longStr = str;
-        if (longStr.endsWith("l")) {
-            longStr = longStr.substring(0, longStr.length() - 1);
-        }
-        return Long.valueOf(longStr);
+        return super.convertToLong(str);
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     protected Object convertToEnumValue(String str, Class<Enum> enumType, boolean ignoreEnumCase) {
-        String errorMessage = "'%s' is not a valid value of enum %s.";
-        if (ignoreEnumCase) {
-            for (Enum<?> enumConstant : enumType.getEnumConstants()) {
-                if (str.equalsIgnoreCase(enumConstant.name())) {
-                    return enumConstant;
-                }
-            }
-        } else {
-            try {
-                @SuppressWarnings("unchecked")
-                Enum result = Enum.valueOf(enumType, str);
-                return result;
-
-            } catch (IllegalArgumentException e) {
-                errorMessage += " Please be aware of case sensitivity or use 'ignoreEnumCase' of @"
-                        + DataProvider.class.getSimpleName() + ".";
-            }
-        }
-        throw new IllegalArgumentException(String.format(errorMessage, str, enumType.getSimpleName()));
+        return super.convertToEnumValue(str, enumType, ignoreEnumCase);
     }
 
+    @Override
     protected Object tryConvertUsingSingleStringParamConstructor(String str, Class<?> targetType) {
-        for (Constructor<?> constructor : targetType.getConstructors()) {
-            if (constructor.getParameterTypes().length == 1 && String.class.equals(constructor.getParameterTypes()[0])) {
-                try {
-                    return constructor.newInstance(str);
+        return super.tryConvertUsingSingleStringParamConstructor(str, targetType);
+    }
 
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(String.format(
-                            "Tried to invoke '%s' for argument '%s'. Exception: %s", constructor, str, e.getMessage()),
-                            e);
-                }
+    private DataProvider createProxyDataProvider(final ConverterContext context) {
+        return new DataProvider() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return DataProvider.class;
             }
-        }
-        return null;
+
+            @Override
+            public String[] value() {
+                throw new UnsupportedOperationException(
+                        "Sorry, this operation is not available anymore. Please create an issue if you still need it.");
+            }
+
+            @Override
+            public boolean trimValues() {
+                return context.isTrimValues();
+            }
+
+            @Override
+            public String splitBy() {
+                return context.getSplitBy();
+            }
+
+            @Override
+            public boolean ignoreEnumCase() {
+                return context.isIgnoreEnumCase();
+            }
+
+            @Override
+            public String format() {
+                throw new UnsupportedOperationException(
+                        "Sorry, this operation is not available anymore. Please create an issue if you still need it.");
+            }
+
+            @Override
+            public boolean convertNulls() {
+                return context.isConvertNulls();
+            }
+        };
     }
 }

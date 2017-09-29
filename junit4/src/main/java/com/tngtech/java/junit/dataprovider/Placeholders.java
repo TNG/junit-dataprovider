@@ -3,13 +3,13 @@ package com.tngtech.java.junit.dataprovider;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder;
 import com.tngtech.java.junit.dataprovider.internal.placeholder.CanonicalClassNamePlaceholder;
 import com.tngtech.java.junit.dataprovider.internal.placeholder.CompleteMethodSignaturePlaceholder;
 import com.tngtech.java.junit.dataprovider.internal.placeholder.IndexPlaceholder;
 import com.tngtech.java.junit.dataprovider.internal.placeholder.ParameterPlaceholder;
 import com.tngtech.java.junit.dataprovider.internal.placeholder.SimpleClassNamePlaceholder;
 import com.tngtech.java.junit.dataprovider.internal.placeholder.SimpleMethodNamePlaceholder;
+import com.tngtech.junit.dataprovider.placeholder.BasePlaceholder;
 
 /**
  * Use this class to manipulate the generation/formatting of test method names.

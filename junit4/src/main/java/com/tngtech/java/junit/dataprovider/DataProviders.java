@@ -21,7 +21,7 @@ public class DataProviders {
      * @see #$$
      */
     public static Object[] $(Object... args) { // define it with <T> produces var-args warning on user side for java < 6
-        return args;
+        return com.tngtech.junit.dataprovider.DataProviders.$(args);
     }
 
     /**
@@ -44,7 +44,7 @@ public class DataProviders {
      * @see #$
      */
     public static Object[][] $$(Object[]... args) {
-        return args;
+        return com.tngtech.junit.dataprovider.DataProviders.$$(args);
     }
 
     /**
@@ -54,11 +54,7 @@ public class DataProviders {
      * @return an array which contains {@link Object} arrays for each single argument
      */
     public static Object[][] testForEach(Object... args) {
-        Object[][] result = new Object[args.length][1];
-        for (int idx = 0; idx < args.length; idx++) {
-            result[idx][0] = args[idx];
-        }
-        return result;
+        return com.tngtech.junit.dataprovider.DataProviders.testForEach(args);
     }
 
     /**
@@ -90,8 +86,7 @@ public class DataProviders {
      * @throws NullPointerException iif given {@code enumClass} is {@code null}
      */
     public static <E extends Enum<E>> Object[][] testForEach(Class<E> enumClass) {
-        checkNotNull(enumClass, "enumClass must not be null");
-        return testForEach((Object[]) enumClass.getEnumConstants());
+        return com.tngtech.junit.dataprovider.DataProviders.testForEach(enumClass);
     }
 
     /**
@@ -108,19 +103,6 @@ public class DataProviders {
      * @return an {@link Object} array array containing the cross product of the given {@code rows}
      */
     public static Object[][] crossProduct(Object[][] rows1, Object[][] rows2) {
-        Object[][] rowsOut = new Object[rows1.length * rows2.length][];
-        int indexOut = 0;
-        for( int index1 = 0; index1 < rows1.length; index1++ ) {
-            Object[] row1 = rows1[index1];
-            for( int index2 = 0; index2 < rows2.length; index2++ ) {
-                Object[] row2 = rows2[index2];
-                Object[] rowOut = new Object[row1.length + row2.length];
-                System.arraycopy( row1, 0, rowOut, 0, row1.length );
-                System.arraycopy( row2, 0, rowOut, row1.length, row2.length );
-                rowsOut[indexOut] = rowOut;
-                indexOut++;
-            }
-        }
-        return rowsOut;
+        return com.tngtech.junit.dataprovider.DataProviders.crossProduct(rows1, rows2);
     }
 }

@@ -8,7 +8,8 @@ import java.util.Arrays;
 
 import org.junit.runners.model.FrameworkMethod;
 
-import com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder;
+import com.tngtech.junit.dataprovider.placeholder.BasePlaceholder;
+import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
 
 /**
  * A special framework method that allows the usage of parameters for the test method.
@@ -62,10 +63,17 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     @Override
     public String getName() {
         String result = nameFormat;
-        for (BasePlaceholder placeHolder : Placeholders.all()) {
-            synchronized (placeHolder) {
-                placeHolder.setContext(getMethod(), idx, Arrays.copyOf(parameters, parameters.length));
-                result = placeHolder.process(result);
+        for (BasePlaceholder placeholder : Placeholders.all()) {
+            if (placeholder instanceof com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder) {
+                com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder placeHolder = (com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder) placeholder;
+                synchronized (placeHolder) {
+                    placeHolder.setContext(getMethod(), idx, Arrays.copyOf(parameters, parameters.length));
+                    result = placeHolder.process(result);
+                }
+
+            } else {
+                ReplacementData data = ReplacementData.of(getMethod(), idx, Arrays.asList(parameters));
+                result = placeholder.process(data, result);
             }
         }
         return result;

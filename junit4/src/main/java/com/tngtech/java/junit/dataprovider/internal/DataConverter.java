@@ -1,23 +1,22 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
-import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkArgument;
 import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.internal.convert.ObjectArrayConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
+import com.tngtech.junit.dataprovider.convert.ConverterContext;
 
 /**
  * Internal class to convert some data to its corresponding parameters.
  */
-public class DataConverter {
+public class DataConverter extends com.tngtech.junit.dataprovider.convert.DataConverter {
 
     private ObjectArrayConverter objectArrayConverter;
     private SingleArgConverter singleArgConverter;
@@ -78,27 +77,12 @@ public class DataConverter {
      * @throws ClassCastException iif {@code data} is not a compatible type
      */
     public List<Object[]> convert(Object data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider) {
-        checkNotNull(parameterTypes, "parameterTypes must not be null");
         checkNotNull(dataProvider, "dataProvider must not be null");
-        checkArgument(parameterTypes.length != 0, "parameterTypes must not be empty");
 
-        if (data instanceof Object[][]) {
-            return convert((Object[][]) data, isVarArgs, parameterTypes);
-
-        } else if (data instanceof String[]) {
-            return convert((String[]) data, isVarArgs, parameterTypes, dataProvider);
-
-        } else if (data instanceof Object[]) {
-            return convert((Object[]) data, isVarArgs, parameterTypes);
-
-        } else if (data instanceof Iterable) {
-            @SuppressWarnings("rawtypes")
-            Iterable iterableData = (Iterable) data;
-            return convert(iterableData, isVarArgs, parameterTypes);
-
-        }
-        throw new ClassCastException(
-                String.format("Cannot cast to either Object[][], Object[], String[], or Iterable because data was: %s", data));
+        ConverterContext context = new ConverterContext(objectArrayConverter, singleArgConverter, stringConverter,
+                dataProvider.splitBy(), dataProvider.convertNulls(), dataProvider.trimValues(),
+                dataProvider.ignoreEnumCase());
+        return super.convert(data, isVarArgs, parameterTypes, context);
     }
 
     private boolean canConvertIterableOf(ParameterizedType parameterizedType) {
@@ -111,54 +95,6 @@ public class DataConverter {
             return true;
         }
         return false;
-    }
-
-    private List<Object[]> convert(Object[][] data, boolean isVarArgs, Class<?>[] parameterTypes) {
-        List<Object[]> result = new ArrayList<Object[]>();
-        for (Object[] arguments : data) {
-            result.add(objectArrayConverter.convert(arguments, isVarArgs, parameterTypes));
-        }
-        return result;
-    }
-
-    private List<Object[]> convert(String[] data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider) {
-        List<Object[]> result = new ArrayList<Object[]>();
-        int idx = 0;
-        for (String argString : data) {
-            result.add(stringConverter.convert(argString, isVarArgs, parameterTypes, dataProvider, idx++));
-        }
-        return result;
-    }
-
-    private List<Object[]> convert(Object[] data, boolean isVarArgs, Class<?>[] parameterTypes) {
-        List<Object[]> result = new ArrayList<Object[]>();
-        for (Object argument : data) {
-            result.add(singleArgConverter.convert(argument, isVarArgs, parameterTypes));
-        }
-        return result;
-    }
-
-    private List<Object[]> convert(Iterable<?> data, boolean isVarArgs, Class<?>[] parameterTypes) {
-        List<Object[]> result = new ArrayList<Object[]>();
-        for (Object arguments : data) {
-            if (arguments != null && Iterable.class.isAssignableFrom(arguments.getClass())) {
-                @SuppressWarnings("rawtypes")
-                Iterable iterable = (Iterable) arguments;
-                result.add(objectArrayConverter.convert(toArray(iterable), isVarArgs, parameterTypes));
-
-            } else {
-                result.add(singleArgConverter.convert(arguments, isVarArgs, parameterTypes));
-            }
-        }
-        return result;
-    }
-
-    private Object[] toArray(Iterable<?> iterable) {
-        List<Object> list = new ArrayList<Object>();
-        for (Object element : iterable) {
-            list.add(element);
-        }
-        return list.toArray();
     }
 
     public void setObjectArrayConverter(ObjectArrayConverter objectArrayConverter) {

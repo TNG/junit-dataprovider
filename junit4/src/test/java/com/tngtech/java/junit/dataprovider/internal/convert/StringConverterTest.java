@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -31,6 +32,11 @@ public class StringConverterTest extends BaseTest {
 
     @Mock
     private DataProvider dataProvider;
+
+    @Before
+    public void setup() {
+        doReturn(DataProvider.COMMA).when(dataProvider).splitBy();
+    }
 
     @Test
     public void testConvertShouldReturnNullObjectWrappedInObjectArray() {

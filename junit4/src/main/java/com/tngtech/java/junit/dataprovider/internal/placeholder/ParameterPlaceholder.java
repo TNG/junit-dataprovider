@@ -1,8 +1,12 @@
 package com.tngtech.java.junit.dataprovider.internal.placeholder;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.junit.dataprovider.placeholder.ArgumentPlaceholder;
+import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
 
 /**
  * This placeholder format the parameters of a dataprovider test as comma-separated {@link String} according to the
@@ -31,7 +35,7 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
  * </tr>
  * </table>
  */
-public class ParameterPlaceholder extends BasePlaceholder {
+public class ParameterPlaceholder extends ArgumentPlaceholder {
 
     /**
      * {@link String} representation of {@code null}
@@ -39,7 +43,7 @@ public class ParameterPlaceholder extends BasePlaceholder {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final String STRING_NULL = "<null>";
+    static final String STRING_NULL = ArgumentPlaceholder.STRING_NULL;
 
     /**
      * {@link String} representation of {@code ""}
@@ -47,7 +51,7 @@ public class ParameterPlaceholder extends BasePlaceholder {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final String STRING_EMPTY = "<empty string>";
+    static final String STRING_EMPTY = ArgumentPlaceholder.STRING_EMPTY;
 
     /**
      * {@link String} representation of an non-printable character
@@ -55,131 +59,70 @@ public class ParameterPlaceholder extends BasePlaceholder {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final String STRING_NON_PRINTABLE = "<np>";
+    static final String STRING_NON_PRINTABLE = ArgumentPlaceholder.STRING_NON_PRINTABLE;
 
+    // -- Begin: copied from origin BasePlaceholder for backwards compatibility reasons --------------------------------
 
-    public ParameterPlaceholder() {
-        super("%p\\[(-?[0-9]+|-?[0-9]+\\.\\.-?[0-9]+)\\]");
+    protected Method method;
+    protected int idx;
+    protected Object[] parameters;
+
+    /**
+     * Sets the given arguments as context for processing or replacement generation, respectively.
+     *
+     * @param method - test method
+     * @param idx - index of the dataprovider row
+     * @param parameters of the current dataprovider test to be executed
+     */
+    public void setContext(Method method, int idx, Object[] parameters) {
+        this.method = method;
+        this.idx = idx;
+        this.parameters = Arrays.copyOf(parameters, parameters.length);
     }
 
-    @Override
+    /**
+     * Executes this placeholder for the given {@link String} by searching all occurrences of the regular expression
+     * supplied in the constructor and replaces them with the retrieved replacement from
+     * {@link #getReplacementFor(String)}. If the regular expression does not match, an exact copy of the given
+     * {@link String} is returned.
+     *
+     * @param formatPattern to be processed
+     * @return the given {@code formatPattern} containing the generated replacements instead of matching patterns
+     */
+    public String process(String formatPattern) {
+        ReplacementData data = ReplacementData.of(method, idx, Arrays.asList(parameters));
+        return super.process(data, formatPattern);
+    }
+
+    // -- End: copied from origin BasePlaceholder for backwards compatibility reasons ----------------------------------
+
     protected String getReplacementFor(String placeholder) {
-        String subscript = placeholder.substring(3, placeholder.length() - 1);
-
-        int from = Integer.MAX_VALUE;
-        int to = Integer.MIN_VALUE;
-        if (subscript.contains("..")) {
-            String[] split = subscript.split("\\.\\.");
-
-            from = Integer.parseInt(split[0]);
-            to = Integer.parseInt(split[1]);
-        } else {
-            from = Integer.parseInt(subscript);
-            to = from;
-        }
-        from = (from >= 0) ? from : parameters.length + from;
-        to = (to >= 0) ? to + 1 : parameters.length + to + 1;
-
-        return formatAll(Arrays.copyOfRange(parameters, from, to));
+        ReplacementData data = ReplacementData.of(method, idx, Arrays.asList(parameters));
+        return super.getReplacementFor(placeholder, data);
     }
 
     /**
      * Formats the given parameters by retrieving it's {@link String} representation and separate it by comma (=
      * {@code ,}).
+     * <p>
+     * Note: For new and future-proof implementations, please use {@link #formatAll(java.util.List)} instead.
      *
      * @param parameters to be formatted
      * @return the {@link String} representation of the given {@link Object}{@code []}
+     *
+     * @see #formatAll(java.util.List)
      */
     protected String formatAll(Object[] parameters) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < parameters.length; i++) {
-            stringBuilder.append(format(parameters[i]));
-            if (i < parameters.length - 1) {
-                stringBuilder.append(", ");
-            }
-        }
-        return stringBuilder.toString();
+        return super.formatAll(Arrays.asList(parameters));
     }
 
+    @Override
+    protected String formatAll(List<Object> arguments) {
+        return formatAll(arguments.toArray());
+    }
+
+    @Override
     protected String format(Object param) {
-        if (param == null) {
-            return STRING_NULL;
-
-        } else if (param.getClass().isArray()) {
-            if (param.getClass().getComponentType().isPrimitive()) {
-                return formatPrimitiveArray(param);
-            }
-            return "[" + formatAll((Object[]) param) + "]";
-
-        } else if (param instanceof String && ((String) param).isEmpty()) {
-            return STRING_EMPTY;
-
-        }
-
-        String result;
-        if (param instanceof String) {
-            result = (String) param;
-        } else {
-            result = param.toString();
-        }
-        if (result == null) {
-            return STRING_NULL;
-        }
-        result = result.replaceAll("\0", "\\\\0").replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n");
-        return replaceNonPrintableChars(result, STRING_NON_PRINTABLE);
-    }
-
-    private String formatPrimitiveArray(Object primitiveArray) {
-        Class<?> componentType = primitiveArray.getClass().getComponentType();
-
-        if (boolean.class.equals(componentType)) {
-            return Arrays.toString((boolean[]) primitiveArray);
-
-        } else if (byte.class.equals(componentType)) {
-            return Arrays.toString((byte[]) primitiveArray);
-
-        } else if (char.class.equals(componentType)) {
-            return Arrays.toString((char[]) primitiveArray);
-
-        } else if (short.class.equals(componentType)) {
-            return Arrays.toString((short[]) primitiveArray);
-
-        } else if (int.class.equals(componentType)) {
-            return Arrays.toString((int[]) primitiveArray);
-
-        } else if (long.class.equals(componentType)) {
-            return Arrays.toString((long[]) primitiveArray);
-
-        } else if (float.class.equals(componentType)) {
-            return Arrays.toString((float[]) primitiveArray);
-
-        } else if (double.class.equals(componentType)) {
-            return Arrays.toString((double[]) primitiveArray);
-        }
-        return "";
-    }
-
-    private String replaceNonPrintableChars(String input, String replacement) {
-        StringBuilder result = new StringBuilder();
-        for (int offset = 0; offset < input.length(); ) {
-            int codePoint = input.codePointAt(offset);
-            offset += Character.charCount(codePoint);
-
-            // Replace invisible control characters and unused code points
-            switch (Character.getType(codePoint)) {
-                case Character.CONTROL:     // \p{Cc}
-                case Character.FORMAT:      // \p{Cf}
-                case Character.PRIVATE_USE: // \p{Co}
-                case Character.SURROGATE:   // \p{Cs}
-                case Character.UNASSIGNED:  // \p{Cn}
-                    result.append(replacement);
-                    break;
-
-                default:
-                    result.append(Character.toChars(codePoint));
-                    break;
-            }
-        }
-        return result.toString();
+        return super.format(param);
     }
 }

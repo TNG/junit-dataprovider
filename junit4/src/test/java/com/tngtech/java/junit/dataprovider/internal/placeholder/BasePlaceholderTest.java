@@ -7,19 +7,29 @@ import java.lang.reflect.Method;
 import org.junit.Test;
 
 import com.tngtech.java.junit.dataprovider.BaseTest;
+import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
 
 public class BasePlaceholderTest extends BaseTest {
 
-    private static class TestPlaceholder extends BasePlaceholder {
+    private class TestPlaceholder extends BasePlaceholder {
         private final String replacement;
 
         public TestPlaceholder(String placeHolderRegex, String replacement) {
             super(placeHolderRegex);
             this.replacement = replacement;
+
+            this.method = anyMethod();
+            this.idx = 1;
+            this.parameters = new Object[0];
         }
 
         @Override
         protected String getReplacementFor(String placeholder) {
+            return (replacement == null) ? placeholder : replacement;
+        }
+
+        @Override
+        protected String getReplacementFor(String placeholder, ReplacementData data) {
             return (replacement == null) ? placeholder : replacement;
         }
     }
@@ -175,5 +185,17 @@ public class BasePlaceholderTest extends BaseTest {
 
         // Then:
         assertThat(result).isEqualTo("\\");
+    }
+
+    @Test
+    public void testGetReplacemantForShouldStillDoTheSameAsBefore() {
+        // Given:
+        BasePlaceholder underTest = new TestPlaceholder("%s", "replacement");
+
+        // When:
+        String result = underTest.getReplacementFor("%s");
+
+        // Then:
+        assertThat(result).isEqualTo("replacement");
     }
 }

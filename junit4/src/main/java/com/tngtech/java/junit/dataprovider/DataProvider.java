@@ -7,6 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
+import com.tngtech.junit.dataprovider.convert.ConverterContext;
+
 /**
  * Mark a method as a dataprovider used by a test method or use it directly at the test method and provide data via {@link #value()}
  * attribute.
@@ -46,14 +48,14 @@ public @interface DataProvider {
      *
      * @see #splitBy()
      */
-    String COMMA = ",";
+    String COMMA = ConverterContext.COMMA;
 
     /**
      * {@code null}-{@link String} value to be converted to {@code null} if {@link #convertNulls()} is {@code true}.
      *
      * @see #convertNulls()
      */
-    String NULL = "null";
+    String NULL = ConverterContext.NULL;
 
     /**
      * Default format string containing test method name followed by an index and all parameters within square brackets.

@@ -103,10 +103,10 @@ project(':core') {
 project(':junit4') {
     apply plugin: 'groovy'
 
-    archivesBaseName = 'junit-dataprovider'
-    description = 'A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit features.'
-    group = 'com.tngtech.java'
-    version = '1.13.1'
+    archivesBaseName = 'junit4-dataprovider'
+    description = 'A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features.'
+    group = 'com.tngtech'
+    version = '2.0-SNAPSHOT'
 
     if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
         ext.junitVersion = '4.12'
@@ -127,6 +127,7 @@ project(':junit4') {
     }
 
     dependencies {
+        compile project(':core')
         compile group: 'junit', name: 'junit', version: junitVersion
 
         testCompile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'

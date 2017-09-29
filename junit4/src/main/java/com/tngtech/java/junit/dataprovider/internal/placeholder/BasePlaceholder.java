@@ -2,23 +2,24 @@ package com.tngtech.java.junit.dataprovider.internal.placeholder;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.Placeholders;
+import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
 
 /**
  * Base class for all placeholder which are used to format the test method name. One can create his/her own placeholder
  * extending this and overriding {@link #getReplacementFor(String)}. Afterwards add the new placeholder to the other
  * placeholders by using {@link Placeholders#all()} (for details see {@link Placeholders}).
+ * <p>
+ * Note: For new and future-proof implementations, please inherit from
+ * {@link com.tngtech.junit.dataprovider.placeholder.BasePlaceholder} and use
+ * {@link #getReplacementFor(String, ReplacementData)} instead.
  *
  * @see DataProvider#format()
  * @see Placeholders
  */
-public abstract class BasePlaceholder {
-
-    private final Pattern pattern;
+public abstract class BasePlaceholder extends com.tngtech.junit.dataprovider.placeholder.BasePlaceholder {
 
     protected Method method;
     protected int idx;
@@ -28,11 +29,16 @@ public abstract class BasePlaceholder {
      * @param placeholderRegex - regular expression to match the placeholder in the {@link DataProvider#format()}.
      */
     public BasePlaceholder(String placeholderRegex) {
-        this.pattern = Pattern.compile(placeholderRegex);
+        super(placeholderRegex);
     }
 
     /**
      * Sets the given arguments as context for processing or replacement generation, respectively.
+     * <p>
+     * Note: For new and future-proof implementations, please inherit from
+     * {@link com.tngtech.junit.dataprovider.placeholder.BasePlaceholder} and use
+     * {@link #getReplacementFor(String, ReplacementData)} instead of {@link #setContext(Method, int, Object[])} and
+     * {@link #getReplacementFor(String)}.
      *
      * @param method - test method
      * @param idx - index of the dataprovider row
@@ -49,23 +55,25 @@ public abstract class BasePlaceholder {
      * supplied in the constructor and replaces them with the retrieved replacement from
      * {@link #getReplacementFor(String)}. If the regular expression does not match, an exact copy of the given
      * {@link String} is returned.
+     * <p>
+     * Note: For new and future-proof implementations, please inherit from
+     * {@link com.tngtech.junit.dataprovider.placeholder.BasePlaceholder} and use
+     * {@link #process(ReplacementData, String)} instead.
      *
      * @param formatPattern to be processed
      * @return the given {@code formatPattern} containing the generated replacements instead of matching patterns
      */
     public String process(String formatPattern) {
-        StringBuffer sb = new StringBuffer();
-
-        Matcher matcher = pattern.matcher(formatPattern);
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, Matcher.quoteReplacement(getReplacementFor(matcher.group())));
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
+        ReplacementData data = ReplacementData.of(method, idx, Arrays.asList(parameters));
+        return super.process(data, formatPattern);
     }
 
     /**
      * Generate and returns the replacement for the found and given placeholder.
+     * <p>
+     * Note: For new and future-proof implementations, please inherit from
+     * {@link com.tngtech.junit.dataprovider.placeholder.BasePlaceholder} and use
+     * {@link #getReplacementFor(String, ReplacementData)} instead.
      *
      * @param placeholder for which the replacement {@link String} should be returned
      * @return the replacement for the given {@code placeholder} (not {@code null})

@@ -1,6 +1,9 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -22,6 +26,7 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.internal.convert.ObjectArrayConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
+import com.tngtech.junit.dataprovider.convert.ConverterContext;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataConverterTest extends BaseTest {
@@ -40,6 +45,11 @@ public class DataConverterTest extends BaseTest {
 
     @Mock
     private StringConverter stringConverter;
+
+    @Before
+    public void setup() {
+        doReturn(DataProvider.COMMA).when(dataProvider).splitBy();
+    }
 
     @Test
     public void testCanConvertShouldReturnFalseIfTypeIsNull() {
@@ -261,7 +271,7 @@ public class DataConverterTest extends BaseTest {
         Class<?>[] parameterTypes = new Class<?>[] { Object.class };
 
         // When:
-        underTest.convert(data, false, parameterTypes, null);
+        underTest.convert(data, false, parameterTypes, (DataProvider) null);
 
         // Then: expect exception
     }
@@ -449,7 +459,7 @@ public class DataConverterTest extends BaseTest {
 
         // Then:
         assertThat(result).hasSize(1);
-        verify(stringConverter).convert(data[0], false, parameterTypes, dataProvider, 0);
+        verify(stringConverter).convert(eq(data[0]), eq(false), eq(parameterTypes), any(ConverterContext.class), eq(0));
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 
@@ -465,8 +475,10 @@ public class DataConverterTest extends BaseTest {
         // Then:
         assertThat(result).hasSize(2);
         InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
-        inOrder.verify(stringConverter).convert(data[0], false, parameterTypes, dataProvider, 0);
-        inOrder.verify(stringConverter).convert(data[1], false, parameterTypes, dataProvider, 1);
+        inOrder.verify(stringConverter).convert(eq(data[0]), eq(false), eq(parameterTypes), any(ConverterContext.class),
+                eq(0));
+        inOrder.verify(stringConverter).convert(eq(data[1]), eq(false), eq(parameterTypes), any(ConverterContext.class),
+                eq(1));
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 

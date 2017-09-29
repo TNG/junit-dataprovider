@@ -1,7 +1,6 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
 import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
-import static java.lang.Character.toUpperCase;
 import static java.util.Collections.singletonList;
 
 import java.util.ArrayList;
@@ -48,7 +47,9 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
  * {@code dataProviderShouldReturnTwoForOnePlusOne}.</li>
  * </ul>
  */
-public class DefaultDataProviderMethodResolver implements DataProviderMethodResolver {
+public class DefaultDataProviderMethodResolver
+        extends com.tngtech.junit.dataprovider.resolver.DefaultDataProviderMethodResolver
+        implements DataProviderMethodResolver {
 
     /**
      * {@inheritDoc}
@@ -92,35 +93,13 @@ public class DefaultDataProviderMethodResolver implements DataProviderMethodReso
 
     protected FrameworkMethod findDataProviderMethod(TestClass location, String testMethodName, String useDataProviderValue) {
         List<FrameworkMethod> dataProviderMethods = location.getAnnotatedMethods(DataProvider.class);
-
-        if (!UseDataProvider.DEFAULT_VALUE.equals(useDataProviderValue)) {
-            return findMethod(dataProviderMethods, useDataProviderValue);
-        }
-
-        FrameworkMethod result = findMethod(dataProviderMethods, testMethodName);
-        if (result == null) {
-            String dataProviderMethodName = testMethodName.replaceAll("^test", "dataProvider");
-            result = findMethod(dataProviderMethods, dataProviderMethodName);
-        }
-        if (result == null) {
-            String dataProviderMethodName = testMethodName.replaceAll("^test", "data");
-            result = findMethod(dataProviderMethods, dataProviderMethodName);
-        }
-        if (result == null) {
-            String dataProviderMethodName = "dataProvider" + toUpperCase(testMethodName.charAt(0)) + testMethodName.substring(1);
-            result = findMethod(dataProviderMethods, dataProviderMethodName);
-        }
-        if (result == null) {
-            String dataProviderMethodName = "data" + toUpperCase(testMethodName.charAt(0)) + testMethodName.substring(1);
-            result = findMethod(dataProviderMethods, dataProviderMethodName);
-        }
-        return result;
-    }
-
-    private FrameworkMethod findMethod(List<FrameworkMethod> methods, String methodName) {
-        for (FrameworkMethod method : methods) {
-            if (method.getName().equals(methodName)) {
-                return method;
+        for (FrameworkMethod dataProviderMethod : dataProviderMethods) {
+            if (UseDataProvider.DEFAULT_VALUE.equals(useDataProviderValue)) {
+                if (isMatchingNameConvention(testMethodName, dataProviderMethod.getName())) {
+                    return dataProviderMethod;
+                }
+            } else if (dataProviderMethod.getName().equals(useDataProviderValue)) {
+                return dataProviderMethod;
             }
         }
         return null;
