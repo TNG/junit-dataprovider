@@ -9,7 +9,7 @@ import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 public class ConverterContext {
 
     /**
-     * Default delimiter is a comma to split up parameters for dataprovider tests.
+     * Default delimiter is a comma to split up arguments for dataprovider tests.
      *
      * @see #getSplitBy()
      */

@@ -11,7 +11,7 @@ public class StringConverter {
      * Converts the given {@code data} to its corresponding arguments using the given {@code parameterTypes} and other
      * provided information.
      *
-     * @param data regex-separated {@link String} of parameters for test method
+     * @param data regex-separated {@link String} of arguments for test method
      * @param isVarArgs determines whether test method has a varargs parameter
      * @param parameterTypes target types of parameters to which corresponding values in regex-separated {@code data}
      *            should be converted

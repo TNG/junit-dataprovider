@@ -31,10 +31,10 @@ public class ReplacementDataTest {
     }
 
     @Test
-    public void testOfShouldThrowNullPointerExceptionIfParametersAreNull() throws Exception {
+    public void testOfShouldThrowNullPointerExceptionIfArgumentsAreNull() throws Exception {
         // Given:
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("'parameters' must not be null");
+        expectedException.expectMessage("'arguments' must not be null");
 
         // When:
         ReplacementData.of(Methods.anyMethod(), 1, null);
@@ -47,28 +47,28 @@ public class ReplacementDataTest {
         // Given:
         final Method testMethod = Methods.anyMethod();
         final int testIndex = 10;
-        final List<Object> parameters = Arrays.<Object>asList("1", 2, 3L);
+        final List<Object> arguments = Arrays.<Object>asList("1", 2, 3L);
 
         // When:
-        ReplacementData result = ReplacementData.of(testMethod, testIndex, parameters);
+        ReplacementData result = ReplacementData.of(testMethod, testIndex, arguments);
 
         // Then:
         assertThat(result).isNotNull();
         assertThat(result.getTestMethod()).isEqualTo(testMethod);
         assertThat(result.getTestIndex()).isEqualTo(testIndex);
-        assertThat(result.getParameters()).isNotSameAs(parameters).isEqualTo(parameters);
+        assertThat(result.getArguments()).isNotSameAs(arguments).isEqualTo(arguments);
     }
 
     @Test
-    public void testGetParametersShouldReturnUnmodifiableListToKeepReplacementDataImmutable() throws Exception {
+    public void testGetArgumentsShouldReturnUnmodifiableListToKeepReplacementDataImmutable() throws Exception {
         // Given:
         ReplacementData underTest = ReplacementData.of(Methods.anyMethod(), 11, Arrays.<Object>asList("1", 2, 3L));
-        List<Object> parameters = underTest.getParameters();
+        List<Object> arguments = underTest.getArguments();
 
         expectedException.expect(UnsupportedOperationException.class);
 
         // When:
-        parameters.clear();
+        arguments.clear();
 
         // Then: expect exception
     }
@@ -78,10 +78,10 @@ public class ReplacementDataTest {
         // Given:
         final Method testMethod = Methods.anyMethod();
         final int testIndex = 20;
-        final List<Object> parameters = Arrays.<Object>asList("1", 2, 3L);
+        final List<Object> arguments = Arrays.<Object>asList("1", 2, 3L);
 
-        ReplacementData data1 = ReplacementData.of(testMethod, testIndex, parameters);
-        ReplacementData data2 = ReplacementData.of(testMethod, testIndex, parameters);
+        ReplacementData data1 = ReplacementData.of(testMethod, testIndex, arguments);
+        ReplacementData data2 = ReplacementData.of(testMethod, testIndex, arguments);
 
         // When:
         int result1 = data1.hashCode();
@@ -95,10 +95,10 @@ public class ReplacementDataTest {
     public void testEqualsShouldReturnFalseForUnequalObjects() throws Exception {
         // Given:
         final Method testMethod = Methods.anyMethod();
-        final List<Object> parameters = Arrays.<Object>asList("1", 2, 3L);
+        final List<Object> arguments = Arrays.<Object>asList("1", 2, 3L);
 
-        ReplacementData data1 = ReplacementData.of(testMethod, 30, parameters);
-        ReplacementData data2 = ReplacementData.of(testMethod, 31, parameters);
+        ReplacementData data1 = ReplacementData.of(testMethod, 30, arguments);
+        ReplacementData data2 = ReplacementData.of(testMethod, 31, arguments);
 
         // When:
         boolean result = data1.equals(data2);
@@ -112,10 +112,10 @@ public class ReplacementDataTest {
         // Given:
         final Method testMethod = Methods.anyMethod();
         final int testIndex = 32;
-        final List<Object> parameters = Arrays.<Object>asList("1", 2, 3L);
+        final List<Object> arguments = Arrays.<Object>asList("1", 2, 3L);
 
-        ReplacementData data1 = ReplacementData.of(testMethod, testIndex, parameters);
-        ReplacementData data2 = ReplacementData.of(testMethod, testIndex, parameters);
+        ReplacementData data1 = ReplacementData.of(testMethod, testIndex, arguments);
+        ReplacementData data2 = ReplacementData.of(testMethod, testIndex, arguments);
 
         // When:
         boolean result = data1.equals(data2);

@@ -4,11 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This placeholder format the parameters of a dataprovider test as comma-separated {@link String} according to the
- * given index or range subscript. Furthermore the following parameter values are treated specially:
+ * This placeholder format the arguments of a dataprovider test as comma-separated {@link String} according to the given
+ * index or range subscript. Furthermore the following arguments are treated specially:
  * <table summary="Special {@link String} treatment">
  * <tr>
- * <th>Parameter value</th>
+ * <th>Argument value</th>
  * <th>target {@link String}</th>
  * </tr>
  * <tr>
@@ -29,35 +29,26 @@ import java.util.List;
  * </tr>
  * </table>
  */
-public class ParameterPlaceholder extends BasePlaceholder {
+public class ArgumentPlaceholder extends BasePlaceholder {
 
     /**
      * {@link String} representation of {@code null}
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
      */
-    static final String STRING_NULL = "<null>";
+    protected static final String STRING_NULL = "<null>";
 
     /**
      * {@link String} representation of {@code ""}
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
      */
-    static final String STRING_EMPTY = "<empty string>";
+    protected static final String STRING_EMPTY = "<empty string>";
 
     /**
      * {@link String} representation of an non-printable character
-     * <p>
-     * This field is package private (= visible) for testing.
-     * </p>
      */
-    static final String STRING_NON_PRINTABLE = "<np>";
+    protected static final String STRING_NON_PRINTABLE = "<np>";
 
 
-    public ParameterPlaceholder() {
-        super("%p\\[(-?[0-9]+|-?[0-9]+\\.\\.-?[0-9]+)\\]");
+    public ArgumentPlaceholder() {
+        super("%[ap]\\[(-?[0-9]+|-?[0-9]+\\.\\.-?[0-9]+)\\]");
     }
 
     @Override
@@ -76,29 +67,30 @@ public class ParameterPlaceholder extends BasePlaceholder {
             to = from;
         }
 
-        List<Object> parameters = data.getParameters();
-        from = (from >= 0) ? from : parameters.size() + from;
-        to = (to >= 0) ? to + 1 : parameters.size() + to + 1;
-        return formatAll(parameters.subList(from, to));
+        List<Object> arguments = data.getArguments();
+        from = (from >= 0) ? from : arguments.size() + from;
+        to = (to >= 0) ? to + 1 : arguments.size() + to + 1;
+        return formatAll(arguments.subList(from, to));
     }
 
     /**
-     * Formats the given parameters by retrieving it's {@link String} representation and separate it by comma (=
+     * Formats the given arguments by retrieving it's {@link String} representation and separate it by comma (=
      * {@code ,}).
      *
-     * @param parameters to be formatted
+     * @param arguments to be formatted
      * @return the {@link String} representation of the given {@link Object}{@code []}
      */
-    protected String formatAll(List<Object> parameters) {
+    protected String formatAll(List<Object> arguments) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < parameters.size(); i++) {
-            stringBuilder.append(format(parameters.get(i)));
-            if (i < parameters.size() - 1) {
+        for (int i = 0; i < arguments.size(); i++) {
+            stringBuilder.append(format(arguments.get(i)));
+            if (i < arguments.size() - 1) {
                 stringBuilder.append(", ");
             }
         }
         return stringBuilder.toString();
     }
+
 
     protected String format(Object param) {
         if (param == null) {

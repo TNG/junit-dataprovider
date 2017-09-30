@@ -17,22 +17,22 @@ public class ReplacementData {
      *
      * @param testMethod to be executed
      * @param testIndex the index (row) of the test / used dataprovider
-     * @param parameters used for invoking this test testMethod
+     * @param arguments used for invoking this test testMethod
      * @return {@link ReplacementData} containing the given values
      * @throws NullPointerException if and only if a given value is {@code null}
      */
-    public static ReplacementData of(Method testMethod, int testIndex, List<Object> parameters) {
-        return new ReplacementData(testMethod, testIndex, parameters);
+    public static ReplacementData of(Method testMethod, int testIndex, List<Object> arguments) {
+        return new ReplacementData(testMethod, testIndex, arguments);
     }
 
     private final Method testMethod;
     private final int testIndex;
-    private final List<Object> parameters;
+    private final List<Object> arguments;
 
-    private ReplacementData(Method testMethod, int testIndex, List<Object> parameters) {
+    private ReplacementData(Method testMethod, int testIndex, List<Object> arguments) {
         this.testMethod = checkNotNull(testMethod, "'testMethod' must not be null");
         this.testIndex = testIndex;
-        this.parameters = new ArrayList<Object>(checkNotNull(parameters, "'parameters' must not be null"));
+        this.arguments = new ArrayList<Object>(checkNotNull(arguments, "'arguments' must not be null"));
     }
 
     public Method getTestMethod() {
@@ -43,8 +43,8 @@ public class ReplacementData {
         return testIndex;
     }
 
-    public List<Object> getParameters() {
-        return unmodifiableList(parameters);
+    public List<Object> getArguments() {
+        return unmodifiableList(arguments);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ReplacementData {
         final int prime = 31;
         int result = 1;
         result = prime * result + testIndex;
-        result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+        result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
         result = prime * result + ((testMethod == null) ? 0 : testMethod.hashCode());
         return result;
     }
@@ -72,11 +72,11 @@ public class ReplacementData {
         if (testIndex != other.testIndex) {
             return false;
         }
-        if (parameters == null) {
-            if (other.parameters != null) {
+        if (arguments == null) {
+            if (other.arguments != null) {
                 return false;
             }
-        } else if (!parameters.equals(other.parameters)) {
+        } else if (!arguments.equals(other.arguments)) {
             return false;
         }
         if (testMethod == null) {
@@ -91,7 +91,7 @@ public class ReplacementData {
 
     @Override
     public String toString() {
-        return "ReplacementData [testMethod=" + testMethod + ", testIndex=" + testIndex + ", parameters="
-                + parameters + "]";
+        return "ReplacementData [testMethod=" + testMethod + ", testIndex=" + testIndex + ", arguments="
+                + arguments + "]";
     }
 }
