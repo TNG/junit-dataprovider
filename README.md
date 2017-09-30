@@ -34,6 +34,7 @@ Have a look to this repositories [Wiki](/../../wiki/) pages for documenation, us
     * [Access ```FrameworkMethod``` in ```@DP```](/../../wiki/Features#access-frameworkmethod-in-dataprovider)
     * [Utility methods](/../../wiki/Features#utility-methods)
     * [Convention over configuration](/../../wiki/Features#convention-over-configuration)
+    * [Kotlin support](/../../wiki/Features#kotlin-support)
     * [OSGi compatible ```MANIFEST.MF```](/../../wiki/Features#osgi-compatible-manifestmf)
 * [Tips and Tricks](/../../wiki/Tips-and-Tricks)
 * [Release Notes](/../../releases)
