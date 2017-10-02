@@ -27,8 +27,10 @@ pipeline {
                 }
             }
         }
-        stage('Integration tests') {
+        stage('Parallel integration tests') {
             parallel {
+                // TODO JUnit Jupiter integration tests should be integrated here as soon as
+                // "junit-platform-gradle-plugin" is able to build separate sourceSets
                 stage('Integration tests') {
                     steps {
                         sh './gradlew integTest'
@@ -39,13 +41,25 @@ pipeline {
                         }
                     }
                 }
-                stage('Maven integration test') {
+                stage('JUnit4 Maven integration test') {
                     steps {
-                        sh 'cd junit4 && mvn test'
+                        sh 'cd ${WORKSPACE}/junit4 && mvn test'
                     }
                     post {
                         always {
+                            sh 'cd ${WORKSPACE}'
                             junit 'junit4/build/maven-target/surefire-reports/*.xml'
+                        }
+                    }
+                }
+                stage('JUnit Jupiter Maven integration test') {
+                    steps {
+                        sh 'cd ${WORKSPACE}/junit-jupiter && mvn test'
+                    }
+                    post {
+                        always {
+                            sh 'cd ${WORKSPACE}'
+                            junit 'junit-jupiter/build/maven-target/surefire-reports/*.xml'
                         }
                     }
                 }

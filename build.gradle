@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+    }
+}
+
 plugins {
     id 'com.github.kt3k.coveralls' version '2.3.1'
     id 'de.aaschmid.cpd' version '1.0'
@@ -92,6 +101,56 @@ project(':junit4') {
     }
     task touchIntegTestResultsForJenkins(type: TouchTestResults) {
         tasks integTest
+        enabled = isBuildOnJenkins
+    }
+    build.dependsOn touchIntegTestResultsForJenkins
+}
+
+project(':junit-jupiter') {
+    apply plugin: 'org.junit.platform.gradle.plugin'
+    apply plugin: 'groovy'
+
+    archivesBaseName = 'junit-jupiter-dataprovider'
+    description = 'A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.'
+    group = 'com.tngtech.junit.dataprovider'
+    version = '2.0-SNAPSHOT'
+
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+
+    if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
+        ext.junitVersion = '5.0.1'
+    }
+    println "Using junit version ${junitVersion} for current build."
+
+    sourceSets {
+        test { // TODO do it as "sourceSet" named "integTest" as soon as "junit-platform-gradle-plugin" is able to handle it
+            java {
+                srcDir 'src/integTest/java'
+            }
+            groovy {
+                srcDir 'src/integTest/groovy'
+            }
+        }
+    }
+
+    dependencies {
+        compile project(':core')
+        compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+
+        testCompile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+        testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.10.0'
+
+        // only integTestCompile
+        testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.12'
+    }
+
+    junitPlatform {
+        platformVersion '1.0.1'
+    }
+
+    task touchIntegTestResultsForJenkins(type: TouchTestResults) {
+        tasks test
         enabled = isBuildOnJenkins
     }
     build.dependsOn touchIntegTestResultsForJenkins

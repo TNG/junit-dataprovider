@@ -9,11 +9,11 @@ script:
   - cd ./junit4/
   - mvn test
 #  - ant test
+  - cd ../junit-jupiter/
+  - mvn test
 
 jdk:
   - oraclejdk8
-  - oraclejdk7
-#  - openjdk7
 
 dist: precise
 
