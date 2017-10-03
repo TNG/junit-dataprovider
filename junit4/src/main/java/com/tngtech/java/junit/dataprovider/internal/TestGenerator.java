@@ -6,7 +6,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.runners.model.FrameworkMethod;
 
@@ -16,6 +18,14 @@ import com.tngtech.java.junit.dataprovider.DataProviderFrameworkMethod;
 public class TestGenerator {
 
     private final DataConverter dataConverter;
+
+    /**
+     * Cached result of {@link #explodeTestMethod(FrameworkMethod, FrameworkMethod)}.
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    final Map<FrameworkMethod, Object> dataProviderDataCache = new HashMap<FrameworkMethod, Object>();
 
     public TestGenerator(DataConverter dataConverter) {
         this.dataConverter = checkNotNull(dataConverter, "dataConverter must not be null");
@@ -73,18 +83,23 @@ public class TestGenerator {
      */
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
         Object data;
-        try {
-            Class<?>[] parameterTypes = dataProviderMethod.getMethod().getParameterTypes();
-            if (parameterTypes.length > 0) {
-                data = dataProviderMethod.invokeExplosively(null, testMethod);
-            } else {
-                data = dataProviderMethod.invokeExplosively(null);
-            }
-        } catch (Throwable t) {
-            throw new IllegalArgumentException(String.format("Exception while invoking dataprovider method '%s': %s",
-                    dataProviderMethod.getName(), t.getMessage()), t);
-        }
+        if (dataProviderDataCache.containsKey(dataProviderMethod)) {
+            data = dataProviderDataCache.get(dataProviderMethod);
+        } else {
+            try {
+                Class<?>[] parameterTypes = dataProviderMethod.getMethod().getParameterTypes();
+                if (parameterTypes.length > 0) {
+                    data = dataProviderMethod.invokeExplosively(null, testMethod);
+                } else {
+                    data = dataProviderMethod.invokeExplosively(null);
+                }
+                dataProviderDataCache.put(dataProviderMethod, data);
 
+            } catch (Throwable t) {
+                throw new IllegalArgumentException(String.format("Exception while invoking dataprovider method '%s': %s",
+                        dataProviderMethod.getName(), t.getMessage()), t);
+            }
+        }
         return explodeTestMethod(testMethod, data, dataProviderMethod.getAnnotation(DataProvider.class));
     }
 
