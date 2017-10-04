@@ -1,5 +1,7 @@
 package com.tngtech.test.java.junit.dataprovider.override;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -13,7 +15,6 @@ public class DataProviderOverrideAcceptanceTest extends DataProviderOverrideAcce
     @Test
     @UseDataProvider
     public void test(String one) {
-
+        assertThat(one).isEqualTo("1");
     }
-
 }

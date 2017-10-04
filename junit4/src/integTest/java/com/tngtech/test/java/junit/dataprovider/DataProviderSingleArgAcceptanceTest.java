@@ -21,19 +21,18 @@ public class DataProviderSingleArgAcceptanceTest {
     public static Object[] dataProviderSingleArgObjectArray() {
         // @formatter:off
         return new Object[] {
-            null,
-            "",
-            "1",
-            "123",
+            0,
+            1,
+            123,
         };
         // @formatter:on
     }
 
     @Test
     @UseDataProvider("dataProviderSingleArgObjectArray")
-    public void testSingleArgObjectArray(String string) {
+    public void testSingleArgObjectArray(long l) {
         // Expected:
-        assertThat(string).isNotEqualTo("1234");
+        assertThat(l).isNotEqualTo(1234);
     }
 
     @DataProvider
