@@ -67,7 +67,7 @@ public class DataProviders {
      * @throws NullPointerException if and only if given {@code enumClass} is {@code null}
      */
     public static <E extends Enum<E>> Object[][] testForEach(Class<E> enumClass) {
-        checkNotNull(enumClass, "enumClass must not be null");
+        checkNotNull(enumClass, "'enumClass' must not be null");
         return testForEach((Object[]) enumClass.getEnumConstants());
     }
 

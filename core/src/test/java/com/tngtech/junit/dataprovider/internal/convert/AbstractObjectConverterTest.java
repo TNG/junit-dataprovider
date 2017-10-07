@@ -1,12 +1,18 @@
 package com.tngtech.junit.dataprovider.internal.convert;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
 public class AbstractObjectConverterTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @InjectMocks
     private final AbstractObjectConverter<Object[]> underTest = new AbstractObjectConverter<Object[]>() {
@@ -16,9 +22,11 @@ public class AbstractObjectConverterTest {
         }
     };
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldThrowNullPointerExceptionIfArgumentsIsNull() {
         // Given:
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("'arguments' must not be null");
 
         // When:
         underTest.checkIfArgumentsMatchParameterTypes(null, new Class<?>[0]);
@@ -26,9 +34,11 @@ public class AbstractObjectConverterTest {
         // Then: expect exception
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldThrowNullPointerExceptionIfParameterTypesIsNull() {
         // Given:
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("'testMethod' must not be null");
 
         // When:
         underTest.checkIfArgumentsMatchParameterTypes(new Object[0], null);
@@ -36,35 +46,47 @@ public class AbstractObjectConverterTest {
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldThrowIllegalArgumentExceptionIfLengthOfArgumentsAndParameterTypesDoesNotMatch() {
         // Given:
         Object[] arguments = new Object[0];
         Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
 
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException
+                .expectMessage("Expected 0 arguments for test method but got 3 parameters.");
+
         // When:
         underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
 
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldThrowIllegalArgumentExceptionIfSingleArgumentIsNotAssignableToParameterType() {
         // Given:
         Object[] arguments = new Object[] { "1" };
         Class<?>[] parameterTypes = new Class<?>[] { int.class };
 
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException
+                .expectMessage("Parameter number 0 is of type 'int' but argument given is '1' of type 'String'");
+
         // When:
         underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
 
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldThrowIllegalArgumentExceptionIfAnyArgumentTypeIsNotAssignableToParameterType() {
         // Given:
         Object[] arguments = new Object[] { 2, "2", 2l };
         Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException
+                .expectMessage("Parameter number 2 is of type 'boolean' but argument given is '2' of type 'Long'");
 
         // When:
         underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
@@ -195,12 +217,15 @@ public class AbstractObjectConverterTest {
         // Then: no exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldThrowExceptionForNonWideningConversionsOfLong() {
         // Given:
         Object[] arguments = new Object[] { (long) 1 };
 
         Class<?>[] parameterTypes = new Class<?>[] { int.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Parameter number 0 is of type 'int' but argument given is '1' of type 'Long'");
 
         // When:
         underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);

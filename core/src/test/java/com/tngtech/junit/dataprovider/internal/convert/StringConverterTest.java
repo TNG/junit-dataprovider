@@ -13,17 +13,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.DataProviders;
 
-@RunWith(MockitoJUnitRunner.class)
 public class StringConverterTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @InjectMocks
     private StringConverter underTest;
@@ -44,7 +50,7 @@ public class StringConverterTest {
         assertThat(result).isEqualTo(new Object[] { null });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowExceptionIfNumberOfArgumentsIsNotEqualToNumberOfParameterTypes() {
         // Given:
         String data = "";
@@ -52,19 +58,26 @@ public class StringConverterTest {
 
         doReturn(",").when(dataProvider).splitBy();
 
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Test method expected 2 parameters but got 1 arguments in row 2");
+
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 2);
 
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowExceptionIfVarargsAndNumberOfArgumentsIsTwoLessComparedToNumberOfParameterTypes() {
         // Given:
         String data = "";
         Class<?>[] parameterTypes = new Class<?>[] { long.class, boolean.class, int[].class };
 
         doReturn(",").when(dataProvider).splitBy();
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException
+                .expectMessage("Test method expected at least 2 parameters but got 1 arguments in row 3");
 
         // When:
         underTest.convert(data, true, parameterTypes, dataProvider, 3);
@@ -198,11 +211,14 @@ public class StringConverterTest {
         assertThat(result).containsExactly(1, "");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowIllegalArgumentExceptionIfCharHasNotLengthOne() {
         // Given:
         String data = "noChar";
         Class<?>[] parameterTypes = new Class[] { char.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("'noChar' cannot be converted to type 'char'");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 40);
@@ -210,11 +226,14 @@ public class StringConverterTest {
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowIllegalArgumentExceptionIfValueOfThrowsNumberFormatException() {
         // Given:
         String data = "noInt";
         Class<?>[] parameterTypes = new Class[] { int.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot convert 'noInt' to type 'int'");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 41);
@@ -222,11 +241,15 @@ public class StringConverterTest {
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowIllegalArgumentExceptionForTargetTypeConstructorWithStringArgWhichThrowsException() {
         // Given:
         String data = "noInt";
         Class<?>[] parameterTypes = new Class[] { BigInteger.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(
+                "Tried to invoke 'public java.math.BigInteger(java.lang.String)' for argument 'noInt'. Exception was: null");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 42);
@@ -234,11 +257,15 @@ public class StringConverterTest {
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowIllegalArgumentExceptionForUnsupportedTargetType() {
         // Given:
         String data = "noObject";
         Class<?>[] parameterTypes = new Class[] { Object.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(
+                "Type 'Object' is not supported as parameter type of test methods. Supported types are primitive types and their wrappers, 'Enum' values, 'String's, and types having a single 'String' parameter constructor");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 43);
@@ -262,11 +289,15 @@ public class StringConverterTest {
         assertThat(result).containsExactly(TestEnum.VAL1, TestEnum.VAL2);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowIllegalArgumentExceptionIfEnumValuesIsInvalid() {
         // Given:
         String data = "Val1";
         Class<?>[] parameterTypes = new Class[] { TestEnum.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(
+                "'Val1' is not a valid value of enum 'TestEnum'. Please be aware of case sensitivity or use 'ignoreEnumCase'");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 51);
@@ -290,11 +321,15 @@ public class StringConverterTest {
         assertThat(result).containsExactly(TestEnum.VAL1, TestEnum.VAL2);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowIllegalArgumentExceptionIfEnumValueIsInvalid() {
         // Given:
         String data = "UNKNOW_ENUM_VALUE";
         Class<?>[] parameterTypes = new Class[] { TestEnum.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(
+                "'UNKNOW_ENUM_VALUE' is not a valid value of enum 'TestEnum'. Please be aware of case sensitivity or use 'ignoreEnumCase'.");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 51);
@@ -318,11 +353,14 @@ public class StringConverterTest {
         assertThat(result).containsExactly(Thread.class, DataProviders.class);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowIllegalArgumentExceptionIfClassNameIsInvalid() {
         // Given:
         String data = "String";
         Class<?>[] parameterTypes = new Class[] { Class.class };
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Unable to instantiate 'Class' for 'String'");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 55);

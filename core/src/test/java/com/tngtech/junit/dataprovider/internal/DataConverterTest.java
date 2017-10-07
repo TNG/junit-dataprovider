@@ -10,27 +10,32 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.internal.convert.ObjectArrayConverter;
 import com.tngtech.junit.dataprovider.internal.convert.SingleArgConverter;
 import com.tngtech.junit.dataprovider.internal.convert.StringConverter;
 
-@RunWith(MockitoJUnitRunner.class)
 public class DataConverterTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @InjectMocks
     private DataConverter underTest;
@@ -131,7 +136,7 @@ public class DataConverterTest {
     @Test
     public void testCanConvertShouldReturnTrueIfTypeIsIterableOfIterable() {
         // Given:
-        Type type = parameterizedType(Iterable.class, parameterizedType(Iterable.class, TypeVariable.class));
+        Type type = parameterizedType(Iterable.class, rawType(Iterable.class));
         // When:
         boolean result = underTest.canConvert(type);
 
@@ -142,7 +147,7 @@ public class DataConverterTest {
     @Test
     public void testCanConvertShouldReturnTrueIfTypeIsSetOfSet() {
         // Given:
-        Type type = parameterizedType(Set.class, parameterizedType(Set.class, WildcardType.class));
+        Type type = parameterizedType(Set.class, rawType(Set.class));
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -159,8 +164,7 @@ public class DataConverterTest {
             // not required for now :-)
         }
 
-        Type type = parameterizedType(TwoArgList.class, parameterizedType(List.class, Object.class),
-                parameterizedType(List.class, Object.class));
+        Type type = parameterizedType(TwoArgList.class, mock(ParameterizedType.class), mock(ParameterizedType.class));
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -208,7 +212,7 @@ public class DataConverterTest {
     @Test
     public void testCanConvertShouldReturnTrueIfTypeIsListOfListOfObject() {
         // Given:
-        Type type = parameterizedType(List.class, parameterizedType(List.class, Object.class));
+        Type type = parameterizedType(List.class, rawType(List.class));
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -220,7 +224,7 @@ public class DataConverterTest {
     @Test
     public void testCanConvertShouldReturnTrueIfTypeIsListOfListOfWildcard() {
         // Given:
-        Type type = parameterizedType(List.class, parameterizedType(List.class, WildcardType.class));
+        Type type = parameterizedType(List.class, rawType(List.class));
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -232,7 +236,7 @@ public class DataConverterTest {
     @Test
     public void testCanConvertShouldReturnTrueIfTypeIsListOfIterable() {
         // Given:
-        Type type = parameterizedType(List.class, parameterizedType(Iterable.class, Number.class));
+        Type type = parameterizedType(List.class, rawType(Iterable.class));
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -248,7 +252,7 @@ public class DataConverterTest {
         class SubList<A> extends ArrayList<A> {
             // not required for now :-)
         }
-        Type type = parameterizedType(SubList.class, parameterizedType(SubList.class, String.class));
+        Type type = parameterizedType(SubList.class, rawType(SubList.class));
 
         // When:
         boolean result = underTest.canConvert(type);
@@ -257,11 +261,14 @@ public class DataConverterTest {
         assertThat(result).isTrue();
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testConvertShouldThrowNullPointerExceptionIfParameterTypesIsNull() {
         // Given:
         Object data = null;
         Class<?>[] parameterTypes = null;
+
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("'parameterTypes' must not be null");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider);
@@ -269,11 +276,14 @@ public class DataConverterTest {
         // Then: expect exception
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testConvertShouldThrowNullPointerExceptionIfDataProviderIsNull() {
         // Given:
         Object data = null;
         Class<?>[] parameterTypes = new Class<?>[] { Object.class };
+
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("'dataProvider' must not be null");
 
         // When:
         underTest.convert(data, false, parameterTypes, null);
@@ -281,35 +291,46 @@ public class DataConverterTest {
         // Then: expect exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConvertShouldThrowIllegalArgumentExceptionIfParameterTypesIsEmpty() {
         // Given:
         Object data = null;
         Class<?>[] parameterTypes = new Class<?>[0];
 
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("'parameterTypes' must not be empty");
+
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then: expect exception
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void testConvertShouldThrowClassCastExceptionIfDataIsNull() {
         // Given:
         Object data = null;
         Class<?>[] parameterTypes = new Class<?>[] { String.class };
 
+        expectedException.expect(ClassCastException.class);
+        expectedException.expectMessage(
+                "Cannot cast to either Object[][], Object[], String[], or Iterable because data was: null");
+
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider);
 
         // Then: expect exception
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void testConvertShouldThrowClassCastExceptionIfDataIsNotConvertable() {
         // Given:
         Object data = "not convertable";
         Class<?>[] parameterTypes = new Class<?>[] { Integer.class };
+
+        expectedException.expect(ClassCastException.class);
+        expectedException.expectMessage(
+                "Cannot cast to either Object[][], Object[], String[], or Iterable because data was: " + data);
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider);
@@ -485,7 +506,13 @@ public class DataConverterTest {
 
     // -- methods used as Method objects -------------------------------------------------------------------------------
 
-    private Type parameterizedType(Type rawType, Type...typeArguments) {
+    private Type rawType(Type rawType) {
+        ParameterizedType type = mock(ParameterizedType.class);
+        when(type.getRawType()).thenReturn(rawType);
+        return type;
+    }
+
+    private Type parameterizedType(Type rawType, Type... typeArguments) {
         ParameterizedType type = mock(ParameterizedType.class);
         when(type.getRawType()).thenReturn(rawType);
         when(type.getActualTypeArguments()).thenReturn(typeArguments);

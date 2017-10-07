@@ -57,8 +57,9 @@ public class StringConverter {
 
     protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
         if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount != argCount)) {
-            throw new IllegalArgumentException(String.format("Test method expected %s %d parameters but got %d from @DataProvider row %d",
-                    (isVarArgs) ? "at least " : "", paramCount - 1, argCount, rowIdx));
+            throw new IllegalArgumentException(
+                    String.format("Test method expected %s%d parameters but got %d arguments in row %d",
+                            (isVarArgs) ? "at least " : "", paramCount - (isVarArgs ? 1 : 0), argCount, rowIdx));
         }
     }
 
@@ -112,7 +113,8 @@ public class StringConverter {
             try {
                 return Class.forName(str);
             } catch (Exception e) {
-                throw new IllegalArgumentException(String.format("Unable to instantiate %s for '%s'", targetType.getSimpleName(), str), e);
+                throw new IllegalArgumentException(
+                        String.format("Unable to instantiate '%s' for '%s'", targetType.getSimpleName(), str), e);
             }
         }
 
@@ -121,9 +123,9 @@ public class StringConverter {
             return result;
         }
 
-        throw new IllegalArgumentException("'" + targetType.getSimpleName() + "' is not supported as parameter type of test methods"
-                + ". Supported types are primitive types and their wrappers, case-sensitive 'Enum'"
-                + " values, 'String's, and types having a single 'String' parameter constructor.");
+        throw new IllegalArgumentException(String.format(
+                "Type '%s' is not supported as parameter type of test methods. Supported types are primitive types and their wrappers, 'Enum' values, 'String's, and types having a single 'String' parameter constructor.",
+                targetType.getSimpleName()));
     }
 
     /**
@@ -152,7 +154,8 @@ public class StringConverter {
                 if (str.length() == 1) {
                     return str.charAt(0);
                 }
-                throw new IllegalArgumentException(String.format("'%s' cannot be converted to %s.", str, targetType.getSimpleName()));
+                throw new IllegalArgumentException(
+                        String.format("'%s' cannot be converted to type '%s'.", str, targetType.getSimpleName()));
             }
             if (short.class.equals(targetType) || Short.class.equals(targetType)) {
                 return Short.valueOf(str);
@@ -186,7 +189,7 @@ public class StringConverter {
 
     @SuppressWarnings("rawtypes")
     protected Object convertToEnumValue(String str, Class<Enum> enumType, boolean ignoreEnumCase) {
-        String errorMessage = "'%s' is not a valid value of enum %s.";
+        String errorMessage = "'%s' is not a valid value of enum '%s'.";
         if (ignoreEnumCase) {
             for (Enum<?> enumConstant : enumType.getEnumConstants()) {
                 if (str.equalsIgnoreCase(enumConstant.name())) {
@@ -211,10 +214,11 @@ public class StringConverter {
             if (constructor.getParameterTypes().length == 1 && String.class.equals(constructor.getParameterTypes()[0])) {
                 try {
                     return constructor.newInstance(str);
-
                 } catch (Exception e) {
                     throw new IllegalArgumentException(
-                            String.format("Tried to invoke '%s' for argument '%s'. Exception: %s", constructor, str, e.getMessage()), e);
+                            String.format("Tried to invoke '%s' for argument '%s'. Exception was: %s", constructor, str,
+                                    e.getMessage()),
+                            e);
                 }
             }
         }

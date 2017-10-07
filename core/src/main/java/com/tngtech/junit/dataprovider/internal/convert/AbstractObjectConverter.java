@@ -33,10 +33,11 @@ public abstract class AbstractObjectConverter<V> {
      *             {@code arguments}
      */
     protected void checkIfArgumentsMatchParameterTypes(Object[] arguments, Class<?>[] parameterTypes) {
-        checkNotNull(arguments, "arguments must not be null");
-        checkNotNull(parameterTypes, "testMethod must not be null");
-        checkArgument(parameterTypes.length == arguments.length, "Expected %s arguments for test method but got %s parameters.",
-                parameterTypes.length, arguments.length);
+        checkNotNull(arguments, "'arguments' must not be null");
+        checkNotNull(parameterTypes, "'testMethod' must not be null");
+        checkArgument(parameterTypes.length == arguments.length,
+                "Expected %d arguments for test method but got %d parameters.", arguments.length,
+                parameterTypes.length);
 
         for (int idx = 0; idx < arguments.length; idx++) {
             Object object = arguments[idx];
@@ -44,9 +45,9 @@ public abstract class AbstractObjectConverter<V> {
                 Class<?> paramType = parameterTypes[idx];
                 if (!paramType.isInstance(object) && !isWrappedInstance(paramType, object)
                         && !isWideningConversion(paramType, object)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Parameter %d is of type %s but argument given is %s of type %s", idx,
-                            paramType.getSimpleName(), object, object.getClass().getSimpleName()));
+                    throw new IllegalArgumentException(
+                            String.format("Parameter number %d is of type '%s' but argument given is '%s' of type '%s'",
+                                    idx, paramType.getSimpleName(), object, object.getClass().getSimpleName()));
                 }
             }
         }

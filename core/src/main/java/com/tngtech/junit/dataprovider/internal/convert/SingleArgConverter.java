@@ -18,7 +18,7 @@ public class SingleArgConverter extends AbstractObjectConverter<Object> {
     public Object[] convert(Object data, boolean isVarArgs, Class<?>[] parameterTypes) {
         checkArgument(parameterTypes.length == 1, "Object[] dataprovider just supports single argument test method but found %d parameters",
                 parameterTypes.length);
-        checkArgument(!isVarArgs, "Object[] dataprovider and single argumented test method does not support varargs");
+        checkArgument(!isVarArgs, "Object[] dataprovider and single parameter test method does not support varargs");
 
         Object[] result = new Object[] { data };
         checkIfArgumentsMatchParameterTypes(result, parameterTypes);

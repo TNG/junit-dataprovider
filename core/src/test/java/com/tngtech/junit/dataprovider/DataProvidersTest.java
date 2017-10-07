@@ -8,9 +8,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class DataProvidersTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void test$ShouldReturnEmptyObjectArrayForNoArgs() {
@@ -131,9 +136,11 @@ public class DataProvidersTest {
         assertThat(result).isEqualTo(new Object[][] { { 'a' }, { "aa" }, { "aaa" } });
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testTestForEachClassOfEnumShouldThrowNullPointerExceptionForNullArg() {
         // Given:
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("'enumClass' must not be null");
 
         // When:
         testForEach((Class<TestEnum>) null);
