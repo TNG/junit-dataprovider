@@ -1,4 +1,4 @@
-package com.tngtech.junit.dataprovider.internal.convert;
+package com.tngtech.junit.dataprovider.convert;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -1,4 +1,4 @@
-package com.tngtech.junit.dataprovider.internal.convert;
+package com.tngtech.junit.dataprovider.convert;
 
 import java.lang.reflect.Array;
 

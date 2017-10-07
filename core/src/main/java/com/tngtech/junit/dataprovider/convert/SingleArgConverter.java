@@ -1,4 +1,4 @@
-package com.tngtech.junit.dataprovider.internal.convert;
+package com.tngtech.junit.dataprovider.convert;
 
 import static com.tngtech.junit.dataprovider.Preconditions.checkArgument;
 
@@ -11,7 +11,7 @@ public class SingleArgConverter extends AbstractObjectConverter<Object> {
      * @param isVarArgs determines whether test method has a varargs parameter
      * @param parameterTypes target types of parameters
      * @return {@code Object[]} which is converted and checked
-     * @throws IllegalArgumentException if and only if the paramter size does not fit, this is tried on varargs method
+     * @throws IllegalArgumentException if and only if the parameter size does not fit, this is tried on varargs method
      *             or there is a type mismatch
      */
     @Override

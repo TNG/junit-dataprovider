@@ -1,4 +1,4 @@
-package com.tngtech.junit.dataprovider.internal.convert;
+package com.tngtech.junit.dataprovider.convert;
 
 import org.junit.Rule;
 import org.junit.Test;

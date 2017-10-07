@@ -8,13 +8,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.annotation.CheckReturnValue;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.testutils.Methods;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -30,7 +31,7 @@ public class DataProviderResolverContextTest {
     private final ResolveStrategy resolveStrategy = ResolveStrategy.AGGREGATE_ALL_MATCHES;
     @SuppressWarnings("unchecked")
     private final List<Class<?>> locations = asList(this.getClass(), DataProviderResolverContext.class);
-    private final Class<? extends Annotation> dataProviderAnnotationClass = DataProvider.class;
+    private final Class<? extends Annotation> dataProviderAnnotationClass = CheckReturnValue.class;
     private final String dataProviderName = "dataProviderName";
 
     @Test

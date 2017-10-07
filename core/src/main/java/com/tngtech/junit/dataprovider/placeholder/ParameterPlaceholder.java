@@ -3,12 +3,9 @@ package com.tngtech.junit.dataprovider.placeholder;
 import java.util.Arrays;
 import java.util.List;
 
-import com.tngtech.junit.dataprovider.DataProvider;
-
 /**
  * This placeholder format the parameters of a dataprovider test as comma-separated {@link String} according to the
- * given index or range subscript (see {@link DataProvider#format()}. Furthermore the following parameter values are
- * treated specially:
+ * given index or range subscript. Furthermore the following parameter values are treated specially:
  * <table summary="Special {@link String} treatment">
  * <tr>
  * <th>Parameter value</th>

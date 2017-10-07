@@ -80,4 +80,46 @@ public class PreconditionsTest {
 
         // Then: expect no exception
     }
+
+    @Test
+    public void testCheckStateShouldThrowIllegalStateExceptionIfExpressionIsFalse() {
+        // Given:
+        String errorMessage = "error message";
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage(errorMessage);
+
+        // When:
+        Preconditions.checkState(1 == 2, errorMessage);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testCheckStateShouldNotThrowIllegalStateExceptionIfExpressionIsTrue() {
+        // When:
+        Preconditions.checkState(true, "error message");
+
+        // Then: expect no exception
+    }
+
+    @Test
+    public void testCheckStateShouldThrowIllegalStateExceptionIfExpressionIsFalseAndReturnFormattedMessage() {
+        // Given:
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("error message template");
+
+        // When:
+        Preconditions.checkState(1 == 2, "error message %s", "template");
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testCheckStateShouldNotThrowIllegalStateExceptionIfExpressionIsTrueUsingMessageTemplate() {
+        // When:
+        Preconditions.checkState(true, "error message %s", "template");
+
+        // Then: expect no exception
+    }
 }

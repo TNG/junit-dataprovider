@@ -1,4 +1,4 @@
-package com.tngtech.junit.dataprovider.internal.convert;
+package com.tngtech.junit.dataprovider.convert;
 
 import static com.tngtech.junit.dataprovider.Preconditions.checkArgument;
 import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;

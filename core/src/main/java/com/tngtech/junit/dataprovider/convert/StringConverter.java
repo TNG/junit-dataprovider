@@ -1,9 +1,7 @@
-package com.tngtech.junit.dataprovider.internal.convert;
+package com.tngtech.junit.dataprovider.convert;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-
-import com.tngtech.junit.dataprovider.DataProvider;
 
 public class StringConverter {
 
@@ -17,13 +15,13 @@ public class StringConverter {
      * @param isVarArgs determines whether test method has a varargs parameter
      * @param parameterTypes target types of parameters to which corresponding values in regex-separated {@code data}
      *            should be converted
-     * @param dataProvider containing settings which should be used to convert given {@code data}
+     * @param context containing settings which should be used to convert given {@code data}
      * @param rowIdx index of current {@code data} (row) for better error messages
      * @return split, trimmed and converted {@code Object[]} of supplied regex-separated {@code data}
      * @throws IllegalArgumentException if and only if count of split data and parameter types does not match or
      *             argument cannot be converted to required type
      */
-    public Object[] convert(String data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider, int rowIdx) {
+    public Object[] convert(String data, boolean isVarArgs, Class<?>[] parameterTypes, ConverterContext context, int rowIdx) {
         if (data == null) {
             return new Object[] { null };
         }
@@ -33,15 +31,15 @@ public class StringConverter {
                     return new Object[] { Array.newInstance(parameterTypes[0].getComponentType(), 0) };
                 }
             } else {
-                return new Object[] { convertValue(data, parameterTypes[0], dataProvider) };
+                return new Object[] { convertValue(data, parameterTypes[0], context) };
             }
         }
 
-        String[] splitData = splitBy(data, dataProvider.splitBy());
+        String[] splitData = splitBy(data, context.getSplitBy());
 
         checkArgumentsAndParameterCount(splitData.length, parameterTypes.length, isVarArgs, rowIdx);
 
-        return convert(splitData, isVarArgs, parameterTypes, dataProvider);
+        return convert(splitData, isVarArgs, parameterTypes, context);
     }
 
     protected String[] splitBy(String data, String regex) {
@@ -63,12 +61,12 @@ public class StringConverter {
         }
     }
 
-    private Object[] convert(String[] splitData, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider) {
+    private Object[] convert(String[] splitData, boolean isVarArgs, Class<?>[] parameterTypes, ConverterContext context) {
         Object[] result = new Object[parameterTypes.length];
 
         int nonVarArgParametersLength = parameterTypes.length - ((isVarArgs) ? 1 : 0);
         for (int idx = 0; idx < nonVarArgParametersLength; idx++) {
-            result[idx] = convertValue(splitData[idx], parameterTypes[idx], dataProvider);
+            result[idx] = convertValue(splitData[idx], parameterTypes[idx], context);
         }
 
         if (isVarArgs) {
@@ -76,20 +74,21 @@ public class StringConverter {
 
             Object varArgArray = Array.newInstance(varArgComponentType, splitData.length - parameterTypes.length + 1);
             for (int idx = nonVarArgParametersLength; idx < splitData.length; idx++) {
-                Array.set(varArgArray, idx - nonVarArgParametersLength, convertValue(splitData[idx], varArgComponentType, dataProvider));
+                Array.set(varArgArray, idx - nonVarArgParametersLength,
+                        convertValue(splitData[idx], varArgComponentType, context));
             }
             result[nonVarArgParametersLength] = varArgArray;
         }
         return result;
     }
 
-    private Object convertValue(String data, Class<?> targetType, DataProvider dataProvider) {
-        String str = (dataProvider.trimValues()) ? data.trim() : data;
-        if (dataProvider.convertNulls() && DataProvider.NULL.equals(str)) {
+    private Object convertValue(String data, Class<?> targetType, ConverterContext context) {
+        String str = (context.isTrimValues()) ? data.trim() : data;
+        if (context.isConvertNulls() && ConverterContext.NULL.equals(str)) {
             return null;
         }
 
-        Object tmp = customConvertValue(str, targetType, dataProvider);
+        Object tmp = customConvertValue(str, targetType, context);
         if (tmp != OBJECT_NO_CONVERSION) {
             return tmp;
         }
@@ -106,7 +105,7 @@ public class StringConverter {
         if (targetType.isEnum()) {
             @SuppressWarnings({ "unchecked", "rawtypes" })
             Class<Enum> enumType = (Class<Enum>) targetType;
-            return convertToEnumValue(str, enumType, dataProvider.ignoreEnumCase());
+            return convertToEnumValue(str, enumType, context.isIgnoreEnumCase());
         }
 
         if (Class.class.equals(targetType)) {
@@ -133,12 +132,12 @@ public class StringConverter {
      *
      * @param str value to be converted
      * @param targetType target type into which value should be converted
-     * @param dataProvider containing settings which should be used to convert given {@code data}
-     * @return to target type converted {@link String} or {@link #OBJECT_NO_CONVERSION} if no conversion was applied. Later will imply that
-     *         normal conversions try to apply.
+     * @param context containing settings which should be used to convert given {@code data}
+     * @return to target type converted {@link String} or {@link #OBJECT_NO_CONVERSION} if no conversion was applied.
+     *         Later will imply that normal conversions try to apply.
      */
     @SuppressWarnings("unused")
-    protected Object customConvertValue(String str, Class<?> targetType, DataProvider dataProvider) {
+    protected Object customConvertValue(String str, Class<?> targetType, ConverterContext context) {
         return OBJECT_NO_CONVERSION;
     }
 
