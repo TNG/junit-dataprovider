@@ -7,39 +7,61 @@ pipeline {
                 git '/home/schmida/work/misc-projects/junit-dataprovider'
             }
         }
-        stage('Build') {
+        stage('Assemble') {
             steps {
                 sh './gradlew clean assemble'
-                archiveArtifacts '**/build/libs/*.jar'
+            }
+            post {
+                always {
+                    archiveArtifacts '**/build/libs/*.jar'
+                }
             }
         }
         stage('Unit tests') {
             steps {
                 sh './gradlew test'
-                junit '**/build/test-results/test/*.xml'
+            }
+            post {
+                always {
+                    junit '**/build/test-results/test/*.xml'
+                }
             }
         }
         stage('Integration tests') {
-            steps {
-                parallel(
-                    junitIntegTest: {
+            parallel {
+                stage('Integration tests') {
+                    steps {
                         sh './gradlew integTest'
-                        junit '**/build/test-results/integTest/*.xml'
-                    },
-                    mavenIntegTest: {
-                        sh 'cd junit4 && mvn test'
-                        junit 'junit4/build/maven-target/surefire-reports/*.xml'
                     }
-                )
+                    post {
+                        always {
+                                junit '**/build/test-results/integTest/*.xml'
+                        }
+                    }
+                }
+                stage('Maven integration test') {
+                    steps {
+                        sh 'cd junit4 && mvn test'
+                    }
+                    post {
+                        always {
+                            junit 'junit4/build/maven-target/surefire-reports/*.xml'
+                        }
+                    }
+                }
             }
         }
-        stage('Static analyses') {
+        stage('Static code analyses') {
             steps {
                 sh './gradlew build'
-                dry canComputeNew: false, defaultEncoding: '', healthy: '', pattern: 'build/reports/cpd/*.xml', unHealthy: ''
-                findbugs defaultEncoding: '', excludePattern: '**/*Test.java', healthy: '', includePattern: '', pattern: '**/build/reports/findbugs/*.xml', unHealthy: '', unstableNewAll: '0'
-                jacoco classPattern: '**/build/classes/main', execPattern: '**/build/jacoco/*.exec', sourcePattern: 'src/main/java'
-                warnings canComputeNew: false, canResolveRelativePaths: false, categoriesPattern: '', consoleParsers: [[parserName: 'Java Compiler (Eclipse)'], [parserName: 'Java Compiler (javac)']], defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', unHealthy: ''
+            }
+            post {
+                always {
+                    dry canComputeNew: false, defaultEncoding: '', healthy: '', pattern: 'build/reports/cpd/*.xml', unHealthy: ''
+                    findbugs defaultEncoding: '', excludePattern: '**/*Test.java', healthy: '', includePattern: '', pattern: '**/build/reports/findbugs/*.xml', unHealthy: '', unstableNewAll: '0'
+                    jacoco classPattern: '**/build/classes/main', execPattern: '**/build/jacoco/*.exec', sourcePattern: 'src/main/java'
+                    warnings canComputeNew: false, canResolveRelativePaths: false, categoriesPattern: '', consoleParsers: [[parserName: 'Java Compiler (Eclipse)'], [parserName: 'Java Compiler (javac)']], defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', unHealthy: ''
+                }
             }
         }
     }
