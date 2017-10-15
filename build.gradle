@@ -30,13 +30,16 @@ subprojects {
 
     jar {
         manifest {
+            def now = new Date()
+
             def title = 'JUnit dataprovider'
             def company = 'TNG Technology Consulting GmbH'
-            def copyright = "${new Date()[Calendar.YEAR]} ${company}"
+            def today = now.format('yyyy-MM-dd')
+            def copyright = "${now[Calendar.YEAR]} ${company}"
 
             attributes (
                 'Built-By': "Gradle ${gradle.gradleVersion}",
-                'Built-Date': new Date(), // TODO destroys incremental build feature
+                'Built-Date': today, // using now would destroy incremental build feature
                 'Specification-Title': title,
                 'Specification-Version': version,
                 'Specification-Vendor': company,
@@ -137,7 +140,7 @@ project(':junit4') {
         ignoreFailures = isBuildOnJenkins
 
         classpath = sourceSets.integTest.runtimeClasspath
-        testClassesDir = sourceSets.integTest.output.classesDir
+        testClassesDirs = sourceSets.integTest.output.classesDirs
     }
     task touchIntegTestResultsForJenkins(type: TouchTestResults) {
         tasks integTest
