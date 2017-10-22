@@ -2,26 +2,21 @@
 <project name="junit-dataprovider" basedir=".">
 
     <!-- Folders and files -->
-    <property name="src.dir" location="${basedir}/src" />
-    <property name="src.main.java.dir" location="${src.dir}/main/java" />
-    <property name="src.test.java.dir" location="${src.dir}/integTest/java" />
-
     <property name="libs.dir" location="${user.home}/.gradle/caches/modules-2/" />
 
     <property name="build.dir" location="${basedir}/build" />
     <property name="build.classes.dir" location="${build.dir}/classes" />
-    <property name="build.classes.main.dir" location="${build.classes.dir}/main" />
-    <property name="build.classes.test.dir" location="${build.classes.dir}/integTest" />
+    <property name="build.classes.core.dir" location="${basedir}/../core/build/classes/java/main" />
+    <property name="build.classes.main.dir" location="${build.classes.dir}/java/main" />
+    <property name="build.classes.test.dir" location="${build.classes.dir}/java/integTest" />
 
     <property name="test.reports.dir" location="${build.dir}/reports/ant-tests" />
 
     <!-- Libraries -->
     <fileset id="libs.fileset" dir="${libs.dir}">
-        <include name="**/assertj-*.jar" />
-        <include name="**/asm-*.jar" />
-        <include name="**/groovy-*.jar" />
-        <include name="**/hamcrest-*.jar" />
         <include name="**/junit-4.12.jar" />
+        <include name="**/hamcrest-core-1.3.jar" />
+        <include name="**/assertj-core-1.7.1.jar" />
     </fileset>
 
     <!-- Targets -->
@@ -45,6 +40,7 @@
 
         <junit haltonerror="true" haltonfailure="true">
             <classpath>
+                <pathelement location="${build.classes.core.dir}" />
                 <pathelement location="${build.classes.main.dir}" />
                 <pathelement location="${build.classes.test.dir}" />
 
