@@ -111,14 +111,9 @@ project(':junit4') {
     build.dependsOn touchIntegTestResultsForJenkins
 }
 
-project(':junit-jupiter') {
+configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
     apply plugin: 'org.junit.platform.gradle.plugin'
     apply plugin: 'groovy'
-
-    archivesBaseName = 'junit-jupiter-dataprovider'
-    description = 'A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.'
-    group = 'com.tngtech.junit.dataprovider'
-    version = '2.0-SNAPSHOT'
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -154,6 +149,24 @@ project(':junit-jupiter') {
         enabled = isBuildOnJenkins
     }
     build.dependsOn touchIntegTestResultsForJenkins
+}
+
+project(':junit-jupiter') {
+    archivesBaseName = 'junit-jupiter-dataprovider'
+    description = 'A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.'
+    group = 'com.tngtech.junit.dataprovider'
+    version = '2.0-SNAPSHOT'
+}
+
+project(':junit-jupiter-params') {
+    archivesBaseName = 'junit-jupiter-params-dataprovider'
+    description = 'A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is partly compatible to JUnit4 dataprovider.'
+    group = 'com.tngtech'
+    version = '2.0-SNAPSHOT'
+
+    dependencies {
+        compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
+    }
 }
 
 // configure after properties are set and integration tests are added

@@ -8,6 +8,8 @@ script:
 #  - ant test
   - cd ../junit-jupiter/
   - mvn test
+  - cd ../junit-jupiter-params/
+  - mvn test
 
 jdk:
   - oraclejdk8

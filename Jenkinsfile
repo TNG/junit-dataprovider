@@ -63,6 +63,17 @@ pipeline {
                         }
                     }
                 }
+                stage('JUnit Jupiter Parameterized Maven integration test') {
+                    steps {
+                        sh 'cd junit-jupiter-params && mvn test'
+                    }
+                    post {
+                        always {
+                            sh 'cd ${WORKSPACE}'
+                            junit 'junit-jupiter-params/build/maven-target/surefire-reports/*.xml'
+                        }
+                    }
+                }
             }
         }
         stage('Static code analyses') {
