@@ -1,3 +1,17 @@
+# Contributing
+
+Contributions are very welcome. The following will provide some helpful guidelines.
+
+## JUnit dataprovider Contributor License Agreement
+
+* You will only submit contributions where you have authored 100% of the content.
+* You will only submit contributions to which you have the necessary rights. 
+This means in particular, that if you are employed you have received the necessary permissions 
+from your employer to make the contributions.
+* Whatever content you contribute will be provided under the project license(s) (see !["LICENSE.txt"](LICENSE.txt))
+
+## How to contribute
+
 We love pull requests. Here is a quick guide:
 
 1. You need to have a JDK (at least version 1.5) installed.
