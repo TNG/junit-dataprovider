@@ -25,71 +25,15 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'findbugs'
     apply plugin: 'osgi'
-
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
-
-    jar {
-        manifest {
-            def now = new Date()
-
-            def title = 'JUnit dataprovider'
-            def company = 'TNG Technology Consulting GmbH'
-            def today = now.format('yyyy-MM-dd')
-            def copyright = "${now[Calendar.YEAR]} ${company}"
-
-            attributes (
-                'Built-By': "Gradle ${gradle.gradleVersion}",
-                'Built-Date': today, // using now would destroy incremental build feature
-                'Specification-Title': title,
-                'Specification-Version': version,
-                'Specification-Vendor': company,
-                'Implementation-Title': title,
-                'Implementation-Version': version,
-                'Implementation-Vendor': company,
-                'Issue-Tracker': 'https://github.com/TNG/junit-dataprovider/issues',
-                'Documentation-URL': 'https://github.com/TNG/junit-dataprovider/wiki',
-                'Copyright': copyright,
-                'License': 'Apache License v2.0, January 2004'
-            )
-
-            // OSGi / p2 plugin information
-            instruction 'Bundle-Vendor', company
-            instruction 'Bundle-Copyright', copyright
-        }
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    test {
-        ignoreFailures = isBuildOnJenkins
-    }
-
-    task touchTestResultsForJenkins(type: TouchTestResults) {
-        tasks test
-        enabled = isBuildOnJenkins
-    }
-    build.dependsOn touchTestResultsForJenkins
-
-    artifacts {
-        archives jar
-        archives javadocJar
-        archives sourcesJar
-    }
 }
 
 project(':core') {
     archivesBaseName = 'junit-dataprovider-core'
     description = 'The common core for a TestNG like dataprovider runner for JUnit.'
-    group = 'com.tngtech'
+    group = 'com.tngtech.junit.dataprovider'
     version = '2.0-SNAPSHOT'
+
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
     dependencies {
         compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
@@ -106,8 +50,10 @@ project(':junit4') {
 
     archivesBaseName = 'junit4-dataprovider'
     description = 'A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features.'
-    group = 'com.tngtech'
+    group = 'com.tngtech.junit.dataprovider'
     version = '2.0-SNAPSHOT'
+
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
     if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
         ext.junitVersion = '4.12'
@@ -151,8 +97,63 @@ project(':junit4') {
     build.dependsOn touchIntegTestResultsForJenkins
 }
 
+// configure after properties are set and integration tests are added
 subprojects {
-    // configure after integTests etc. are added
+    jar {
+        manifest {
+            def now = new Date()
+
+            def company = 'TNG Technology Consulting GmbH'
+            def today = now.format('yyyy-MM-dd')
+            def copyright = "${now[Calendar.YEAR]} ${company}"
+
+            attributes (
+                'Built-By': "Gradle ${gradle.gradleVersion}",
+                'Built-Date': today, // using now would destroy incremental build feature
+                'Specification-Title': archivesBaseName,
+                'Specification-Version': version,
+                'Specification-Vendor': company,
+                'Implementation-Title': archivesBaseName,
+                'Implementation-Version': version,
+                'Implementation-Vendor': company,
+                'Issue-Tracker': 'https://github.com/TNG/junit-dataprovider/issues',
+                'Documentation-URL': 'https://github.com/TNG/junit-dataprovider/wiki',
+                'Copyright': copyright,
+                'License': 'Apache License v2.0, January 2004'
+            )
+
+            // OSGi / p2 plugin information
+            instruction 'Bundle-Vendor', company
+            instruction 'Bundle-Copyright', copyright
+        }
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    test {
+        ignoreFailures = isBuildOnJenkins
+    }
+
+    task touchTestResultsForJenkins(type: TouchTestResults) {
+        tasks test
+        enabled = isBuildOnJenkins
+    }
+    build.dependsOn touchTestResultsForJenkins
+
+    artifacts {
+        archives jar
+        archives javadocJar
+        archives sourcesJar
+    }
+
     jacocoTestReport {
         reports {
             xml.enabled = true // coveralls plugin depends on xml format report
@@ -163,7 +164,7 @@ subprojects {
     }
 
     findbugs {
-        if (System.getProperty("java.version")[0..2] in [ '1.5', '1.6' ]) { // FindBugs v3.0.0 does not work with Java < v1.7 :-(
+        if (System.getProperty("java.version")[0..2] in [ '1.6' ]) { // FindBugs v3.0.0 does not work with Java < v1.7 :-(
             toolVersion = '2.0.3'
         } else {
             toolVersion = '3.0.1'
@@ -181,7 +182,7 @@ subprojects {
 }
 
 cpd {
-    if (System.getProperty("java.version")[0..2] in [ '1.5', '1.6' ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
+    if (System.getProperty("java.version")[0..2] in [ '1.6' ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
         toolVersion = '5.3.7'
     } else {
         toolVersion = '5.5.1'
@@ -263,7 +264,7 @@ subprojects {
                             dep.scope = 'provided'
                         }
                         pom.dependencies.removeAll{ dep -> dep.scope in [ 'compile', 'test' ] &&
-                                !(dep.groupId == 'com.tngtech' && dep.artifactId == 'junit-dataprovider-core') }
+                                !(dep.groupId == 'com.tngtech.junit.dataprovider' && dep.artifactId == 'junit-dataprovider-core') }
                     }
                 }
             }
