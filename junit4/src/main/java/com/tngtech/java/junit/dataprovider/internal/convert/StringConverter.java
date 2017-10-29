@@ -5,6 +5,9 @@ import java.lang.annotation.Annotation;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
 public class StringConverter extends com.tngtech.junit.dataprovider.convert.StringConverter {
 
     protected static final Object OBJECT_NO_CONVERSION = com.tngtech.junit.dataprovider.convert.StringConverter.OBJECT_NO_CONVERSION;

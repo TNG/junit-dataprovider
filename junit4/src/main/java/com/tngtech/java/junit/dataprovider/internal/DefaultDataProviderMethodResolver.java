@@ -13,6 +13,8 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderMethodResolver;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Default implementation to resolve the dataprovider method for a test method using {@link UseDataProvider} annotation.
  * <p>
@@ -47,6 +49,7 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
  * {@code dataProviderShouldReturnTwoForOnePlusOne}.</li>
  * </ul>
  */
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
 public class DefaultDataProviderMethodResolver
         extends com.tngtech.junit.dataprovider.resolver.DefaultDataProviderMethodResolver
         implements DataProviderMethodResolver {

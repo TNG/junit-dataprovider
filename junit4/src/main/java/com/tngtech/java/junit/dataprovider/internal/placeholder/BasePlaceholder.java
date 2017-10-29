@@ -7,6 +7,8 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.Placeholders;
 import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Base class for all placeholder which are used to format the test method name. One can create his/her own placeholder
  * extending this and overriding {@link #getReplacementFor(String)}. Afterwards add the new placeholder to the other
@@ -19,6 +21,7 @@ import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
  * @see DataProvider#format()
  * @see Placeholders
  */
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
 public abstract class BasePlaceholder extends com.tngtech.junit.dataprovider.placeholder.BasePlaceholder {
 
     protected Method method;

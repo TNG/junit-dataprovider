@@ -13,9 +13,12 @@ import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Internal class to convert some data to its corresponding parameters.
  */
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
 public class DataConverter extends com.tngtech.junit.dataprovider.convert.DataConverter {
 
     private ObjectArrayConverter objectArrayConverter;

@@ -5,6 +5,9 @@ import java.util.Arrays;
 
 import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
 public class CanonicalClassNamePlaceholder
         extends com.tngtech.junit.dataprovider.placeholder.CanonicalClassNamePlaceholder {
 
