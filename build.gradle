@@ -18,6 +18,16 @@ ext {
 ext.skipFindBugs = hasProperty('skipFindBugs')
 println "Using skipFindBugs = ${skipFindBugs} for current build."
 
+if (!hasProperty('junit4Version')) { // set default junit version if not set via command line
+    ext.junit4Version = '4.12'
+}
+println "Using JUnit4 version ${junit4Version} for current build."
+
+if (!hasProperty('junitJupiterVersion')) { // set default junit version if not set via command line
+    ext.junitJupiterVersion = '5.0.1'
+}
+println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
+
 task wrapper(type: Wrapper) {
     gradleVersion = '4.1'
 }
@@ -64,11 +74,6 @@ project(':junit4') {
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
-    if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
-        ext.junitVersion = '4.12'
-    }
-    println "Using junit version ${junitVersion} for current build."
-
     sourceSets {
         integTest {
             compileClasspath += main.output + test.output
@@ -84,7 +89,7 @@ project(':junit4') {
 
     dependencies {
         compile project(':core')
-        compile group: 'junit', name: 'junit', version: junitVersion
+        compile group: 'junit', name: 'junit', version: junit4Version
         compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
 
         testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
@@ -117,11 +122,6 @@ project(':junit-jupiter') {
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
-    if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
-        ext.junitVersion = '5.0.1'
-    }
-    println "Using junit version ${junitVersion} for current build."
-
     sourceSets {
         test { // TODO do it as "sourceSet" named "integTest" as soon as "junit-platform-gradle-plugin" is able to handle it
             java {
@@ -135,7 +135,7 @@ project(':junit-jupiter') {
 
     dependencies {
         compile project(':core')
-        compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+        compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
 
         testCompile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
         testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
