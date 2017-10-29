@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                git '/home/schmida/work/misc-projects/junit-dataprovider'
+                checkout scm
             }
         }
         stage('Assemble') {
