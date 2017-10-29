@@ -3,6 +3,8 @@ package com.tngtech.junit.dataprovider.placeholder;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * This placeholder format the arguments of a dataprovider test as comma-separated {@link String} according to the given
  * index or range subscript. Furthermore the following arguments are treated specially:
@@ -92,6 +94,7 @@ public class ArgumentPlaceholder extends BasePlaceholder {
     }
 
 
+    @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification = "false positive if 'param.toString()' returns 'null'")
     protected String format(Object param) {
         if (param == null) {
             return STRING_NULL;
@@ -113,7 +116,7 @@ public class ArgumentPlaceholder extends BasePlaceholder {
         } else {
             result = param.toString();
         }
-        if (result == null) {
+        if (result == null) { // maybe null if "param.toString()" returns null
             return STRING_NULL;
         }
         result = result.replaceAll("\0", "\\\\0").replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n");

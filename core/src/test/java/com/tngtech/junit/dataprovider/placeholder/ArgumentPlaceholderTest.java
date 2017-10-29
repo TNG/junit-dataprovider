@@ -483,6 +483,18 @@ public class ArgumentPlaceholderTest {
     }
 
     @Test
+    public void testFormatForCustomObjectReplacesNullFromToString() {
+        // Given:
+        final TestToString argument = new TestToString(null);
+
+        // When:
+        String result = underTest.format(argument);
+
+        // Then:
+        assertThat(result).isEqualTo(STRING_NULL);
+    }
+
+    @Test
     public void testFormatAllHandleObjectArrayCorrectly() {
         // Given:
         final List<Object> arguments = list(new Object[] { 7.5, "test" });
