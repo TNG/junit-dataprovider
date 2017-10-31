@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+    }
+}
+
 plugins {
     id 'com.github.kt3k.coveralls' version '2.3.1'
     id 'de.aaschmid.cpd' version '1.0'
@@ -9,8 +18,18 @@ ext {
 ext.skipFindBugs = hasProperty('skipFindBugs')
 println "Using skipFindBugs = ${skipFindBugs} for current build."
 
+if (!hasProperty('junit4Version')) { // set default junit version if not set via command line
+    ext.junit4Version = '4.12'
+}
+println "Using JUnit4 version ${junit4Version} for current build."
+
+if (!hasProperty('junitJupiterVersion')) { // set default junit version if not set via command line
+    ext.junitJupiterVersion = '5.0.1'
+}
+println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
+
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.1'
+    gradleVersion = '4.2.1'
 }
 
 allprojects {
@@ -55,11 +74,6 @@ project(':junit4') {
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
-    if (!hasProperty('junitVersion')) { // set default junit version if not set via command line
-        ext.junitVersion = '4.12'
-    }
-    println "Using junit version ${junitVersion} for current build."
-
     sourceSets {
         integTest {
             compileClasspath += main.output + test.output
@@ -75,7 +89,7 @@ project(':junit4') {
 
     dependencies {
         compile project(':core')
-        compile group: 'junit', name: 'junit', version: junitVersion
+        compile group: 'junit', name: 'junit', version: junit4Version
         compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
 
         testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
@@ -95,6 +109,64 @@ project(':junit4') {
         enabled = isBuildOnJenkins
     }
     build.dependsOn touchIntegTestResultsForJenkins
+}
+
+configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
+    apply plugin: 'org.junit.platform.gradle.plugin'
+    apply plugin: 'groovy'
+
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+
+    sourceSets {
+        test { // TODO do it as "sourceSet" named "integTest" as soon as "junit-platform-gradle-plugin" is able to handle it
+            java {
+                srcDir 'src/integTest/java'
+            }
+            groovy {
+                srcDir 'src/integTest/groovy'
+            }
+        }
+    }
+
+    dependencies {
+        compile project(':core')
+        compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
+
+        testCompile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+        testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.10.0'
+
+        // only integTestCompile
+        testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.12'
+    }
+
+    junitPlatform {
+        platformVersion '1.0.1'
+    }
+
+    task touchIntegTestResultsForJenkins(type: TouchTestResults) {
+        tasks test
+        enabled = isBuildOnJenkins
+    }
+    build.dependsOn touchIntegTestResultsForJenkins
+}
+
+project(':junit-jupiter') {
+    archivesBaseName = 'junit-jupiter-dataprovider'
+    description = 'A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.'
+    group = 'com.tngtech.junit.dataprovider'
+    version = '2.0-SNAPSHOT'
+}
+
+project(':junit-jupiter-params') {
+    archivesBaseName = 'junit-jupiter-params-dataprovider'
+    description = 'A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is partly compatible to JUnit4 dataprovider.'
+    group = 'com.tngtech'
+    version = '2.0-SNAPSHOT'
+
+    dependencies {
+        compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
+    }
 }
 
 // configure after properties are set and integration tests are added

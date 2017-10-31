@@ -1,23 +1,30 @@
 language: java
 
 script:
-  - ./gradlew build -PjunitVersion=4.8.2 -PskipFindBugs
-  - ./gradlew build -PjunitVersion=4.9   -PskipFindBugs
-  - ./gradlew build -PjunitVersion=4.10  -PskipFindBugs
-  - ./gradlew build -PjunitVersion=4.11  -PskipFindBugs
+  - ./gradlew build -Pjunit4Version=4.8.2 -PjunitJupiterVersion=5.0.0-M6  -PskipFindBugs
+  - ./gradlew build -Pjunit4Version=4.9   -PjunitJupiterVersion=5.0.0-RC2 -PskipFindBugs
+  - ./gradlew build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.0.0-RC3 -PskipFindBugs
+  - ./gradlew build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.0.0     -PskipFindBugs
+
   - ./gradlew build
-  - cd ./junit4/
+
+  - cd ${TRAVIS_BUILD_DIR}/junit4/
   - mvn test
 #  - ant test
 
+  - cd ${TRAVIS_BUILD_DIR}/junit-jupiter/
+  - mvn test
+
+  - cd ${TRAVIS_BUILD_DIR}/junit-jupiter-params/
+  - mvn test
+
 jdk:
   - oraclejdk8
-  - oraclejdk7
-#  - openjdk7
 
 dist: precise
 
 after_success:
+  - cd ${TRAVIS_BUILD_DIR}
   - ./gradlew jacocoTestReport coveralls
 
 sudo: false
