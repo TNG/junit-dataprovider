@@ -44,13 +44,14 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'findbugs'
     apply plugin: 'osgi'
+
+    group = 'com.tngtech.junit.dataprovider'
+    version = '2.0-SNAPSHOT'
 }
 
 project(':core') {
     archivesBaseName = 'junit-dataprovider-core'
     description = 'The common core for a TestNG like dataprovider runner for JUnit.'
-    group = 'com.tngtech.junit.dataprovider'
-    version = '2.0-SNAPSHOT'
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
@@ -69,8 +70,6 @@ project(':junit4') {
 
     archivesBaseName = 'junit4-dataprovider'
     description = 'A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features.'
-    group = 'com.tngtech.junit.dataprovider'
-    version = '2.0-SNAPSHOT'
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
@@ -154,15 +153,11 @@ configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
 project(':junit-jupiter') {
     archivesBaseName = 'junit-jupiter-dataprovider'
     description = 'A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.'
-    group = 'com.tngtech.junit.dataprovider'
-    version = '2.0-SNAPSHOT'
 }
 
 project(':junit-jupiter-params') {
     archivesBaseName = 'junit-jupiter-params-dataprovider'
     description = 'A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is partly compatible to JUnit4 dataprovider.'
-    group = 'com.tngtech'
-    version = '2.0-SNAPSHOT'
 
     dependencies {
         compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
