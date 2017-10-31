@@ -37,4 +37,24 @@ class FormatAcceptanceTest {
         // Expect:
         assertThat(a * b).isEqualTo(expected);
     }
+
+    @DataProvider(format = "[%i] %na[0..-1]")
+    static Object[][] dataProviderDivide() {
+        // @formatter:off
+        return new Object[][] {
+            {  0,  1,  0 },
+            {  1,  1,  1 },
+            { -1,  1, -1 },
+            {  2,  1,  2 },
+            { 15,  3,  5 },
+        };
+        // @formatter:on
+    }
+
+    @TestTemplate
+    @UseDataProvider
+    void testDivide(int dividend, int divisor, int result) {
+        // Expect:
+        assertThat(dividend / divisor).isEqualTo(result);
+    }
 }

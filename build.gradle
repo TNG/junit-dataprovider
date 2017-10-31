@@ -166,6 +166,10 @@ project(':junit-jupiter-params') {
 
 // configure after properties are set and integration tests are added
 subprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += [ "-parameters" ]
+    }
+
     jar {
         manifest {
             def now = new Date()
