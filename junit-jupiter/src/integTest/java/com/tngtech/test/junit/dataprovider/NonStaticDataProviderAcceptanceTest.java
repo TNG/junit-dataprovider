@@ -4,6 +4,7 @@ import static com.tngtech.junit.dataprovider.DataProviders.$;
 import static com.tngtech.junit.dataprovider.DataProviders.$$;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestTemplate;
@@ -40,5 +41,34 @@ class NonStaticDataProviderAcceptanceTest {
 
         // Then:
         assertThat(result).isEqualTo(expected);
+    }
+
+    @TestInstance(Lifecycle.PER_CLASS)
+    @Nested
+    class NestedTests {
+
+        @DataProvider
+        Object[][] dataProviderPow() {
+            // @formatter:off
+            return $$(
+                    $( 0,  0 ),
+                    $( 1,  1 ),
+                    $( 2,  4 ),
+                    $( 4, 16 )
+            );
+            // @formatter:on
+        }
+
+        @TestTemplate
+        @UseDataProvider
+        void testPow(int a, int expected) {
+            // Given:
+
+            // When:
+            int result = a * a;
+
+            // Then:
+            assertThat(result).isEqualTo(expected);
+        }
     }
 }
