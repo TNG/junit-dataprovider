@@ -40,7 +40,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[-3]");
+        String result = underTest.process(data, "%a[-3]");
 
         // Then:
         assertThat(result).isEqualTo("1");
@@ -68,7 +68,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[0..-1]");
+        String result = underTest.process(data, "%a[0..-1]");
 
         // Then:
         assertThat(result).isEqualTo("0, 1, 2, 3, 4, 5, 6, 7, 8, 9");
@@ -82,7 +82,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[-10..9]");
+        String result = underTest.process(data, "%a[-10..9]");
 
         // Then:
         assertThat(result).isEqualTo("0, 1, 2, 3, 4, 5, 6, 7, 8, 9");
@@ -96,7 +96,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[-10..-1]");
+        String result = underTest.process(data, "%a[-10..-1]");
 
         // Then:
         assertThat(result).isEqualTo("0, 1, 2, 3, 4, 5, 6, 7, 8, 9");
@@ -110,7 +110,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[1..-1]");
+        String result = underTest.process(data, "%a[1..-1]");
 
         // Then:
         assertThat(result).isEqualTo("1, 2, 3, 4, 5, 6, 7, 8, 9");
@@ -124,7 +124,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[0..8]");
+        String result = underTest.process(data, "%a[0..8]");
 
         // Then:
         assertThat(result).isEqualTo("0, 1, 2, 3, 4, 5, 6, 7, 8");
@@ -138,7 +138,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[4..6]");
+        String result = underTest.process(data, "%a[4..6]");
 
         // Then:
         assertThat(result).isEqualTo("4, 5, 6");
@@ -152,7 +152,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[4..-4]");
+        String result = underTest.process(data, "%a[4..-4]");
 
         // Then:
         assertThat(result).isEqualTo("4, 5, 6");
@@ -166,7 +166,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[-6..6]");
+        String result = underTest.process(data, "%a[-6..6]");
 
         // Then:
         assertThat(result).isEqualTo("4, 5, 6");
@@ -180,7 +180,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[-6..-4]");
+        String result = underTest.process(data, "%a[-6..-4]");
 
         // Then:
         assertThat(result).isEqualTo("4, 5, 6");
@@ -194,7 +194,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[7..7]");
+        String result = underTest.process(data, "%a[7..7]");
 
         // Then:
         assertThat(result).isEqualTo("7");
@@ -208,7 +208,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[7..-3]");
+        String result = underTest.process(data, "%a[7..-3]");
 
         // Then:
         assertThat(result).isEqualTo("7");
@@ -222,7 +222,7 @@ public class ArgumentPlaceholderTest {
         ReplacementData data = ReplacementData.of(Methods.anyMethod(), 0, arguments);
 
         // When:
-        String result = underTest.process(data, "%p[-3..-3]");
+        String result = underTest.process(data, "%a[-3..-3]");
 
         // Then:
         assertThat(result).isEqualTo("7");
