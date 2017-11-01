@@ -4,9 +4,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
-
-import org.junit.platform.commons.logging.Logger;
-import org.junit.platform.commons.logging.LoggerFactory;
+import java.util.logging.Logger;
 
 /**
  * This placeholder format the arguments including their parameter names of a dataprovider test as comma-separated
@@ -17,7 +15,7 @@ import org.junit.platform.commons.logging.LoggerFactory;
  */
 public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
 
-    private static final Logger logger = LoggerFactory.getLogger(NamedArgumentPlaceholder.class);
+    private static final Logger logger = Logger.getLogger(NamedArgumentPlaceholder.class.getName());
 
     public NamedArgumentPlaceholder() {
         super("%na\\[(-?[0-9]+|-?[0-9]+\\.\\.-?[0-9]+)\\]");
@@ -69,7 +67,7 @@ public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
     private Parameter[] getSubArrayOfMethodParameters(Method testMethod, int fromIndex, int toIndex) {
         Parameter[] parameters = testMethod.getParameters();
         if (parameters.length > 0 && !parameters[0].isNamePresent()) {
-            logger.warn(() -> String.format("Parameter names on method '%s' are not available"
+            logger.warning(String.format("Parameter names on method '%s' are not available"
                     + ". To store formal parameter names, compile the source file with the '-parameters' option"
                     + ". See also https://docs.oracle.com/javase/tutorial/reflect/member/methodparameterreflection.html",
                     testMethod));
