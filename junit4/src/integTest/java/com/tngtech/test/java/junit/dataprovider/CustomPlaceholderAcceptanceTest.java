@@ -2,14 +2,13 @@ package com.tngtech.test.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.Placeholders;
+import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import com.tngtech.java.junit.dataprovider.internal.placeholder.ParameterPlaceholder;
 
 @RunWith(DataProviderRunner.class)
@@ -42,26 +41,27 @@ public class CustomPlaceholderAcceptanceTest {
         }
     }
 
-    @BeforeClass
-    public static void setup() {
+    // Note: is only called before test initialization in Runner's constructor if at least one "external"
+    // dataprovider (= static method) exists
+    static {
         Placeholders.all().add(0, new StripParameterLengthPlaceholder(10));
     }
 
-    @AfterClass
-    public static void teardown() {
-        Placeholders.reset();
+    @DataProvider
+    public static String[] dataProviderEqualsIgnoreCase() {
+        // @formatter:off
+        return new String[] {
+                "veryVeryLongMethodNameWhichMustBeStripped,                                      null, false",
+                "veryVeryLongMethodNameWhichMustBeStripped,                                          , false",
+                "veryVeryLongMethodNameWhichMustBeStripped, veryVeryLongMethodNameWhichMustBeStripped,  true",
+                "veryverylongmethodnamewhichmustbestripped, veryVeryLongMethodNameWhichMustBeStripped,  true",
+                "veryVeryLongMethodNameWhichMustBeStripped, veryverylongmethodnamewhichmustbestripped,  true",
+        };
+        // @formatter:on
     }
 
     @Test
-    // @formatter:off
-    @DataProvider({
-        "veryVeryLongMethodNameWhichMustBeStripped,                                      null, false",
-        "veryVeryLongMethodNameWhichMustBeStripped,                                          , false",
-        "veryVeryLongMethodNameWhichMustBeStripped, veryVeryLongMethodNameWhichMustBeStripped,  true",
-        "veryverylongmethodnamewhichmustbestripped, veryVeryLongMethodNameWhichMustBeStripped,  true",
-        "veryVeryLongMethodNameWhichMustBeStripped, veryverylongmethodnamewhichmustbestripped,  true"
-    })
-    // @formatter:on
+    @UseDataProvider
     public void testEqualsIgnoreCase(String methodName1, String methodName2, boolean expected) {
         // Expected:
         assertThat(methodName1.equalsIgnoreCase(methodName2)).isEqualTo(expected);
