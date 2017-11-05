@@ -50,20 +50,35 @@ public class StringConverterTest {
     }
 
     @Test
-    public void testConvertShouldThrowExceptionIfNumberOfArgumentsIsNotEqualToNumberOfParameterTypes() {
+    public void testConvertShouldThrowExceptionIfNumberOfArgumentsIsGreaterThanNumberOfParameterTypesOnNonVarargMethod() {
+        // Given:
+        String data = "1, 2, 3";
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, int.class };
+
+        when(context.getSplitBy()).thenReturn(",");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Test method has 2 parameters but got 3 arguments in row 2");
+
+        // When:
+        underTest.convert(data, false, parameterTypes, context, 2);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testConvertShouldReturnConvertedDataIfNumberOfArgumentsIsSmallerThanNumberOfParameterTypes() {
         // Given:
         String data = "";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, int.class };
 
         when(context.getSplitBy()).thenReturn(",");
 
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Test method expected 2 parameters but got 1 arguments in row 2");
-
         // When:
-        underTest.convert(data, false, parameterTypes, context, 2);
+        Object[] result = underTest.convert(data, false, parameterTypes, context, 2);
 
-        // Then: expect exception
+        // Then:
+        assertThat(result).containsExactly(data);
     }
 
     @Test
@@ -76,7 +91,7 @@ public class StringConverterTest {
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException
-                .expectMessage("Test method expected at least 2 parameters but got 1 arguments in row 3");
+                .expectMessage("Varargs test method has 3 parameters but got only 1 arguments in row 3");
 
         // When:
         underTest.convert(data, true, parameterTypes, context, 3);
