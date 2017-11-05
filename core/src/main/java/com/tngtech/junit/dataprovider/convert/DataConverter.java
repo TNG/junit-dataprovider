@@ -34,8 +34,8 @@ public class DataConverter {
      *            converting {@code String[]})
      * @return converted data as {@link List}{@code <}{@link Object}{@code []>} with the required {@code parameterTypes}
      * @throws NullPointerException if and only if given {@code parameterTypes} are {@code null}
-     * @throws IllegalArgumentException if and only if given {@code parameterTypes} is empty
-     * @throws IllegalStateException if and only if given {@code config} is {@code null} but data is {@code String[]}
+     * @throws IllegalArgumentException if and only if given {@code parameterTypes} are empty
+     * @throws IllegalStateException if and only if given {@code context} is {@code null} but data is {@code String[]}
      * @throws ClassCastException if and only if {@code data} is not a compatible type
      */
     public List<Object[]> convert(Object data, boolean isVarargs, Class<?>[] parameterTypes, ConverterContext context) {

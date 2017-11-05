@@ -11,8 +11,8 @@ public class SingleArgConverter extends AbstractObjectConverter<Object> {
      * @param isVarargs determines whether test method has a varargs parameter
      * @param parameterTypes target types of parameters
      * @return {@code Object[]} which is converted and checked
-     * @throws IllegalArgumentException if and only if the parameter size does not fit, this is tried on varargs method
-     *             or there is a type mismatch
+     * @throws IllegalArgumentException if and only if the parameter size does not fit, test method has varargs, or
+     *             there is a type mismatch
      */
     @Override
     public Object[] convert(Object data, boolean isVarargs, Class<?>[] parameterTypes) {

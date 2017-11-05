@@ -21,16 +21,15 @@ public abstract class AbstractObjectConverter<V> {
 
     /**
      * Checks if the types of the given {@code arguments} matches the given test methods {@code parameterTypes} and
-     * throws an {@link Error} if not.
+     * throws an {@link IllegalArgumentException} if not.
      * <p>
      * This method is package private (= visible) for testing.
      * </p>
      *
      * @param arguments the arguments to be used for each test method to be executed
      * @param parameterTypes test method parameter types (from {@link Method#getParameterTypes()})
-     * @throws NullPointerException if and only if given {@code parameterTypes} or {@code settings} are {@code null}
-     * @throws IllegalArgumentException if and only if test methods parameter types does not match the given
-     *             {@code arguments}
+     * @throws NullPointerException if and only if given {@code arguments} or {@code parameterTypes} are {@code null}
+     * @throws IllegalArgumentException if and only if the {@code arguments} does not match the given parameter types
      */
     protected void checkIfArgumentsMatchParameterTypes(Object[] arguments, Class<?>[] parameterTypes) {
         checkNotNull(arguments, "'arguments' must not be null");

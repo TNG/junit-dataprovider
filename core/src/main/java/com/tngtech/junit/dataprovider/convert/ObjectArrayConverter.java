@@ -11,7 +11,7 @@ public class ObjectArrayConverter extends AbstractObjectConverter<Object[]> {
      * @param isVarargs determines whether test method has a varargs parameter
      * @param parameterTypes target types of parameters
      * @return {@code Object[]} which is converted for varargs support and checked against {@code parameterTypes}
-     * @throws IllegalArgumentException if and only if the data does not fit the varargs array component type
+     * @throws IllegalArgumentException if and only if the data does not fit the {@code parameterTypes}
      */
     @Override
     public Object[] convert(Object[] data, boolean isVarargs, Class<?>[] parameterTypes) {
