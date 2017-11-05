@@ -12,7 +12,7 @@ public class StringConverter {
      * provided information.
      *
      * @param data regex-separated {@link String} of arguments for test method
-     * @param isVarArgs determines whether test method has a varargs parameter
+     * @param isVarargs determines whether test method has a varargs parameter
      * @param parameterTypes target types of parameters to which corresponding values in regex-separated {@code data}
      *            should be converted
      * @param context containing settings which should be used to convert given {@code data}
@@ -21,12 +21,12 @@ public class StringConverter {
      * @throws IllegalArgumentException if and only if count of split data and parameter types does not match or
      *             argument cannot be converted to required type
      */
-    public Object[] convert(String data, boolean isVarArgs, Class<?>[] parameterTypes, ConverterContext context, int rowIdx) {
+    public Object[] convert(String data, boolean isVarargs, Class<?>[] parameterTypes, ConverterContext context, int rowIdx) {
         if (data == null) {
             return new Object[] { null };
         }
         if (parameterTypes.length == 1) {
-            if (isVarArgs) {
+            if (isVarargs) {
                 if (data.isEmpty()) {
                     return new Object[] { Array.newInstance(parameterTypes[0].getComponentType(), 0) };
                 }
@@ -37,9 +37,9 @@ public class StringConverter {
 
         String[] splitData = splitBy(data, context.getSplitBy());
 
-        checkArgumentsAndParameterCount(splitData.length, parameterTypes.length, isVarArgs, rowIdx);
+        checkArgumentsAndParameterCount(splitData.length, parameterTypes.length, isVarargs, rowIdx);
 
-        return convert(splitData, isVarArgs, parameterTypes, context);
+        return convert(splitData, isVarargs, parameterTypes, context);
     }
 
     protected String[] splitBy(String data, String regex) {
@@ -53,31 +53,31 @@ public class StringConverter {
         return splitData;
     }
 
-    protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
-        if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount < argCount)) {
+    protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarargs, int rowIdx) {
+        if ((isVarargs && paramCount - 1 > argCount) || (!isVarargs && paramCount < argCount)) {
             throw new IllegalArgumentException(
                     String.format("%sest method has %d parameters but got %s%d arguments in row %d",
-                            (isVarArgs) ? "Varargs t" : "T", paramCount, (isVarArgs) ? "only " : "", argCount, rowIdx));
+                            (isVarargs) ? "Varargs t" : "T", paramCount, (isVarargs) ? "only " : "", argCount, rowIdx));
         }
     }
 
-    private Object[] convert(String[] splitData, boolean isVarArgs, Class<?>[] parameterTypes, ConverterContext context) {
-        Object[] result= new Object[(isVarArgs) ? parameterTypes.length : splitData.length];
+    private Object[] convert(String[] splitData, boolean isVarargs, Class<?>[] parameterTypes, ConverterContext context) {
+        Object[] result= new Object[(isVarargs) ? parameterTypes.length : splitData.length];
 
-        int nonVarArgParametersLength = (isVarArgs) ? parameterTypes.length - 1 : splitData.length;
-        for (int idx = 0; idx < nonVarArgParametersLength; idx++) {
+        int nonVarargParametersLength = (isVarargs) ? parameterTypes.length - 1 : splitData.length;
+        for (int idx = 0; idx < nonVarargParametersLength; idx++) {
             result[idx] = convertValue(splitData[idx], parameterTypes[idx], context);
         }
 
-        if (isVarArgs) {
-            Class<?> varArgComponentType = parameterTypes[nonVarArgParametersLength].getComponentType();
+        if (isVarargs) {
+            Class<?> varargComponentType = parameterTypes[nonVarargParametersLength].getComponentType();
 
-            Object varArgArray = Array.newInstance(varArgComponentType, splitData.length - parameterTypes.length + 1);
-            for (int idx = nonVarArgParametersLength; idx < splitData.length; idx++) {
-                Array.set(varArgArray, idx - nonVarArgParametersLength,
-                        convertValue(splitData[idx], varArgComponentType, context));
+            Object varargArray = Array.newInstance(varargComponentType, splitData.length - parameterTypes.length + 1);
+            for (int idx = nonVarargParametersLength; idx < splitData.length; idx++) {
+                Array.set(varargArray, idx - nonVarargParametersLength,
+                        convertValue(splitData[idx], varargComponentType, context));
             }
-            result[nonVarArgParametersLength] = varArgArray;
+            result[nonVarargParametersLength] = varargArray;
         }
         return result;
     }

@@ -9,8 +9,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class ObjectArrayConverter extends com.tngtech.junit.dataprovider.convert.ObjectArrayConverter {
 
     @Override
-    public Object[] convert(Object[] data, boolean isVarArgs, Class<?>[] parameterTypes) {
-        return super.convert(data, isVarArgs, parameterTypes);
+    public Object[] convert(Object[] data, boolean isVarargs, Class<?>[] parameterTypes) {
+        return super.convert(data, isVarargs, parameterTypes);
     }
 
     @Override

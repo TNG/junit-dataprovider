@@ -9,10 +9,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class SingleArgConverter extends com.tngtech.junit.dataprovider.convert.SingleArgConverter {
 
     @Override
-    public Object[] convert(Object data, boolean isVarArgs, Class<?>[] parameterTypes) {
+    public Object[] convert(Object data, boolean isVarargs, Class<?>[] parameterTypes) {
         checkArgument(parameterTypes.length == 1, "Object[] dataprovider just supports single argument test method but found %d parameters",
                 parameterTypes.length);
-        return super.convert(data, isVarArgs, parameterTypes);
+        return super.convert(data, isVarargs, parameterTypes);
     }
 
     @Override

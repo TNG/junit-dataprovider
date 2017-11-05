@@ -10,7 +10,7 @@ public abstract class AbstractObjectConverter<V>
         extends com.tngtech.junit.dataprovider.convert.AbstractObjectConverter<V> {
 
     @Override
-    public abstract Object[] convert(V data, boolean isVarArgs, Class<?>[] parameterTypes);
+    public abstract Object[] convert(V data, boolean isVarargs, Class<?>[] parameterTypes);
 
     @Override
     protected void checkIfArgumentsMatchParameterTypes(Object[] arguments, Class<?>[] parameterTypes) {

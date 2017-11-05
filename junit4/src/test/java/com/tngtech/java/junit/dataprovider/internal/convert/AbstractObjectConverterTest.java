@@ -13,7 +13,7 @@ public class AbstractObjectConverterTest extends BaseTest {
     @InjectMocks
     private final AbstractObjectConverter<Object[]> underTest = new AbstractObjectConverter<Object[]>() {
         @Override
-        public Object[] convert(Object[] data, boolean isVarArgs, Class<?>[] parameterTypes) {
+        public Object[] convert(Object[] data, boolean isVarargs, Class<?>[] parameterTypes) {
             return null;
         }
     };

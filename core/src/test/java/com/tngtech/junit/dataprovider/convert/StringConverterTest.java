@@ -50,7 +50,7 @@ public class StringConverterTest {
     }
 
     @Test
-    public void testConvertShouldThrowExceptionIfNumberOfArgumentsIsGreaterThanNumberOfParameterTypesOnNonVarArgMethod() {
+    public void testConvertShouldThrowExceptionIfNumberOfArgumentsIsGreaterThanNumberOfParameterTypesOnNonVarargMethod() {
         // Given:
         String data = "1, 2, 3";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, int.class };

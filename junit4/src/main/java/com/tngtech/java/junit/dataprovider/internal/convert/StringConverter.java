@@ -17,7 +17,7 @@ public class StringConverter extends com.tngtech.junit.dataprovider.convert.Stri
      * provided information.
      *
      * @param data regex-separated {@link String} of parameters for test method
-     * @param isVarArgs determines whether test method has a varargs parameter
+     * @param isVarargs determines whether test method has a varargs parameter
      * @param parameterTypes target types of parameters to which corresponding values in regex-separated {@code data}
      *            should be converted
      * @param dataProvider containing settings which should be used to convert given {@code data}
@@ -26,11 +26,11 @@ public class StringConverter extends com.tngtech.junit.dataprovider.convert.Stri
      * @throws IllegalArgumentException iif count of split data and parameter types does not match or argument cannot be
      *             converted to required type
      */
-    public Object[] convert(String data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider,
+    public Object[] convert(String data, boolean isVarargs, Class<?>[] parameterTypes, DataProvider dataProvider,
             int rowIdx) {
         ConverterContext context = new ConverterContext(dataProvider.splitBy(), dataProvider.convertNulls(),
                 dataProvider.trimValues(), dataProvider.ignoreEnumCase());
-        return super.convert(data, isVarArgs, parameterTypes, context, rowIdx);
+        return super.convert(data, isVarargs, parameterTypes, context, rowIdx);
     }
 
     @Override
@@ -39,13 +39,13 @@ public class StringConverter extends com.tngtech.junit.dataprovider.convert.Stri
     }
 
     @Override
-    protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
-        if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount != argCount)) {
+    protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarargs, int rowIdx) {
+        if ((isVarargs && paramCount - 1 > argCount) || (!isVarargs && paramCount != argCount)) {
             throw new IllegalArgumentException(
                     String.format("Test method expected %s%d parameters but got %d arguments in row %d",
-                            (isVarArgs) ? "at least " : "", paramCount - (isVarArgs ? 1 : 0), argCount, rowIdx));
+                            (isVarargs) ? "at least " : "", paramCount - (isVarargs ? 1 : 0), argCount, rowIdx));
         }
-        super.checkArgumentsAndParameterCount(argCount, paramCount, isVarArgs, rowIdx);
+        super.checkArgumentsAndParameterCount(argCount, paramCount, isVarargs, rowIdx);
     }
 
     @Override
