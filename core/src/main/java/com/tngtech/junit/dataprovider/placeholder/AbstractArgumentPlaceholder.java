@@ -32,6 +32,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
 
+    protected static final class FromAndTo {
+        protected final int from;
+        protected final int to;
+        protected FromAndTo(int from, int to) {
+            this.from = from;
+            this.to = to;
+        }
+    }
+
     /**
      * {@link String} representation of {@code null}
      */
@@ -49,6 +58,34 @@ abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
 
     AbstractArgumentPlaceholder(String placeholderRegex) {
         super(placeholderRegex);
+    }
+
+    /**
+     * @param placeholder containing the subscript
+     * @param subscriptStartIndex starting index of first subscript inner digit (to parse part within {@code []})
+     * @param argumentCount used to apply the parsed subscript values and derive real {@code from} and {@code to}
+     * @return the wrapped {@link FromAndTo} for the subscript contained in given {@code placeholder} starting at given
+     *         position {@code subscriptStartIndex} and applied on the given {@code argumentCount}
+     */
+    FromAndTo calcFromAndToForSubscriptAndArguments(String placeholder, int subscriptStartIndex,
+            int argumentCount) {
+        String subscript = placeholder.substring(subscriptStartIndex, placeholder.length() - 1);
+
+        int from = Integer.MAX_VALUE;
+        int to = Integer.MIN_VALUE;
+        if (subscript.contains("..")) {
+            String[] split = subscript.split("\\.\\.");
+
+            from = Integer.parseInt(split[0]);
+            to = Integer.parseInt(split[1]);
+        } else {
+            from = Integer.parseInt(subscript);
+            to = from;
+        }
+
+        from = (from >= 0) ? from : argumentCount + from;
+        to = (to >= 0) ? to + 1 : argumentCount + to + 1;
+        return new FromAndTo(from, to);
     }
 
     @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification = "false positive if 'param.toString()' returns 'null'")

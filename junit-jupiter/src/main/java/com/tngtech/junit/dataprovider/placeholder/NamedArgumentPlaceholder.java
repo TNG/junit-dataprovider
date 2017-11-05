@@ -23,24 +23,9 @@ public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
 
     @Override
     protected String getReplacementFor(String placeholder, ReplacementData data) {
-        String subscript = placeholder.substring(4, placeholder.length() - 1);
-
-        int from = Integer.MAX_VALUE;
-        int to = Integer.MIN_VALUE;
-        if (subscript.contains("..")) {
-            String[] split = subscript.split("\\.\\.");
-
-            from = Integer.parseInt(split[0]);
-            to = Integer.parseInt(split[1]);
-        } else {
-            from = Integer.parseInt(subscript);
-            to = from;
-        }
-
-        List<Object> arguments = data.getArguments();
-        from = (from >= 0) ? from : arguments.size() + from;
-        to = (to >= 0) ? to + 1 : arguments.size() + to + 1;
-        return formatAll(getSubArrayOfMethodParameters(data.getTestMethod(), from, to), arguments.subList(from, to));
+        FromAndTo fromAndTo = calcFromAndToForSubscriptAndArguments(placeholder, 4, data.getArguments().size());
+        return formatAll(getSubArrayOfMethodParameters(data.getTestMethod(), fromAndTo),
+                data.getArguments().subList(fromAndTo.from, fromAndTo.to));
     }
 
     /**
@@ -65,7 +50,7 @@ public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
         return stringBuilder.toString();
     }
 
-    private Parameter[] getSubArrayOfMethodParameters(Method testMethod, int fromIndex, int toIndex) {
+    private Parameter[] getSubArrayOfMethodParameters(Method testMethod, FromAndTo fromAndTo) {
         Parameter[] parameters = testMethod.getParameters();
         if (parameters.length > 0 && !parameters[0].isNamePresent()) {
             logger.warning(String.format("Parameter names on method '%s' are not available"
@@ -73,6 +58,6 @@ public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
                     + ". See also https://docs.oracle.com/javase/tutorial/reflect/member/methodparameterreflection.html",
                     testMethod));
         }
-        return Arrays.copyOfRange(parameters, fromIndex, toIndex);
+        return Arrays.copyOfRange(parameters, fromAndTo.from, fromAndTo.to);
     }
 }
