@@ -46,10 +46,9 @@ public class SingleArgConverterTest extends BaseTest {
         Class<?>[] parameterTypes = new Class<?>[] { double.class };
 
         // When:
-        Object[] result = underTest.convert(data, true, parameterTypes);
+        underTest.convert(data, true, parameterTypes);
 
-        // Then:
-        assertThat(result).containsExactly(new int[0]);
+        // Then: expect exception
     }
 
     @Test
