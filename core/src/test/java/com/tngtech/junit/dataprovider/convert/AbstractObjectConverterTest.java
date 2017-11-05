@@ -47,19 +47,31 @@ public class AbstractObjectConverterTest {
     }
 
     @Test
-    public void testCheckIfArgumentsMatchParameterTypesShouldThrowIllegalArgumentExceptionIfLengthOfArgumentsAndParameterTypesDoesNotMatch() {
+    public void testCheckIfArgumentsMatchParameterTypesShouldThrowIllegalArgumentExceptionIfMoreArgumentsThanParametersAreGiven() {
         // Given:
-        Object[] arguments = new Object[0];
+        Object[] arguments = new Object[] { 0, "b", false, 'd' };
         Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException
-                .expectMessage("Expected 0 arguments for test method but got 3 parameters.");
+                .expectMessage("Expected at most 3 arguments for test method but got 4.");
 
         // When:
         underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
 
         // Then: expect exception
+    }
+
+    @Test
+    public void testCheckIfArgumentsMatchParameterTypesShouldEndWithoutFailureIfLengthOfArgumentsIsSmallerThanParameterTypes() {
+        // Given:
+        Object[] arguments = new Object[0];
+        Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, boolean.class };
+
+        // When:
+        underTest.checkIfArgumentsMatchParameterTypes(arguments, parameterTypes);
+
+        // Then: no exception expected
     }
 
     @Test

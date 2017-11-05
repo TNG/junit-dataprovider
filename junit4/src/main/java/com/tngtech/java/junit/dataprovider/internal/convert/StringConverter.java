@@ -40,6 +40,11 @@ public class StringConverter extends com.tngtech.junit.dataprovider.convert.Stri
 
     @Override
     protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
+        if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount != argCount)) {
+            throw new IllegalArgumentException(
+                    String.format("Test method expected %s%d parameters but got %d arguments in row %d",
+                            (isVarArgs) ? "at least " : "", paramCount - (isVarArgs ? 1 : 0), argCount, rowIdx));
+        }
         super.checkArgumentsAndParameterCount(argCount, paramCount, isVarArgs, rowIdx);
     }
 

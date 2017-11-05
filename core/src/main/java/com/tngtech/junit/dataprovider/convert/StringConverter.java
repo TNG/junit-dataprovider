@@ -54,17 +54,17 @@ public class StringConverter {
     }
 
     protected void checkArgumentsAndParameterCount(int argCount, int paramCount, boolean isVarArgs, int rowIdx) {
-        if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount != argCount)) {
+        if ((isVarArgs && paramCount - 1 > argCount) || (!isVarArgs && paramCount < argCount)) {
             throw new IllegalArgumentException(
-                    String.format("Test method expected %s%d parameters but got %d arguments in row %d",
-                            (isVarArgs) ? "at least " : "", paramCount - (isVarArgs ? 1 : 0), argCount, rowIdx));
+                    String.format("%sest method has %d parameters but got %s%d arguments in row %d",
+                            (isVarArgs) ? "Varargs t" : "T", paramCount, (isVarArgs) ? "only " : "", argCount, rowIdx));
         }
     }
 
     private Object[] convert(String[] splitData, boolean isVarArgs, Class<?>[] parameterTypes, ConverterContext context) {
-        Object[] result = new Object[parameterTypes.length];
+        Object[] result= new Object[(isVarArgs) ? parameterTypes.length : splitData.length];
 
-        int nonVarArgParametersLength = parameterTypes.length - ((isVarArgs) ? 1 : 0);
+        int nonVarArgParametersLength = (isVarArgs) ? parameterTypes.length - 1 : splitData.length;
         for (int idx = 0; idx < nonVarArgParametersLength; idx++) {
             result[idx] = convertValue(splitData[idx], parameterTypes[idx], context);
         }

@@ -15,19 +15,19 @@ public class ObjectArrayConverter extends AbstractObjectConverter<Object[]> {
      */
     @Override
     public Object[] convert(Object[] data, boolean isVarArgs, Class<?>[] parameterTypes) {
-        Object[] result = new Object[parameterTypes.length];
-
-        int lastArgIdx = parameterTypes.length - 1;
-        for (int idx = 0; idx < lastArgIdx; idx++) {
-            result[idx] = data[idx];
-        }
-
+        Object[] result;
         if (isVarArgs) {
-            result[lastArgIdx] = convertVarArgArgument(data, parameterTypes[lastArgIdx].getComponentType(), lastArgIdx);
-        } else {
-            result[lastArgIdx] = data[data.length - 1];
-        }
+            result = new Object[parameterTypes.length];
 
+            int lastArgIdx = parameterTypes.length - 1;
+            for (int idx = 0; idx < lastArgIdx; idx++) {
+                result[idx] = data[idx];
+            }
+            result[lastArgIdx] = convertVarArgArgument(data, parameterTypes[lastArgIdx].getComponentType(), lastArgIdx);
+
+        } else {
+            result = data;
+        }
         checkIfArgumentsMatchParameterTypes(result, parameterTypes);
         return result;
     }

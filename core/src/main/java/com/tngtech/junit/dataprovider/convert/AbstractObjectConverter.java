@@ -35,9 +35,8 @@ public abstract class AbstractObjectConverter<V> {
     protected void checkIfArgumentsMatchParameterTypes(Object[] arguments, Class<?>[] parameterTypes) {
         checkNotNull(arguments, "'arguments' must not be null");
         checkNotNull(parameterTypes, "'testMethod' must not be null");
-        checkArgument(parameterTypes.length == arguments.length,
-                "Expected %d arguments for test method but got %d parameters.", arguments.length,
-                parameterTypes.length);
+        checkArgument(parameterTypes.length >= arguments.length,
+                "Expected at most %d arguments for test method but got %d.", parameterTypes.length, arguments.length);
 
         for (int idx = 0; idx < arguments.length; idx++) {
             Object object = arguments[idx];
