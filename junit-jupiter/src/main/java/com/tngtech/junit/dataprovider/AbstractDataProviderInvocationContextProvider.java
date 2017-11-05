@@ -23,6 +23,7 @@ import com.tngtech.junit.dataprovider.placeholder.BasePlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.CanonicalClassNamePlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.CompleteMethodSignaturePlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.IndexPlaceholder;
+import com.tngtech.junit.dataprovider.placeholder.NamedArgumentPlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.SimpleClassNamePlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.SimpleMethodNamePlaceholder;
 
@@ -92,6 +93,7 @@ abstract class AbstractDataProviderInvocationContextProvider<TEST_ANNOTATION ext
         result.add(new CanonicalClassNamePlaceholder()); // must be before SimpleClassNamePlaceholder
         result.add(new CompleteMethodSignaturePlaceholder()); // must be before SimpleClassNamePlaceholder
         result.add(new IndexPlaceholder());
+        result.add(new NamedArgumentPlaceholder());
         result.add(new SimpleClassNamePlaceholder());
         result.add(new SimpleMethodNamePlaceholder());
         return result;
