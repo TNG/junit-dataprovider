@@ -10,12 +10,15 @@ import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestReporter;
-import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.UseDataProvider;
+import com.tngtech.junit.dataprovider.UseDataProviderExtension;
 
-class TestMethodParameterAcceptanceTest {
+@ExtendWith(UseDataProviderExtension.class)
+class DataproviderMethodParameterAcceptanceTest {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
@@ -41,7 +44,7 @@ class TestMethodParameterAcceptanceTest {
         return new Object[][] { { testDataFile } };
     }
 
-    @ParameterizedTest
+    @TestTemplate
     @UseDataProvider("loadFromExternalFile")
     @ExternalFile(format = ExternalFile.Format.CSV, value = "testdata.csv")
     void testThatUsesUniversalDataProvider(String testData) {

@@ -71,7 +71,7 @@ public class DataConverter extends com.tngtech.junit.dataprovider.convert.DataCo
      * For compatible types, see {@link #canConvert(Type)}.
      *
      * @param data to be converted
-     * @param isVarArgs determines whether test method has a varargs parameter
+     * @param isVarargs determines whether test method has a varargs parameter
      * @param parameterTypes required types for {@code data}
      * @param dataProvider containing settings which should be used to convert given {@code data}
      * @return converted data as {@link List}{@code <}{@link Object}{@code []>} with the required {@code parameterTypes}
@@ -79,13 +79,13 @@ public class DataConverter extends com.tngtech.junit.dataprovider.convert.DataCo
      * @throws IllegalArgumentException iif given {@code parameterTypes} is empty
      * @throws ClassCastException iif {@code data} is not a compatible type
      */
-    public List<Object[]> convert(Object data, boolean isVarArgs, Class<?>[] parameterTypes, DataProvider dataProvider) {
+    public List<Object[]> convert(Object data, boolean isVarargs, Class<?>[] parameterTypes, DataProvider dataProvider) {
         checkNotNull(dataProvider, "dataProvider must not be null");
 
         ConverterContext context = new ConverterContext(objectArrayConverter, singleArgConverter, stringConverter,
                 dataProvider.splitBy(), dataProvider.convertNulls(), dataProvider.trimValues(),
                 dataProvider.ignoreEnumCase());
-        return super.convert(data, isVarArgs, parameterTypes, context);
+        return super.convert(data, isVarargs, parameterTypes, context);
     }
 
     private boolean canConvertIterableOf(ParameterizedType parameterizedType) {

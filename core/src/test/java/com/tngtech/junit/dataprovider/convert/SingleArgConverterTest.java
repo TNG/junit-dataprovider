@@ -27,7 +27,7 @@ public class SingleArgConverterTest {
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage(
-                "Object[] dataprovider just supports single argument test method but found 0 parameters");
+                "Object[] dataprovider must at least have a single argument for the dataprovider but found no parameters");
 
         // When:
         underTest.convert(data, false, parameterTypes);
@@ -36,19 +36,16 @@ public class SingleArgConverterTest {
     }
 
     @Test
-    public void testConvertShouldThrowIllegalArgumentExceptionIfParameterTypesSizeGreaterThanOne() {
+    public void testConvertShouldReturnArgumentIfParameterTypesSizeIsEvenGreaterThanOne() {
         // Given:
-        Object data = 2L;
-        Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class, Long.class };
-
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(
-                "Object[] dataprovider just supports single argument test method but found 3 parameters");
+        Object data = 2;
+        Class<?>[] parameterTypes = new Class<?>[] { long.class, String.class, Long.class };
 
         // When:
-        underTest.convert(data, false, parameterTypes);
+        Object[] result = underTest.convert(data, false, parameterTypes);
 
-        // Then: expect exception
+        // Then:
+        assertThat(result).containsExactly(data);
     }
 
     @Test
@@ -58,14 +55,12 @@ public class SingleArgConverterTest {
         Class<?>[] parameterTypes = new Class<?>[] { double.class };
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException
-                .expectMessage("Object[] dataprovider and single parameter test method does not support varargs");
+        expectedException.expectMessage("Object[] dataprovider does not support varargs");
 
         // When:
-        Object[] result = underTest.convert(data, true, parameterTypes);
+        underTest.convert(data, true, parameterTypes);
 
-        // Then:
-        assertThat(result).containsExactly(new int[0]);
+        // Then: expect exception
     }
 
     @Test
