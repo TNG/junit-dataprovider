@@ -58,9 +58,9 @@ abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
 
         } else if (param.getClass().isArray()) {
             if (param.getClass().getComponentType().isPrimitive()) {
-                return formatValuesOfPrimitiveArray(param);
+                return formatPrimitiveArray(param);
             }
-            return "[" + formatValuesOfArray((Object[]) param) + "]";
+            return "[" + formatArray((Object[]) param) + "]";
 
         } else if (param instanceof String && ((String) param).isEmpty()) {
             return STRING_EMPTY;
@@ -80,7 +80,7 @@ abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
         return replaceNonPrintableChars(result, STRING_NON_PRINTABLE);
     }
 
-    private String formatValuesOfPrimitiveArray(Object primitiveArray) {
+    private String formatPrimitiveArray(Object primitiveArray) {
         Class<?> componentType = primitiveArray.getClass().getComponentType();
 
         if (boolean.class.equals(componentType)) {
@@ -110,7 +110,7 @@ abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
         throw new IllegalStateException("Called 'formatPrimitiveArray' on non-primitive array");
     }
 
-    private String formatValuesOfArray(Object[] array) {
+    private String formatArray(Object[] array) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < array.length; i++) {
             stringBuilder.append(format(array[i]));

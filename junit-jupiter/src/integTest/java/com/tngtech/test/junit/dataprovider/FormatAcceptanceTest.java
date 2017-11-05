@@ -2,6 +2,7 @@ package com.tngtech.test.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -53,8 +54,10 @@ class FormatAcceptanceTest {
 
     @TestTemplate
     @UseDataProvider
-    void testDivide(int dividend, int divisor, int result) {
+    void testDivide(int dividend, int divisor, int result, TestInfo testInfo) {
         // Expect:
         assertThat(dividend / divisor).isEqualTo(result);
+        assertThat(testInfo.getDisplayName())
+                .endsWith(String.format("dividend=%d, divisor=%d, result=%d", dividend, divisor, result));
     }
 }

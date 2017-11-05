@@ -37,10 +37,10 @@ public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
             to = from;
         }
 
-        List<Object> namedArguments = data.getArguments();
-        from = (from >= 0) ? from : namedArguments.size() + from;
-        to = (to >= 0) ? to + 1 : namedArguments.size() + to + 1;
-        return formatAll(getSubArrayOfMethodParameters(data.getTestMethod(), from, to), namedArguments.subList(from, to));
+        List<Object> arguments = data.getArguments();
+        from = (from >= 0) ? from : arguments.size() + from;
+        to = (to >= 0) ? to + 1 : arguments.size() + to + 1;
+        return formatAll(getSubArrayOfMethodParameters(data.getTestMethod(), from, to), arguments.subList(from, to));
     }
 
     /**
@@ -56,6 +56,7 @@ public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
         for (int idx = 0; idx < arguments.size(); idx++) {
             String parameterName = (parameters.length > idx) ? parameters[idx].getName() : "?";
             Object argument = arguments.get(idx);
+
             stringBuilder.append(parameterName).append("=").append(format(argument));
             if (idx < arguments.size() - 1) {
                 stringBuilder.append(", ");
