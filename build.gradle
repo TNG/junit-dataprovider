@@ -157,7 +157,7 @@ project(':junit-jupiter') {
 
 project(':junit-jupiter-params') {
     archivesBaseName = 'junit-jupiter-params-dataprovider'
-    description = 'A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is partly compatible to JUnit4 dataprovider.'
+    description = 'A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider.'
 
     dependencies {
         compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
@@ -329,11 +329,22 @@ subprojects {
                         }
                     }
                     whenConfigured { pom ->
+                        // JUnit4
                         pom.dependencies.findAll{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit' &&
                                 dep.scope == 'compile' }.each{ dep ->
                             dep.version = '[4.8.2,4.12]'
                             dep.scope = 'provided'
                         }
+                        // JUnit5
+                        pom.dependencies.findAll{ dep ->
+                                ((dep.groupId == 'org.junit.jupiter' && dep.artifactId == 'junit-jupiter-engine') ||
+                                (dep.groupId == 'org.junit.jupiter' && dep.artifactId == 'junit-jupiter-params')) &&
+                                    dep.scope == 'compile'
+                                }.each{ dep ->
+                            dep.version = '[5.0.0-M6,6.0.0)'
+                            dep.scope = 'provided'
+                        }
+                        // Remove all other dependencies
                         pom.dependencies.removeAll{ dep -> dep.scope in [ 'compile', 'test' ] &&
                                 !(dep.groupId == 'com.tngtech.junit.dataprovider' && dep.artifactId == 'junit-dataprovider-core') }
                     }
