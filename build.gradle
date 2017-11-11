@@ -46,7 +46,7 @@ subprojects {
     apply plugin: 'osgi'
 
     group = 'com.tngtech.junit.dataprovider'
-    version = '2.0-SNAPSHOT'
+    version = '2.0'
 }
 
 project(':core') {
