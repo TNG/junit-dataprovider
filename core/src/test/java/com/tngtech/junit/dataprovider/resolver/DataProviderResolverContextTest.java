@@ -16,6 +16,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.tngtech.junit.dataprovider.convert.SingleArgConverter;
+import com.tngtech.junit.dataprovider.convert.StringConverter;
 import com.tngtech.junit.dataprovider.testutils.Methods;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -33,6 +35,54 @@ public class DataProviderResolverContextTest {
     private final List<Class<?>> locations = asList(this.getClass(), DataProviderResolverContext.class);
     private final Class<? extends Annotation> dataProviderAnnotationClass = CheckReturnValue.class;
     private final String dataProviderName = "dataProviderName";
+
+    @Test
+    public void testGenerateLocationsShouldThrowNullPointerExceptionIfTestClassIsNull() throws Exception {
+        // Given:
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("'testClass' must not be null");
+
+        // When:
+        DataProviderResolverContext.generateLocations(null);
+
+        // Then: expect exception
+    }
+
+    @Test
+    public void testGenerateLocationsShouldReturnExplicitLocationsIfNotNull() throws Exception {
+        // Given:
+        Class<?>[] explicitLocations = { SingleArgConverter.class, StringConverter.class };
+
+        // When:
+        List<Class<?>> result = DataProviderResolverContext.generateLocations(this.getClass(), explicitLocations);
+
+        // Then:
+        assertThat(result).containsExactly(explicitLocations);
+    }
+
+    @Test
+    public void testGenerateLocationsShouldReturnTestClassIfExplicitLocationsAreNull() throws Exception {
+        // Given:
+        Class<?>[] explicitLocations = null;
+
+        // When:
+        List<Class<?>> result = DataProviderResolverContext.generateLocations(this.getClass(), explicitLocations);
+
+        // Then:
+        assertThat(result).containsOnly(this.getClass());
+    }
+
+    @Test
+    public void testGenerateLocationsShouldReturnTestClassIfExplicitLocationsAreEmpty() throws Exception {
+        // Given:
+        Class<?>[] explicitLocations = {};
+
+        // When:
+        List<Class<?>> result = DataProviderResolverContext.generateLocations(this.getClass(), explicitLocations);
+
+        // Then:
+        assertThat(result).containsOnly(this.getClass());
+    }
 
     @Test
     public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfTestMethodIsNull() {

@@ -6,6 +6,7 @@ import static java.util.Collections.unmodifiableList;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +22,25 @@ public class DataProviderResolverContext {
      */
     public static final String METHOD_NAME_TO_USE_CONVENTION = "<use_convention>";
 
+    /**
+     * Picks the locations from given explicit locations or falls back on given test class if no explicit locations are
+     * provided.
+     *
+     * @param testClass which is currently executed
+     * @param explicitLocations which are provided by the writer of the test case e.g. via annotation
+     * @return {@link List} of locations taken from given {@code explicitLocations} or {@code testClass} otherwise
+     * @throws NullPointerException if {@code testClass} is {@code null}
+     */
+    public static List<Class<?>> generateLocations(Class<?> testClass, Class<?>... explicitLocations) {
+        checkNotNull(testClass, "'testClass' must not be null");
+        if (explicitLocations == null || explicitLocations.length == 0) {
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            List<Class<?>> result = (List) Arrays.asList(testClass);
+            return result;
+        }
+        return Arrays.asList(explicitLocations);
+    }
+
     private final Method testMethod;
 
     private final List<Class<? extends DataProviderMethodResolver>> resolverClasses;
@@ -30,16 +50,17 @@ public class DataProviderResolverContext {
     private final Class<? extends Annotation> dataProviderAnnotationClass;
     private final String dataProviderName;
 
+    // TODO refactor above ... whats a good solution?
     /**
      * @param testMethod for which a dataprovider should be resolved
      * @param resolverClasses to use for resolving dataproviders
      * @param resolveStrategy used to determine if only first match or all matches should be returned
-     * @param locations where to search for potential dataproviders; if empty, test methods declaring class will be used
+     * @param locations where to search for potential dataproviders, use {@link #generateLocations(Class, Class...)} to
+     *            set properly; leaving empty is <b>deprecated</b> but uses test methods declaring class
      * @param dataProviderAnnotationClass used to identify methods as dataproviders
      * @param dataProviderName used to find matching dataproviders or {@link #METHOD_NAME_TO_USE_CONVENTION} if a method
      *            name should be derived via convention
      * @throws NullPointerException if one of the given arguments is {@code null}
-     *
      */
     public DataProviderResolverContext(Method testMethod,
             List<Class<? extends DataProviderMethodResolver>> resolverClasses, ResolveStrategy resolveStrategy,

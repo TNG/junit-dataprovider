@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.UseDataProvider;
 import com.tngtech.junit.dataprovider.UseDataProviderExtension;
 
@@ -14,7 +15,19 @@ class OverridingAcceptanceTest extends ToBeOverriddenAcceptanceTest {
     @Override
     @TestTemplate
     @UseDataProvider
-    void test(String one) {
+    void testBase(String one) {
         assertThat(one).isEqualTo("1");
     }
+
+    @TestTemplate
+    @UseDataProvider("dataProviderBase")
+    public void testBaseNotOverridden(String one) {
+        assertThat(one).isEqualTo("1");
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderChild() {
+        return new Object[][] { { "1" } };
+    }
+
 }

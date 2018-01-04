@@ -1,5 +1,6 @@
 package com.tngtech.junit.dataprovider;
 
+import static com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext.generateLocations;
 import static java.util.Arrays.asList;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -21,7 +22,8 @@ public class UseDataProviderExtension extends UseDataProviderInvocationContextPr
     protected DataProviderResolverContext getDataProviderResolverContext(ExtensionContext extensionContext,
             UseDataProvider testAnnotation) {
         return new DataProviderResolverContext(extensionContext.getRequiredTestMethod(),
-                asList(testAnnotation.resolver()), testAnnotation.resolveStrategy(), asList(testAnnotation.location()),
+                asList(testAnnotation.resolver()), testAnnotation.resolveStrategy(),
+                generateLocations(extensionContext.getRequiredTestClass(), testAnnotation.location()),
                 DataProvider.class, testAnnotation.value());
     }
 
