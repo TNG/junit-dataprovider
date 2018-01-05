@@ -2,6 +2,10 @@ package com.tngtech.junit.dataprovider;
 
 import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class DataProviders {
 
     /**
@@ -72,7 +76,7 @@ public class DataProviders {
     }
 
     /**
-     * Creates a dataprovider test for each combination of elements of the two provided data providers.
+     * Creates a dataprovider test for each combination of elements of the two provided dataproviders.
      *
      * <pre>
      * <code>
@@ -90,12 +94,108 @@ public class DataProviders {
         for (Object[] row1 : rows1) {
             for (Object[] row2 : rows2) {
                 Object[] rowOut = new Object[row1.length + row2.length];
-                System.arraycopy( row1, 0, rowOut, 0, row1.length );
-                System.arraycopy( row2, 0, rowOut, row1.length, row2.length );
-                rowsOut[indexOut] = rowOut;
-                indexOut++;
+                System.arraycopy(row1, 0, rowOut, 0, row1.length);
+                System.arraycopy(row2, 0, rowOut, row1.length, row2.length);
+                rowsOut[indexOut++] = rowOut;
             }
         }
         return rowsOut;
+    }
+
+    /**
+     * Creates a dataprovider test for each combination of elements of the two provided single arg dataproviders.
+     *
+     * <pre>
+     * <code>
+     * Object[][] r = crossProduct(dataProviderMethod1, dataProviderMethod2);
+     * </code>
+     * </pre>
+     *
+     * @param rows1 of first single arg dataprovider which should be cross producted with the second
+     * @param rows2 of second single arg dataprovider which should be cross producted with the first
+     * @return an {@link Object} array array containing the cross product of the given {@code rows}
+     */
+    public static Object[][] crossProductSingleArg(Object[] rows1, Object[] rows2) {
+        Object[][] rowsOut = new Object[rows1.length * rows2.length][];
+        int indexOut = 0;
+        for (Object entry1 : rows1) {
+            for (Object entry2 : rows2) {
+                rowsOut[indexOut++] = new Object[] { entry1, entry2 };
+            }
+        }
+        return rowsOut;
+    }
+
+    /**
+     * Creates a dataprovider test for each combination of elements of the two provided {@link Iterable}s of
+     * {@link Iterable} dataproviders.
+     *
+     * <pre>
+     * <code>
+     * Object[][] r = crossProduct(iterableOfIterable1, iterableOfIterable2);
+     * </code>
+     * </pre>
+     *
+     * @param rows1 of first {@link Iterable} of {@link Iterable} which should be cross producted with the second
+     * @param rows2 of second {@link Iterable} of {@link Iterable} which should be cross producted with the first
+     * @param <T> inner type of first {@link Iterable} parameter in order to also support covariance for inner types,
+     *            e.g. {@code List<List<Integer>>}
+     * @param <V> inner type of second {@link Iterable} parameter in order to also support covariance for inner types,
+     *            e.g. {@code List<List<Integer>>}
+     * @return an {@link Object} array array containing the cross product of the given {@code rows}
+     */
+    public static <T extends Iterable<?>, V extends Iterable<?>> Object[][] crossProduct(Iterable<T> rows1,
+            Iterable<V> rows2) {
+        List<List<Object>> rowsOut = new ArrayList<List<Object>>();
+        for (Iterable<?> row1 : rows1) {
+            for (Iterable<?> row2 : rows2) {
+                rowsOut.add(concat(row1, row2));
+            }
+        }
+        return convert(rowsOut);
+    }
+
+    /**
+     * Creates a dataprovider test for each combination of elements of the two provided single arg {@link Iterable}s
+     * dataprovider.
+     *
+     * <pre>
+     * <code>
+     * Object[][] r = crossProduct(iterable1, iterable2);
+     * </code>
+     * </pre>
+     *
+     * @param rows1 of first single arg {@link Iterable} dataprovider which should be cross producted with the second
+     * @param rows2 of second single arg {@link Iterable} dataprovider which should be cross producted with the first
+     * @return an {@link Object} array array containing the cross product of the given {@code rows}
+     */
+    public static Object[][] crossProductSingleArg(Iterable<?> rows1, Iterable<?> rows2) {
+        List<List<Object>> rowsOut = new ArrayList<List<Object>>();
+        for (Object row1 : rows1) {
+            for (Object row2 : rows2) {
+                rowsOut.add(Arrays.asList(row1, row2));
+            }
+        }
+        return convert(rowsOut);
+    }
+
+    private static List<Object> concat(Iterable<?> row1, Iterable<?> row2) {
+        List<Object> outs = new ArrayList<Object>();
+        for (Object t : row1) {
+            outs.add(t);
+        }
+        for (Object v : row2) {
+            outs.add(v);
+        }
+        return outs;
+    }
+
+    private static Object[][] convert(List<List<Object>> rows) {
+        Object[][] result = new Object[rows.size()][];
+        int indexOut = 0;
+        for (List<Object> row : rows) {
+            result[indexOut++] = row.toArray();
+        }
+        return result;
     }
 }

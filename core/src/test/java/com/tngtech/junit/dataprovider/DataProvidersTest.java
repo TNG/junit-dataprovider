@@ -3,9 +3,13 @@ package com.tngtech.junit.dataprovider;
 import static com.tngtech.junit.dataprovider.DataProviders.$;
 import static com.tngtech.junit.dataprovider.DataProviders.$$;
 import static com.tngtech.junit.dataprovider.DataProviders.crossProduct;
+import static com.tngtech.junit.dataprovider.DataProviders.crossProductSingleArg;
 import static com.tngtech.junit.dataprovider.DataProviders.testForEach;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.Date;
 
 import org.junit.Rule;
@@ -160,7 +164,7 @@ public class DataProvidersTest {
     }
 
     @Test
-    public void testCrossProductShouldReturnEmptyWhenLeftSideIsEmpty() {
+    public void testCrossProductObjectArrayArrayShouldReturnEmptyWhenLeftSideIsEmpty() {
         // Given:
 
         // When:
@@ -171,7 +175,7 @@ public class DataProvidersTest {
     }
 
     @Test
-    public void testCrossProductShouldReturnEmptyWhenRightSideIsEmpty() {
+    public void testCrossProductObjectArrayArrayShouldReturnEmptyWhenRightSideIsEmpty() {
         // Given:
 
         // When:
@@ -182,7 +186,7 @@ public class DataProvidersTest {
     }
 
     @Test
-    public void testCrossProductShouldReturnTheCrossProductOfBothSides() {
+    public void testCrossProductObjectArrayArrayShouldReturnTheCrossProductOfBothSidesForOneElementArrays() {
         // Given:
 
         // When:
@@ -190,6 +194,138 @@ public class DataProvidersTest {
 
         // Then:
         assertThat(result).isEqualTo(new Object[][] { { 1, 4 }, { 1, 5 }, { 2, 4 }, { 2, 5 }, { 3, 4 }, { 3, 5 } });
+    }
+
+    @Test
+    public void testCrossProductObjectArrayArrayShouldReturnTheCrossProductOfBothSidesForMoreComplexArrays() {
+        // Given:
+
+        // When:
+        Object[][] result = crossProduct(new Object[][] { { 1, 2 }, { 3, 4 } },
+                new Object[][] { { 5, 6, 7 }, { 8, 9, 0 } });
+
+        // Then:
+        assertThat(result).isEqualTo(
+                new Object[][] { { 1, 2, 5, 6, 7 }, { 1, 2, 8, 9, 0 }, { 3, 4, 5, 6, 7 }, { 3, 4, 8, 9, 0 } });
+    }
+
+    @Test
+    public void testCrossProductSingleArgObjectArrayShouldReturnEmptyWhenLeftSideIsEmpty() {
+        // Given:
+
+        // When:
+        Object[][] result = crossProductSingleArg(new Object[] { 1, 2, 3 }, new Object[0]);
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] {});
+    }
+
+    @Test
+    public void testCrossProductSingleArgObjectArrayShouldReturnEmptyWhenRightSideIsEmpty() {
+        // Given:
+
+        // When:
+        Object[][] result = crossProductSingleArg(new Object[0], new Object[] { 1, 2, 3 });
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] {});
+    }
+
+    @Test
+    public void testCrossProductSingleArgObjectArrayShouldReturnTheCrossProductOfBothSides() {
+        // Given:
+
+        // When:
+        Object[][] result = crossProductSingleArg(new Object[] { 1, 2, 3 }, new Object[] { 4, 5 });
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] { { 1, 4 }, { 1, 5 }, { 2, 4 }, { 2, 5 }, { 3, 4 }, { 3, 5 } });
+    }
+
+    @Test
+    public void testCrossProductIterableShouldReturnEmptyWhenLeftSideIsEmpty() {
+        // Given:
+
+        // When:
+        @SuppressWarnings("unchecked")
+        Object[][] result = crossProduct(asList(asList(1), asList(2), asList(3)),
+                Collections.<Iterable<Object>>emptyList());
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] {});
+    }
+
+    @Test
+    public void testCrossProductIterableShouldReturnEmptyWhenRightSideIsEmpty() {
+        // Given:
+
+        // When:
+        @SuppressWarnings("unchecked")
+        Object[][] result = crossProduct(Collections.<Iterable<Object>>emptyList(),
+                asList(asList(1), asList(2), asList(3)));
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] {});
+    }
+
+    @Test
+    public void testCrossProductIterableShouldReturnTheCrossProductOfBothSidesForOneElementIterables() {
+        // Given:
+
+        // When:
+        @SuppressWarnings("unchecked")
+        Object[][] result = crossProduct(asList(asList(1), asList(2), asList(3)), asList(asList(4), asList(5)));
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] { { 1, 4 }, { 1, 5 }, { 2, 4 }, { 2, 5 }, { 3, 4 }, { 3, 5 } });
+    }
+
+    @Test
+    public void testCrossProductIterableShouldReturnTheCrossProductOfBothSidesForMoreComplexIterables() {
+        // Given:
+
+        // When:
+        @SuppressWarnings("unchecked")
+        Object[][] result = crossProduct(asList(asList(1, 2), asList(3, 4)), asList(asList(5, 6, 7), asList(8, 9, 0)));
+
+        // Then:
+        assertThat(result).isEqualTo(
+                new Object[][] { { 1, 2, 5, 6, 7 }, { 1, 2, 8, 9, 0 }, { 3, 4, 5, 6, 7 }, { 3, 4, 8, 9, 0 } });
+    }
+
+    @Test
+    public void testCrossProductSingleArgIterableShouldReturnEmptyWhenLeftSideIsEmpty() {
+        // Given:
+
+        // When:
+        Object[][] result = crossProductSingleArg(asList(1, 2, 3), emptyList());
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] {});
+    }
+
+    @Test
+    public void testCrossProductSingleArgIterableShouldReturnEmptyWhenRightSideIsEmpty() {
+        // Given:
+
+        // When:
+        Object[][] result = crossProductSingleArg(emptyList(), asList(1, 2, 3));
+
+        // Then:
+        assertThat(result).isEqualTo(new Object[][] {});
+    }
+
+    @Test
+    public void testCrossProductSingleArgIterableShouldReturnTheCrossProductOfBothSides() {
+        // Given:
+
+        // When:
+        @SuppressWarnings("unchecked")
+        Object[][] result = crossProductSingleArg(asList(1, "2", 3l), asList(4, 5.0));
+
+        // Then:
+        assertThat(result)
+                .isEqualTo(new Object[][] { { 1, 4 }, { 1, 5.0 }, { "2", 4 }, { "2", 5.0 }, { 3l, 4 }, { 3l, 5.0 } });
     }
 
     // -- test data ----------------------------------------------------------------------------------------------------
