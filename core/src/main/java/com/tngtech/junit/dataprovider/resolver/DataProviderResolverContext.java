@@ -50,7 +50,6 @@ public class DataProviderResolverContext {
     private final Class<? extends Annotation> dataProviderAnnotationClass;
     private final String dataProviderName;
 
-    // TODO refactor above ... whats a good solution?
     /**
      * @param testMethod for which a dataprovider should be resolved
      * @param resolverClasses to use for resolving dataproviders
