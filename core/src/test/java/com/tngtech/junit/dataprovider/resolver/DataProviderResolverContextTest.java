@@ -98,8 +98,7 @@ public class DataProviderResolverContextTest {
     }
 
     @Test
-    public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfResolverClassesIsNull()
-    {
+    public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfResolverClassesIsNull() {
         // Given:
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'resolverClasses' must not be null");
@@ -112,8 +111,7 @@ public class DataProviderResolverContextTest {
     }
 
     @Test
-    public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfResolveStrategyIsNull()
-    {
+    public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfResolveStrategyIsNull() {
         // Given:
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'resolveStrategy' must not be null");
@@ -139,8 +137,7 @@ public class DataProviderResolverContextTest {
     }
 
     @Test
-    public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfDataProviderAnnotationClassIsNull()
-    {
+    public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfDataProviderAnnotationClassIsNull() {
         // Given:
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'dataProviderAnnotationClass' must not be null");
@@ -153,8 +150,7 @@ public class DataProviderResolverContextTest {
     }
 
     @Test
-    public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfDataProviderNameIsNull()
-    {
+    public void testDataProviderResolverContextShouldThrowNullPointerExceptionIfDataProviderNameIsNull() {
         // Given:
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'dataProviderName' must not be null");
@@ -216,8 +212,7 @@ public class DataProviderResolverContextTest {
         final String dataProviderName = DataProviderResolverContext.METHOD_NAME_TO_USE_CONVENTION;
 
         DataProviderResolverContext underTest = new DataProviderResolverContext(testMethod, resolverClasses,
-                resolveStrategy, locations, dataProviderAnnotationClass,
-                dataProviderName);
+                resolveStrategy, locations, dataProviderAnnotationClass, dataProviderName);
 
         // When:
         boolean result = underTest.useDataProviderNameConvention();
