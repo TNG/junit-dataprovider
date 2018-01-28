@@ -59,9 +59,10 @@ public abstract class AbstractUseDataProviderArgumentProvider<SOURCE_ANNOTATION 
 
         DataProviderResolverContext resolverContext = getDataProviderResolverContext(context, sourceAnnotation);
         return findDataProviderMethods(resolverContext).stream().flatMap(dpm -> {
-            Object data = invokeDataProviderMethodToRetrieveData(dpm, context);
-
             DATAPROVIDER_ANNOTATION dataProviderAnnotation = dpm.getAnnotation(dataProviderAnnotationClass);
+            boolean cacheDataProviderResult = cacheDataProviderResult(dataProviderAnnotation);
+
+            Object data = invokeDataProviderMethodToRetrieveData(dpm, cacheDataProviderResult, context);
             return convertData(testMethod, data, getConverterContext(dataProviderAnnotation));
         });
     }
@@ -82,6 +83,17 @@ public abstract class AbstractUseDataProviderArgumentProvider<SOURCE_ANNOTATION 
     protected abstract ConverterContext getConverterContext(DATAPROVIDER_ANNOTATION dataProvider);
 
     /**
+     * @param dataProviderAnnotation on the test method which is providing the converter context; never {@code null}
+     * @return {@code true} if and only if dataprovider result should be cached or evaluated otherwise. Defaults to
+     *         {@code true} for backwards compatibility reasons.
+     * @see DataProvider#cache()
+     */
+    protected boolean cacheDataProviderResult(
+            @SuppressWarnings("unused") DATAPROVIDER_ANNOTATION dataProviderAnnotation) {
+        return true;
+    }
+
+    /**
      * Retrieves the test data from given dataprovider method.
      *
      * @param dataProviderMethod the dataprovider method that gives the parameters; never {@code null}
@@ -89,8 +101,29 @@ public abstract class AbstractUseDataProviderArgumentProvider<SOURCE_ANNOTATION 
      *
      * @return a list of methods, each method bound to a parameter combination returned by the dataprovider
      * @throws NullPointerException if and only if one of the given arguments is {@code null}
+     *
+     * @deprecated available for backwards compatibility, use new
+     *             {@link #invokeDataProviderMethodToRetrieveData(Method, boolean, ExtensionContext)} instead
+     * @see #invokeDataProviderMethodToRetrieveData(Method, boolean, ExtensionContext)
      */
+    @Deprecated
     protected Object invokeDataProviderMethodToRetrieveData(Method dataProviderMethod, ExtensionContext context) {
+        return invokeDataProviderMethodToRetrieveData(dataProviderMethod, true, context);
+    }
+
+    /**
+     * Retrieves the test data from given dataprovider method.
+     *
+     * @param dataProviderMethod the dataprovider method that gives the parameters; never {@code null}
+     * @param cacheDataProviderResult determines if the dataprovider result should be cached using
+     *            {@code dataProviderMethod} as key
+     * @param context the execution context to use to create a {@link TestInfo} if required; never {@code null}
+     *
+     * @return a list of methods, each method bound to a parameter combination returned by the dataprovider
+     * @throws NullPointerException if and only if one of the given arguments is {@code null}
+     */
+    protected Object invokeDataProviderMethodToRetrieveData(Method dataProviderMethod, boolean cacheDataProviderResult,
+            ExtensionContext context) {
         checkNotNull(dataProviderMethod, "'dataProviderMethod' must not be null");
         checkNotNull(context, "'context' must not be null");
 
@@ -105,7 +138,9 @@ public abstract class AbstractUseDataProviderArgumentProvider<SOURCE_ANNOTATION 
             ExtensionRegistry extensionRegistry = createRegistryWithDefaultExtensions(emptyConfigurationParameters());
             Object data = executableInvoker.invoke(dataProviderMethod, context.getTestInstance().orElse(null), context,
                     extensionRegistry);
-            store.put(dataProviderMethod, data);
+            if (cacheDataProviderResult) {
+                store.put(dataProviderMethod, data);
+            }
             return data;
 
         } catch (Exception e) {

@@ -113,6 +113,13 @@ public @interface DataProvider {
     boolean ignoreEnumCase() default false;
 
     /**
+     * @return {@code true} if and only if the result of this dataprovider should be cached. Otherwise it will be
+     *         evaluated for every usage. This could be necessary if it contains dynamic results, e.g. depending on a
+     *         provided parameter. Default is {@code true}.
+     */
+    boolean cache() default true;
+
+    /**
      * Format pattern to be used to generate test method description. The following placeholders are by default
      * available (for more information see their implementations in package
      * {@link com.tngtech.junit.dataprovider.placeholder}:

@@ -36,6 +36,11 @@ class DataProviderTestExtension extends UseDataProviderInvocationContextProvider
     }
 
     @Override
+    protected boolean cacheDataProviderResult(DataProvider dataProviderAnnotation) {
+        return dataProviderAnnotation.cache();
+    }
+
+    @Override
     protected DisplayNameContext getDisplayNameContext(DataProvider dataProvider) {
         return new DisplayNameContext(dataProvider.format(), getDefaultPlaceholders());
     }

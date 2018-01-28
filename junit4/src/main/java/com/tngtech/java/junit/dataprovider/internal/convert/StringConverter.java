@@ -117,6 +117,12 @@ public class StringConverter extends com.tngtech.junit.dataprovider.convert.Stri
             }
 
             @Override
+            public boolean cache() {
+                throw new UnsupportedOperationException(
+                        "Sorry, this operation is not available anymore. Please create an issue if you still need it.");
+            }
+
+            @Override
             public String format() {
                 throw new UnsupportedOperationException(
                         "Sorry, this operation is not available anymore. Please create an issue if you still need it.");

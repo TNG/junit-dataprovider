@@ -64,6 +64,11 @@ public class AbstractUseDataProviderArgumentProviderTest {
             protected ConverterContext getConverterContext(Annotation dataProvider) {
                 return converterContext;
             }
+
+            @Override
+            protected boolean cacheDataProviderResult(Annotation dataProviderAnnotation) {
+                return true;
+            }
         };
 
         MockitoAnnotations.initMocks(this);
@@ -81,7 +86,7 @@ public class AbstractUseDataProviderArgumentProviderTest {
 
         // When:
         Exception result = assertThrows(ParameterResolutionException.class,
-                () -> underTest.invokeDataProviderMethodToRetrieveData(dataProviderMethod, extensionContext));
+                () -> underTest.invokeDataProviderMethodToRetrieveData(dataProviderMethod, true, extensionContext));
 
         // Then:
         assertThat(result).hasMessageMatching("Exception while invoking dataprovider method '.*': .*");

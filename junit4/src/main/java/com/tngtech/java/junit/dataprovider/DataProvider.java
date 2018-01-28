@@ -177,4 +177,11 @@ public @interface DataProvider {
      *         for the corresponding {@link Enum} values is case-insensitive. Default is {@code false}. Optional.
      */
     boolean ignoreEnumCase() default false;
+
+    /**
+     * @return {@code true} if and only if the result of this dataprovider should be cached. Otherwise it will be
+     *         evaluated for every usage. This could be necessary if it contains dynamic results, e.g. depending on a
+     *         provided test methodO. Default is {@code true}.
+     */
+    boolean cache() default true;
 }

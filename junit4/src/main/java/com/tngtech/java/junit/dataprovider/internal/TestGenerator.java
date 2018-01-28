@@ -25,7 +25,7 @@ public class TestGenerator {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    final Map<FrameworkMethod, Object> dataProviderDataCache = new HashMap<FrameworkMethod, Object>();
+    static final Map<FrameworkMethod, Object> dataProviderDataCache = new HashMap<FrameworkMethod, Object>();
 
     public TestGenerator(DataConverter dataConverter) {
         this.dataConverter = checkNotNull(dataConverter, "dataConverter must not be null");
@@ -82,6 +82,8 @@ public class TestGenerator {
      * @return a list of methods, each method bound to a parameter combination returned by the dataprovider
      */
     List<FrameworkMethod> explodeTestMethod(FrameworkMethod testMethod, FrameworkMethod dataProviderMethod) {
+        DataProvider dataProvider = dataProviderMethod.getAnnotation(DataProvider.class);
+
         Object data;
         if (dataProviderDataCache.containsKey(dataProviderMethod)) {
             data = dataProviderDataCache.get(dataProviderMethod);
@@ -93,14 +95,16 @@ public class TestGenerator {
                 } else {
                     data = dataProviderMethod.invokeExplosively(null);
                 }
-                dataProviderDataCache.put(dataProviderMethod, data);
+                if (dataProvider.cache()) {
+                    dataProviderDataCache.put(dataProviderMethod, data);
+                }
 
             } catch (Throwable t) {
                 throw new IllegalArgumentException(String.format("Exception while invoking dataprovider method '%s': %s",
                         dataProviderMethod.getName(), t.getMessage()), t);
             }
         }
-        return explodeTestMethod(testMethod, data, dataProviderMethod.getAnnotation(DataProvider.class));
+        return explodeTestMethod(testMethod, data, dataProvider);
     }
 
     /**

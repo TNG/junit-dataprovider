@@ -40,4 +40,9 @@ class UseDataProviderArgumentProvider
                 ReflectionSupport.newInstance(dataProvider.stringConverter()), dataProvider.splitBy(),
                 dataProvider.convertNulls(), dataProvider.trimValues(), dataProvider.ignoreEnumCase());
     }
+
+    @Override
+    protected boolean cacheDataProviderResult(DataProvider dataProviderAnnotation) {
+        return dataProviderAnnotation.cache();
+    }
 }

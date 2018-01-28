@@ -43,6 +43,8 @@ public class TestGeneratorTest extends BaseTest {
 
     @Before
     public void setup() {
+        TestGenerator.dataProviderDataCache.clear();
+
         doReturn(anyMethod()).when(testMethod).getMethod();
         doReturn(anyMethod()).when(dataProviderMethod).getMethod();
     }
@@ -85,6 +87,7 @@ public class TestGeneratorTest extends BaseTest {
     public void testGenerateExplodedTestMethodsForShouldCatchExceptionUsingUseDataProviderAndReThrowAsError()
             throws Throwable {
         // Given:
+        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
         doThrow(IllegalArgumentException.class).when(dataProviderMethod).invokeExplosively(any(), any());
 
         // When:
@@ -112,6 +115,7 @@ public class TestGeneratorTest extends BaseTest {
     public void testExplodeTestMethodsUseDataProviderShouldThrowIllegalArgumentExceptionIfDataProviderMethodThrowsException()
             throws Throwable {
         // Given:
+        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
         doThrow(NullPointerException.class).when(dataProviderMethod).invokeExplosively(null);
 
         // When:
@@ -146,7 +150,6 @@ public class TestGeneratorTest extends BaseTest {
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
-        assertThat(underTest.dataProviderDataCache).hasSize(1).containsKey(dataProviderMethod);
         assertDataProviderFrameworkMethods(result, dataConverterResult, "%m");
         verify(dataProviderMethod).invokeExplosively(null);
     }
@@ -155,7 +158,7 @@ public class TestGeneratorTest extends BaseTest {
     public void testExplodeTestMethodsUseDataProviderShouldUseCachedDataProviderResultIfAvailable() {
         // Given:
         Object data = new Object[][] { { 1 } };
-        underTest.dataProviderDataCache.put(dataProviderMethod, data);
+        TestGenerator.dataProviderDataCache.put(dataProviderMethod, data);
 
         doReturn(listOfArrays(new Object[] { 1 })).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
                 any(DataProvider.class));
@@ -180,12 +183,13 @@ public class TestGeneratorTest extends BaseTest {
         doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class));
         doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
         doReturn("%c").when(dataProvider).format();
+        doReturn(false).when(dataProvider).cache();
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
-        assertThat(underTest.dataProviderDataCache).hasSize(1).containsKey(dataProviderMethod);
+        assertThat(TestGenerator.dataProviderDataCache).isEmpty();
         assertDataProviderFrameworkMethods(result, dataConverterResult, "%c");
         verify(dataProviderMethod).invokeExplosively(null);
     }
@@ -200,12 +204,13 @@ public class TestGeneratorTest extends BaseTest {
         doReturn(dataConverterResult).when(dataConverter).convert(any(), anyBoolean(), any(Class[].class), any(DataProvider.class));
         doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
         doReturn(DataProvider.DEFAULT_FORMAT).when(dataProvider).format();
+        doReturn(true).when(dataProvider).cache();
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
 
         // Then:
-        assertThat(underTest.dataProviderDataCache).hasSize(1).containsKey(dataProviderMethod);
+        assertThat(TestGenerator.dataProviderDataCache).hasSize(1).containsKey(dataProviderMethod);
         assertThat(result).hasSize(1);
         verify(dataProviderMethod).invokeExplosively(null, testMethod);
     }
