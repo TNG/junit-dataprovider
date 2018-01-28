@@ -10,7 +10,6 @@ import java.util.TimeZone;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import com.tngtech.junit.dataprovider.DataProvider;
-import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.UseDataProvider;
 
 class CustomStringConverterAcceptanceTest {

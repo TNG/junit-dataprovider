@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import com.tngtech.junit.dataprovider.DataProvider;
-import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.UseDataProvider;
 
 class VarargsAcceptanceTest {

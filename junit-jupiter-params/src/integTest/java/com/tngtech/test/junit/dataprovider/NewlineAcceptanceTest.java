@@ -3,7 +3,6 @@ package com.tngtech.test.junit.dataprovider;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import com.tngtech.junit.dataprovider.DataProvider;
-import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.UseDataProvider;
 
 class NewlineAcceptanceTest {
