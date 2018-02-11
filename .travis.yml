@@ -1,11 +1,6 @@
 language: java
 
 script:
-  - ./gradlew build -Pjunit4Version=4.8.2 -PjunitJupiterVersion=5.0.0     -PskipFindBugs
-  - ./gradlew build -Pjunit4Version=4.9   -PjunitJupiterVersion=5.0.1     -PskipFindBugs
-  - ./gradlew build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.0.2     -PskipFindBugs
-  - ./gradlew build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.0.3     -PskipFindBugs
-
   - ./gradlew build
 
   - cd ${TRAVIS_BUILD_DIR}/junit4/
