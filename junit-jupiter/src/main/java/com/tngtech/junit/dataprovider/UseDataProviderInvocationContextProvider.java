@@ -23,6 +23,7 @@ import org.junit.platform.engine.ConfigurationParameters;
 
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
 import com.tngtech.junit.dataprovider.convert.DataConverter;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 import com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext;
 
 /**

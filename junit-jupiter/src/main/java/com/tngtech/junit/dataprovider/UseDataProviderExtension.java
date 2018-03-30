@@ -42,6 +42,6 @@ public class UseDataProviderExtension extends UseDataProviderInvocationContextPr
 
     @Override
     protected DisplayNameContext getDisplayNameContext(DataProvider dataProvider) {
-        return new DisplayNameContext(dataProvider.format(), getDefaultPlaceholders());
+        return new DisplayNameContext(dataProvider.formatter(), dataProvider.format(), getDefaultPlaceholders());
     }
 }

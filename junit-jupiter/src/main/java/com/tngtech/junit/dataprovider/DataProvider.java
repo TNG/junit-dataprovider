@@ -12,6 +12,8 @@ import com.tngtech.junit.dataprovider.convert.ConverterContext;
 import com.tngtech.junit.dataprovider.convert.ObjectArrayConverter;
 import com.tngtech.junit.dataprovider.convert.SingleArgConverter;
 import com.tngtech.junit.dataprovider.convert.StringConverter;
+import com.tngtech.junit.dataprovider.format.DataProviderPlaceholderFormatter;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 /**
  * Mark a method as a dataprovider used by a test method or use it directly at the test method and provide data via {@link #value()}
@@ -198,6 +200,14 @@ public @interface DataProvider {
      * @see #DEFAULT_FORMAT
      */
     String format() default DEFAULT_FORMAT;
+
+    /**
+     * Formatter to be used to generate test method description. The placeholder approach which formats according to
+     * {@link #format()} is used by default.
+     *
+     * @return a formatter used to generate test names.
+     */
+    Class<? extends DataProviderTestNameFormatter> formatter() default DataProviderPlaceholderFormatter.class;
 
     /**
      * @return a custom converter converting {@link Object}{@code []} data to proper arguments
