@@ -177,6 +177,11 @@ public @interface DataProvider {
      * parameters array length</td>
      * </tr>
      * <tr>
+     * <td>{@code %na[x]}</td>
+     * <td><i>string=test, search=e, index=1</i></td>
+     * <td>Named arguments with same subscription options as {@code %a}.</td>
+     * </tr>
+     * <tr>
      * <td>{@code %p[x]}</td>
      * <td><i>test, &lt;null&gt;, 4</i></td>
      * <td><b>deprecated.</b> Use {@code %a} which has the same effect.</td>
