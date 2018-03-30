@@ -23,6 +23,6 @@ class StringDataProviderExtension extends DataProviderInvocationContextProvider<
 
     @Override
     protected DisplayNameContext getDisplayNameContext(StringDataProvider annotation) {
-        return new DisplayNameContext(annotation.format(), getDefaultPlaceholders());
+        return new DisplayNameContext(annotation.formatter(), annotation.format(), getDefaultPlaceholders());
     }
 }

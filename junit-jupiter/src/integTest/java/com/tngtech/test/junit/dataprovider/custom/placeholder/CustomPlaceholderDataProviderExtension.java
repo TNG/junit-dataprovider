@@ -34,6 +34,6 @@ class CustomPlaceholderDataProviderExtension extends DataProviderInvocationConte
         @SuppressWarnings("unchecked")
         List<BasePlaceholder> defaultPlaceholders = (List<BasePlaceholder>) getDefaultPlaceholders();
         defaultPlaceholders.add(0, new StripArgumentLengthPlaceholder(10));
-        return new DisplayNameContext(dataProvider.format(), defaultPlaceholders);
+        return new DisplayNameContext(dataProvider.formatter(), dataProvider.format(), defaultPlaceholders);
     }
 }

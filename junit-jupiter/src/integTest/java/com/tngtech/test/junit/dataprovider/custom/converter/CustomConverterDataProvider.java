@@ -11,6 +11,8 @@ import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.convert.ObjectArrayConverter;
 import com.tngtech.junit.dataprovider.convert.SingleArgConverter;
 import com.tngtech.junit.dataprovider.convert.StringConverter;
+import com.tngtech.junit.dataprovider.format.DataProviderPlaceholderFormatter;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 /**
  * @see DataProvider
@@ -49,6 +51,11 @@ import com.tngtech.junit.dataprovider.convert.StringConverter;
      * @see DataProvider#format()
      */
     String format() default DataProvider.DEFAULT_FORMAT;
+
+    /**
+     * @see DataProvider#formatter()
+     */
+    Class<? extends DataProviderTestNameFormatter> formatter() default DataProviderPlaceholderFormatter.class;
 
     /**
      * @see DataProvider#objectArrayConverter()

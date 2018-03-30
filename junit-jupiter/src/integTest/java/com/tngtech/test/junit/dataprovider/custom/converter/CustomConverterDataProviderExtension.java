@@ -27,6 +27,6 @@ class CustomConverterDataProviderExtension extends DataProviderInvocationContext
 
     @Override
     protected DisplayNameContext getDisplayNameContext(CustomConverterDataProvider annotation) {
-        return new DisplayNameContext(annotation.format(), getDefaultPlaceholders());
+        return new DisplayNameContext(annotation.formatter(), annotation.format(), getDefaultPlaceholders());
     }
 }
