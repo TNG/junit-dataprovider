@@ -202,8 +202,8 @@ public @interface DataProvider {
     String format() default DEFAULT_FORMAT;
 
     /**
-     * Formatter to be used to generate test method description. The placeholder approach which formats according to
-     * {@link #format()} is used by default.
+     * Formatter to be used to generate test method description. Defaults to {@link DataProviderPlaceholderFormatter}
+     * which used placeholders and formats according to {@link #format()}. Optional.
      *
      * @return a formatter used to generate test names.
      */

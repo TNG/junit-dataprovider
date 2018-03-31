@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import com.tngtech.junit.dataprovider.format.DataProviderPlaceholderFormatter;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 class DataProviderInvocationContext implements TestTemplateInvocationContext {
 
