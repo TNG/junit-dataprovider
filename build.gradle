@@ -29,7 +29,7 @@ if (!hasProperty('junitJupiterVersion')) { // set default junit version if not s
 println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.2.1'
+    gradleVersion = '4.6'
 }
 
 allprojects {
