@@ -1,6 +1,6 @@
 plugins {
     id 'com.github.kt3k.coveralls' version '2.3.1'
-    id 'de.aaschmid.cpd' version '1.0'
+    id 'de.aaschmid.cpd' version '1.1'
 }
 
 ext {
@@ -234,7 +234,7 @@ subprojects {
         }
     }
     jacoco {
-        toolVersion = '0.7.7.201606060606'
+        toolVersion = '0.8.1'
     }
 
     findbugs {
@@ -259,7 +259,7 @@ cpd {
     if (System.getProperty("java.version")[0..2] in [ '1.6' ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
         toolVersion = '5.3.7'
     } else {
-        toolVersion = '5.5.1'
+        toolVersion = '6.2.0'
     }
 }
 
