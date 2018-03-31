@@ -1,12 +1,3 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
-    }
-}
-
 plugins {
     id 'com.github.kt3k.coveralls' version '2.3.1'
     id 'de.aaschmid.cpd' version '1.0'
@@ -111,19 +102,20 @@ project(':junit4') {
 }
 
 configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
-    apply plugin: 'org.junit.platform.gradle.plugin'
     apply plugin: 'groovy'
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
     sourceSets {
-        test { // TODO do it as "sourceSet" named "integTest" as soon as "junit-platform-gradle-plugin" is able to handle it
-            java {
-                srcDir 'src/integTest/java'
-            }
-            groovy {
-                srcDir 'src/integTest/groovy'
-            }
+        integTest {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+    }
+
+    configurations {
+        integTestCompile {
+            extendsFrom testRuntime
         }
     }
 
@@ -135,16 +127,23 @@ configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
         testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.10.0'
 
-        // only integTestCompile
-        testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.12'
+        integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.12'
     }
 
-    junitPlatform {
-        platformVersion '1.0.1'
+    test {
+        useJUnitPlatform()
     }
 
+    task integTest(dependsOn: integTestClasses, type: Test, group: 'verification', description: 'Runs all integration tests.') {
+        ignoreFailures = isBuildOnJenkins
+
+        classpath = sourceSets.integTest.runtimeClasspath
+        testClassesDirs = sourceSets.integTest.output.classesDirs
+
+        useJUnitPlatform()
+    }
     task touchIntegTestResultsForJenkins(type: TouchTestResults) {
-        tasks test
+        tasks integTest
         enabled = isBuildOnJenkins
     }
     build.dependsOn touchIntegTestResultsForJenkins
