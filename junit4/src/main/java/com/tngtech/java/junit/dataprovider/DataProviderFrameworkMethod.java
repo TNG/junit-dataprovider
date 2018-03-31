@@ -8,8 +8,8 @@ import java.util.Arrays;
 
 import org.junit.runners.model.FrameworkMethod;
 
-import com.tngtech.junit.dataprovider.placeholder.BasePlaceholder;
-import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
+import com.tngtech.java.junit.dataprovider.format.DataProviderPlaceholderFormatter;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 /**
  * A special framework method that allows the usage of parameters for the test method.
@@ -41,6 +41,14 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     final String nameFormat;
 
     /**
+     * Formatter for test method name. May be {@code null}.
+     * <p>
+     * This field is package private (= visible) for testing.
+     * </p>
+     */
+    final Class<? extends DataProviderTestNameFormatter> nameFormatter;
+
+    /**
      * Create a {@link FrameworkMethod} extended with special attributes for using this test with a dataprovider.
      *
      * @param method test method for which the {@link FrameworkMethod} is created
@@ -49,6 +57,20 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
      * @param nameFormat defines the format of the test method name according to {@code @}{@link DataProvider#format()}
      */
     public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters, String nameFormat) {
+        this(method, idx, parameters, nameFormat, null);
+    }
+
+    /**
+     * Create a {@link FrameworkMethod} extended with special attributes for using this test with a dataprovider.
+     *
+     * @param method test method for which the {@link FrameworkMethod} is created
+     * @param idx the index (row) of the used dataprovider
+     * @param parameters used for invoking this test method
+     * @param nameFormat defines the format of the test method name according to {@code @}{@link DataProvider#format()}
+     * @param nameFormatter defines the test method name formatter
+     */
+    public DataProviderFrameworkMethod(Method method, int idx, Object[] parameters,
+            String nameFormat, Class<? extends DataProviderTestNameFormatter> nameFormatter) {
         super(method);
 
         checkNotNull(parameters, "parameter must not be null");
@@ -58,25 +80,26 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         this.idx = idx;
         this.parameters = Arrays.copyOf(parameters, parameters.length);
         this.nameFormat = nameFormat;
+        this.nameFormatter = nameFormatter;
     }
 
     @Override
     public String getName() {
-        String result = nameFormat;
-        for (BasePlaceholder placeholder : Placeholders.all()) {
-            if (placeholder instanceof com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder) {
-                com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder placeHolder = (com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder) placeholder;
-                synchronized (placeHolder) {
-                    placeHolder.setContext(getMethod(), idx, Arrays.copyOf(parameters, parameters.length));
-                    result = placeHolder.process(result);
-                }
-
-            } else {
-                ReplacementData data = ReplacementData.of(getMethod(), idx, Arrays.asList(parameters));
-                result = placeholder.process(data, result);
-            }
+        if (nameFormatter == null || DataProviderPlaceholderFormatter.class.equals(nameFormatter)) {
+            return new DataProviderPlaceholderFormatter(nameFormat, Placeholders.all()).format(getMethod(), idx,
+                    Arrays.asList(parameters));
         }
-        return result;
+
+        try {
+            return nameFormatter.newInstance().format(getMethod(), idx, Arrays.asList(parameters));
+        } catch (InstantiationException e) {
+            throw new IllegalStateException(String
+                    .format("Could not instantiate name formatter using default constructor '%s'.", nameFormatter),
+                    e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(
+                    String.format("Default constructor not accessable of name formatter '%s'.", nameFormatter), e);
+        }
     }
 
     @Override
