@@ -25,7 +25,7 @@ class FormatAcceptanceTest {
         }
     }
 
-    @DataProvider(format = "%a[0] * %a[1] == %a[2]", formatter = PlusTestNameFormatter.class)
+    @DataProvider(format = "%a[0] * %a[1] == %a[2]", formatter = PlusTestNameFormatter.class) // format is ignored
     static Object[][] dataProviderPlus() {
         // @formatter:off
         return new Object[][] {

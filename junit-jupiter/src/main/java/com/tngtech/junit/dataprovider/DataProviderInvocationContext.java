@@ -28,14 +28,12 @@ class DataProviderInvocationContext implements TestTemplateInvocationContext {
 
     @Override
     public String getDisplayName(int invocationIndex) {
-
-        if (displayNameContext.getFormatter() == null
-                || DataProviderPlaceholderFormatter.class.equals(displayNameContext.getFormatter())) {
+        Class<? extends DataProviderTestNameFormatter> formatter = displayNameContext.getFormatter();
+        if (formatter == null || DataProviderPlaceholderFormatter.class.equals(formatter)) {
             return new DataProviderPlaceholderFormatter(displayNameContext.getFormat(),
                     displayNameContext.getPlaceholders()).format(testMethod, invocationIndex, arguments);
         }
-        return ReflectionUtils.newInstance(displayNameContext.getFormatter()).format(testMethod, invocationIndex,
-                arguments);
+        return ReflectionUtils.newInstance(formatter).format(testMethod, invocationIndex, arguments);
     }
 
     @Override
