@@ -29,8 +29,6 @@ pipeline {
         }
         stage('Parallel integration tests') {
             parallel {
-                // TODO JUnit Jupiter integration tests should be integrated here as soon as
-                // "junit-platform-gradle-plugin" is able to build separate sourceSets
                 stage('Integration tests') {
                     steps {
                         sh './gradlew integTest'
