@@ -10,7 +10,7 @@ import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 @RunWith(DataProviderRunner.class)
-public class DataProviderOverrideAcceptanceTest extends DataProviderOverrideAcceptanceBaseTest {
+public class DataProviderOverridingAcceptanceTest extends DataProviderAbstractAcceptanceBaseTest {
 
     @Override
     @Test

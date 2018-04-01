@@ -49,6 +49,10 @@ public class TestGenerator {
         if (testMethod == null) {
             return Collections.emptyList();
         }
+        // do not create dataprovider tests for synthetic methods (should normally be handled by JUnit 4 but isn't)
+        if (testMethod.getMethod().isSynthetic()) {
+            return Collections.emptyList();
+        }
         if (dataProviderMethod != null) {
             try {
                 return explodeTestMethod(testMethod, dataProviderMethod);
