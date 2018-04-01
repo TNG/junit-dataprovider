@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.UseDataProvider;
 
-class OverridingAcceptanceTest extends ToBeOverriddenAcceptanceTest {
+class OverridingAcceptanceTest extends AbstractAcceptanceBaseTest {
 
     @Override
     @ParameterizedTest
