@@ -10,6 +10,8 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.tngtech.junit.dataprovider.DataProvider;
+import com.tngtech.junit.dataprovider.format.DataProviderPlaceholderFormatter;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 /**
  * @see DataProvider
@@ -49,4 +51,9 @@ import com.tngtech.junit.dataprovider.DataProvider;
      * @see DataProvider#format()
      */
     String format() default DataProvider.DEFAULT_FORMAT;
+
+    /**
+     * @see DataProvider#formatter()
+     */
+    Class<? extends DataProviderTestNameFormatter> formatter() default DataProviderPlaceholderFormatter.class;
 }

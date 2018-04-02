@@ -7,7 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
+import com.tngtech.java.junit.dataprovider.format.DataProviderPlaceholderFormatter;
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 /**
  * Mark a method as a dataprovider used by a test method or use it directly at the test method and provide data via {@link #value()}
@@ -171,6 +173,14 @@ public @interface DataProvider {
      * @see #DEFAULT_FORMAT
      */
     String format() default DEFAULT_FORMAT;
+
+    /**
+     * Formatter to be used to generate test method description. Defaults to {@link DataProviderPlaceholderFormatter}
+     * which used placeholders and formats according to {@link #format()}. Optional.
+     *
+     * @return a formatter used to generate test names.
+     */
+    Class<? extends DataProviderTestNameFormatter> formatter() default DataProviderPlaceholderFormatter.class;
 
     /**
      * @return {@code true} if and only if the case for {@link Enum} conversion should be ignored such that searching

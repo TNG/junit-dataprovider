@@ -9,9 +9,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
+import org.junit.platform.commons.util.ReflectionUtils;
 
-import com.tngtech.junit.dataprovider.placeholder.BasePlaceholder;
-import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
+import com.tngtech.junit.dataprovider.format.DataProviderPlaceholderFormatter;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 class DataProviderInvocationContext implements TestTemplateInvocationContext {
 
@@ -27,13 +28,12 @@ class DataProviderInvocationContext implements TestTemplateInvocationContext {
 
     @Override
     public String getDisplayName(int invocationIndex) {
-        ReplacementData data = ReplacementData.of(testMethod, invocationIndex, arguments);
-
-        String result = displayNameContext.getFormat();
-        for (BasePlaceholder placeHolder : displayNameContext.getPlaceholders()) {
-            result = placeHolder.process(data, result);
+        Class<? extends DataProviderTestNameFormatter> formatter = displayNameContext.getFormatter();
+        if (formatter == null || DataProviderPlaceholderFormatter.class.equals(formatter)) {
+            return new DataProviderPlaceholderFormatter(displayNameContext.getFormat(),
+                    displayNameContext.getPlaceholders()).format(testMethod, invocationIndex, arguments);
         }
-        return result;
+        return ReflectionUtils.newInstance(formatter).format(testMethod, invocationIndex, arguments);
     }
 
     @Override

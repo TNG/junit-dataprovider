@@ -12,6 +12,8 @@ import com.tngtech.junit.dataprovider.convert.ConverterContext;
 import com.tngtech.junit.dataprovider.convert.ObjectArrayConverter;
 import com.tngtech.junit.dataprovider.convert.SingleArgConverter;
 import com.tngtech.junit.dataprovider.convert.StringConverter;
+import com.tngtech.junit.dataprovider.format.DataProviderPlaceholderFormatter;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 /**
  * Mark a method as a dataprovider used by a test method or use it directly at the test method and provide data via {@link #value()}
@@ -177,6 +179,11 @@ public @interface DataProvider {
      * parameters array length</td>
      * </tr>
      * <tr>
+     * <td>{@code %na[x]}</td>
+     * <td><i>string=test, search=e, index=1</i></td>
+     * <td>Named arguments with same subscription options as {@code %a}.</td>
+     * </tr>
+     * <tr>
      * <td>{@code %p[x]}</td>
      * <td><i>test, &lt;null&gt;, 4</i></td>
      * <td><b>deprecated.</b> Use {@code %a} which has the same effect.</td>
@@ -193,6 +200,14 @@ public @interface DataProvider {
      * @see #DEFAULT_FORMAT
      */
     String format() default DEFAULT_FORMAT;
+
+    /**
+     * Formatter to be used to generate test method description. Defaults to {@link DataProviderPlaceholderFormatter}
+     * which used placeholders and formats according to {@link #format()}. Optional.
+     *
+     * @return a formatter used to generate test names.
+     */
+    Class<? extends DataProviderTestNameFormatter> formatter() default DataProviderPlaceholderFormatter.class;
 
     /**
      * @return a custom converter converting {@link Object}{@code []} data to proper arguments

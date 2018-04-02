@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
+import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -124,6 +125,12 @@ public class StringConverter extends com.tngtech.junit.dataprovider.convert.Stri
 
             @Override
             public String format() {
+                throw new UnsupportedOperationException(
+                        "Sorry, this operation is not available anymore. Please create an issue if you still need it.");
+            }
+
+            @Override
+            public Class<? extends DataProviderTestNameFormatter> formatter() {
                 throw new UnsupportedOperationException(
                         "Sorry, this operation is not available anymore. Please create an issue if you still need it.");
             }
