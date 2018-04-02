@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
-public abstract class DataProviderOverrideAcceptanceBaseTest {
+public abstract class DataProviderAbstractAcceptanceBaseTest {
     @DataProvider
     public static Object[][] dataProviderBase() {
         return new Object[][] { { "1" } };
@@ -21,9 +21,9 @@ public abstract class DataProviderOverrideAcceptanceBaseTest {
     }
 
     // Does not work since v1.12.0 any more as new dataprovider resolver mechanism uses "Method#getDeclaringClass()"
-    // instead of "testClass" (= JUnit4 Frameworks "TestClass"); Workaround by specifying "location" explicitely ...
+    // instead of "testClass" (= JUnit4 Frameworks "TestClass"); Workaround by specifying "location" explicitly ...
     @Test
-    @UseDataProvider(location = DataProviderOverrideAcceptanceTest.class)
+    @UseDataProvider(location = DataProviderOverridingAcceptanceTest.class)
     public void testChild(String one) {
         assertThat(one).isEqualTo("1");
     }

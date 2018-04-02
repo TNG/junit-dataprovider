@@ -10,7 +10,7 @@ import com.tngtech.junit.dataprovider.UseDataProvider;
 import com.tngtech.junit.dataprovider.UseDataProviderExtension;
 
 @ExtendWith(UseDataProviderExtension.class)
-class OverridingAcceptanceTest extends ToBeOverriddenAcceptanceTest {
+class OverridingAcceptanceTest extends AbstractAcceptanceBaseTest {
 
     @Override
     @TestTemplate
