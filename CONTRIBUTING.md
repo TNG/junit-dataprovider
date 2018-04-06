@@ -4,6 +4,7 @@ Contributions are very welcome. The following will provide some helpful guidelin
 
 ## JUnit dataprovider Contributor License Agreement
 
+* You will only submit contributions using your real name (sorry, no pseudonyms or anonymous contributions).
 * You will only submit contributions where you have authored 100% of the content.
 * You will only submit contributions to which you have the necessary rights.
 This means in particular, that if you are employed you have received the necessary permissions
