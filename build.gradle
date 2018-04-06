@@ -38,6 +38,13 @@ subprojects {
 
     group = 'com.tngtech.junit.dataprovider'
     version = '2.3'
+
+    tasks.withType(Jar) {
+        from(project.rootDir) {
+            include 'LICENSE.md', 'LICENSE-notice.md'
+            into 'META-INF'
+        }
+    }
 }
 
 project(':core') {
