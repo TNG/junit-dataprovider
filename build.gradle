@@ -61,6 +61,14 @@ project(':core') {
         testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.7'
     }
+
+    jar {
+        manifest {
+            attributes(
+                'Automatic-Module-Name': 'com.tngtech.junit.dataprovider.core'
+            )
+        }
+    }
 }
 
 project(':junit4') {
@@ -93,6 +101,14 @@ project(':junit4') {
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.7'
 
         integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.7'
+    }
+
+    jar {
+        manifest {
+            attributes(
+                'Automatic-Module-Name': 'com.tngtech.junit.dataprovider.junit4'
+            )
+        }
     }
 
     task integTest(dependsOn: integTestClasses, type: Test, group: 'verification', description: 'Runs all integration tests.') {
@@ -159,6 +175,14 @@ configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
 project(':junit-jupiter') {
     archivesBaseName = 'junit-jupiter-dataprovider'
     description = 'A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.'
+
+    jar {
+        manifest {
+            attributes(
+                'Automatic-Module-Name': 'com.tngtech.junit.dataprovider.jupiter'
+            )
+        }
+    }
 }
 
 project(':junit-jupiter-params') {
@@ -167,6 +191,14 @@ project(':junit-jupiter-params') {
 
     dependencies {
         compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
+    }
+
+    jar {
+        manifest {
+            attributes(
+                'Automatic-Module-Name': 'com.tngtech.junit.dataprovider.jupiter.params'
+            )
+        }
     }
 }
 
