@@ -2,8 +2,8 @@ package com.tngtech.java.junit.dataprovider;
 
 import static com.tngtech.java.junit.dataprovider.DataProviders.$;
 import static com.tngtech.java.junit.dataprovider.DataProviders.$$;
-import static com.tngtech.java.junit.dataprovider.DataProviders.testForEach;
 import static com.tngtech.java.junit.dataprovider.DataProviders.crossProduct;
+import static com.tngtech.java.junit.dataprovider.DataProviders.testForEach;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -140,7 +140,8 @@ public class DataProvidersTest extends BaseTest {
         // Given:
 
         // When:
-        testForEach((Iterable<Object>) null);
+        @SuppressWarnings({ "deprecation", "unused" })
+        Object[][] result = testForEach((Iterable<Object>) null);
 
         // Then: expect exception
     }
@@ -153,6 +154,7 @@ public class DataProvidersTest extends BaseTest {
         set.add(238.78239f);
 
         // When:
+        @SuppressWarnings("deprecation")
         Object[][] result = testForEach(set);
 
         // Then:
@@ -167,6 +169,7 @@ public class DataProvidersTest extends BaseTest {
         list.add(167120l);
 
         // When:
+        @SuppressWarnings("deprecation")
         Object[][] result = testForEach(list);
 
         // Then:

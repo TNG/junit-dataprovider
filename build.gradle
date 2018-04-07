@@ -1,11 +1,11 @@
 buildscript {
     repositories {
         maven {
-            url "https://plugins.gradle.org/m2/"
+            url 'https://plugins.gradle.org/m2/'
         }
     }
     dependencies {
-        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.2"
+        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.2'
     }
 }
 
@@ -52,6 +52,11 @@ subprojects {
     group = 'com.tngtech.junit.dataprovider'
     version = '2.3'
 
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        options.compilerArgs += [ '-Xlint:all', '-Werror' ]
+    }
+
     tasks.withType(Jar) {
         from(project.rootDir) {
             include 'LICENSE.md', 'LICENSE-notice.md'
@@ -75,6 +80,10 @@ project(':core') {
 
         testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += [ '-Xlint:-options' ]
     }
 
     jar {
@@ -117,6 +126,10 @@ project(':junit4') {
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
 
         integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.7'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += [ '-Xlint:-options' ]
     }
 
     jar {
@@ -166,6 +179,10 @@ configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
 
         integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.12'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += [ '-parameters' ]
     }
 
     test {
@@ -219,10 +236,6 @@ project(':junit-jupiter-params') {
 
 // configure after properties are set and integration tests are added
 subprojects {
-    tasks.withType(JavaCompile) {
-        options.compilerArgs += [ "-parameters" ]
-    }
-
     jar {
         manifest {
             def now = new Date()
@@ -306,7 +319,7 @@ subprojects {
 }
 
 cpd {
-    if (System.getProperty("java.version")[0..2] in [ '1.6' ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
+    if (System.getProperty('java.version')[0..2] in [ '1.6' ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
         toolVersion = '5.3.7'
     } else {
         toolVersion = '6.2.0'

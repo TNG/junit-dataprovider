@@ -75,9 +75,9 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         doReturn(testMethodName).when(testMethod).getName();
 
         doReturn(dataProviderMethodName).when(useDataProvider).value();
-        doReturn(new Class[0]).when(useDataProvider).location();
+        doReturn(new Class<?>[0]).when(useDataProvider).location();
 
-        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class[0]);
+        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class<?>[0]);
         doReturn(emptyList()).when(underTest).findDataProviderMethods(asList(testClass), testMethodName, dataProviderMethodName);
 
         // When:
@@ -96,9 +96,9 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         doReturn(testMethodName).when(testMethod).getName();
 
         doReturn(dataProviderMethodName).when(useDataProvider).value();
-        doReturn(new Class[0]).when(useDataProvider).location();
+        doReturn(new Class<?>[0]).when(useDataProvider).location();
 
-        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class[0]);
+        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class<?>[0]);
         doReturn(asList(dataProviderMethod)).when(underTest).findDataProviderMethods(asList(testClass), testMethodName,
                 dataProviderMethodName);
 
@@ -116,7 +116,7 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
                 .when(testMethod).getMethod();
 
         // When:
-        List<TestClass> result = underTest.findDataProviderLocations(testMethod, new Class[0]);
+        List<TestClass> result = underTest.findDataProviderLocations(testMethod, new Class<?>[0]);
 
         // Then:
         assertThatResultContainsCorrectClassesExactlyInOrder(result, this.getClass());

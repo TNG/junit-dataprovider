@@ -1,5 +1,6 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -349,7 +351,7 @@ public class DataConverterTest extends BaseTest {
     public void testConvertShouldCallObjectArrayConverterOnlyOnceForListOfListOfObjectWithOneElement() {
         // Given:
         @SuppressWarnings("unchecked")
-        List<List<Character>> data = list(list('a'));
+        List<List<Character>> data = asList(asList('a'));
         Class<?>[] parameterTypes = new Class<?>[] { char.class };
 
         // When:
@@ -365,7 +367,7 @@ public class DataConverterTest extends BaseTest {
     public void testConvertShouldReturnMultipleElementsForListOfListOfObjectWithMultipleElements() {
         // Given:
         @SuppressWarnings("unchecked")
-        List<List<?>> data = list(this.<Object> list('x', "foo"), list('y', "bar"), list('z', "baz"));
+        List<List<?>> data = asList(Arrays.<Object>asList('x', "foo"), asList('y', "bar"), asList('z', "baz"));
         Class<?>[] parameterTypes = new Class<?>[] { char.class, String.class };
 
         // When:
@@ -416,7 +418,7 @@ public class DataConverterTest extends BaseTest {
     @Test
     public void testConvertShouldCallSingleArgConverterOnlyOnceForListOfObjectWithSingleElement() {
         // Given:
-        List<Object> data = this.<Object> list(88);
+        List<Object> data = Arrays.<Object>asList(88);
         Class<?>[] parameterTypes = new Class<?>[] { Object.class };
 
         // When:
@@ -432,7 +434,7 @@ public class DataConverterTest extends BaseTest {
     @Test
     public void testConvertShouldCallSingleArgConverterMultipleTimesForListOfObjectWithMultipleElements() {
         // Given:
-        List<Object> data = this.<Object> list("12", 34L, 5.6);
+        List<Object> data = Arrays.<Object>asList("12", 34L, 5.6);
         Class<?>[] parameterTypes = new Class<?>[] { Object.class };
 
         // When:
