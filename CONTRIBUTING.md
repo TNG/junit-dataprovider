@@ -24,7 +24,7 @@ We love pull requests. Here is a quick guide:
 7. Push to your fork/branch and submit a pull request.
 8. Add the following line to your Pull Request description:
 ```
-I hereby agree to the terms of the ArchUnit Contributor License Agreement.
+I hereby agree to the terms of the JUnit dataprovider Contributor License Agreement.
 ```
 9. Now you are waiting on us. We review your pull request and at least leave some comments.
 
