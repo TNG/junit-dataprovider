@@ -32,7 +32,7 @@ allprojects {
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'jacoco'
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'findbugs'
     apply plugin: 'osgi'
 
@@ -45,6 +45,10 @@ subprojects {
             into 'META-INF'
         }
     }
+
+    dependencies {
+        implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+    }
 }
 
 project(':core') {
@@ -54,8 +58,6 @@ project(':core') {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
     dependencies {
-        compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
-
         testCompile group: 'junit', name: 'junit', version: '4.12'
 
         testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
@@ -87,15 +89,16 @@ project(':junit4') {
     }
 
     configurations {
-        integTestCompile {
-            extendsFrom testRuntime
+        integTestImplementation {
+            extendsFrom testImplementation
         }
     }
 
     dependencies {
-        compile project(':core')
-        compile group: 'junit', name: 'junit', version: junit4Version
-        compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+        api project(':core')
+        api group: 'junit', name: 'junit', version: junit4Version
+
+        implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
 
         testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.7'
@@ -137,16 +140,15 @@ configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
     }
 
     configurations {
-        integTestCompile {
-            extendsFrom testRuntime
+        integTestImplementation {
+            extendsFrom testImplementation
         }
     }
 
     dependencies {
-        compile project(':core')
-        compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
+        api project(':core')
+        api group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
 
-        testCompile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
         testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.10.0'
 
@@ -190,7 +192,7 @@ project(':junit-jupiter-params') {
     description = 'A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider.'
 
     dependencies {
-        compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
+        api group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
     }
 
     jar {

@@ -5,10 +5,9 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
 import java.lang.reflect.Method;
 import java.util.List;
-
-import javax.annotation.CheckReturnValue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +32,7 @@ public class DataProviderResolverContextTest {
     private final ResolveStrategy resolveStrategy = ResolveStrategy.AGGREGATE_ALL_MATCHES;
     @SuppressWarnings("unchecked")
     private final List<Class<?>> locations = asList(this.getClass(), DataProviderResolverContext.class);
-    private final Class<? extends Annotation> dataProviderAnnotationClass = CheckReturnValue.class;
+    private final Class<? extends Annotation> dataProviderAnnotationClass = Documented.class;
     private final String dataProviderName = "dataProviderName";
 
     @Test

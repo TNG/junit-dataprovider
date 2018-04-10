@@ -8,12 +8,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.CheckReturnValue;
 
 import org.assertj.core.api.Condition;
 import org.junit.Rule;
@@ -112,7 +112,7 @@ public class DefaultDataProviderMethodResolverTest {
         final List<Class<?>> locations = Arrays.<Class<?>>asList(ShadowingTestChild.class);
 
         // When:
-        List<Method> result = underTest.findAnnotatedMethods(locations, CheckReturnValue.class);
+        List<Method> result = underTest.findAnnotatedMethods(locations, TestAnnotation.class);
 
         // Then:
         // @formatter:off
@@ -134,7 +134,7 @@ public class DefaultDataProviderMethodResolverTest {
         final List<Class<?>> locations = Arrays.<Class<?>>asList(ShadowingTestChild.class, ShadowingTestParent.class);
 
         // When:
-        List<Method> result = underTest.findAnnotatedMethods(locations, CheckReturnValue.class);
+        List<Method> result = underTest.findAnnotatedMethods(locations, TestAnnotation.class);
 
         // Then:
         assertThat(result).hasSize(11);
@@ -219,28 +219,33 @@ public class DefaultDataProviderMethodResolverTest {
 
     // -- test data and helper methods ---------------------------------------------------------------------------------
 
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface TestAnnotation {
+        // annotation exclusively used for test
+    }
+
     void dataProviderMethod() {
         // method used in tests via reflection
     }
 
     @SuppressWarnings("unused")
     private static class ShadowingTestParent {
-        @CheckReturnValue
+        @TestAnnotation
         protected void notShadowedDueToParameterLength(int i, Double d) {
             // method used in tests via reflection
         }
 
-        @CheckReturnValue
+        @TestAnnotation
         void notShadowedDueToParameterTypes(Integer i) {
             // method used in tests via reflection
         }
 
-        @CheckReturnValue
+        @TestAnnotation
         public void shadowed(String s, Long l) {
             // method used in tests via reflection
         }
 
-        @CheckReturnValue
+        @TestAnnotation
         protected void shadowedButChildHasNoAnnotation(Double d) {
             // method used in tests via reflection
         }
@@ -248,18 +253,18 @@ public class DefaultDataProviderMethodResolverTest {
 
     @SuppressWarnings("unused")
     private static class ShadowingTestChild extends ShadowingTestParent {
-        @CheckReturnValue
+        @TestAnnotation
         protected void notShadowedDueToParameterLength(int i) {
             // method used in tests via reflection
         }
 
-        @CheckReturnValue
+        @TestAnnotation
         void notShadowedDueToParameterTypes(long l) {
             // method used in tests via reflection
         }
 
         @Override
-        @CheckReturnValue
+        @TestAnnotation
         public void shadowed(String s, Long l) {
             // method used in tests via reflection
         }
@@ -269,7 +274,7 @@ public class DefaultDataProviderMethodResolverTest {
             // method used in tests via reflection
         }
 
-        @CheckReturnValue
+        @TestAnnotation
         protected void privateWithAnnotation() {
             // method used in tests via reflection
         }
