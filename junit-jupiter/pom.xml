@@ -23,6 +23,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.8</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -44,6 +45,9 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <debug>true</debug>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -53,7 +57,7 @@
                     <dependency>
                         <groupId>org.junit.platform</groupId>
                         <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.0.1</version>
+                        <version>1.1.1</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -69,7 +73,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.0.1</version>
+            <version>5.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
