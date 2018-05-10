@@ -12,7 +12,7 @@ import com.tngtech.junit.dataprovider.UseDataProvider;
 class CacheDataProviderResultsAcceptanceTest {
 
     // works if test discovery order is equal to execution order
-    public static final AtomicInteger noOfTestsCallsUsingNotCachedDataProvider = new AtomicInteger(0);
+    static final AtomicInteger noOfTestsCallsUsingNotCachedDataProvider = new AtomicInteger(0);
 
     private static final AtomicInteger noOfCachedDataProviderCalls = new AtomicInteger(0);
     private static final AtomicInteger noOfNotCachedDataProviderCalls = new AtomicInteger(0);
@@ -28,16 +28,16 @@ class CacheDataProviderResultsAcceptanceTest {
 
     @ParameterizedTest
     @UseDataProvider("dataProviderCachedDataProviderResults")
-    void testCachedDataProviderResultsOne(int noOfDataProvderCalls) {
+    void testCachedDataProviderResultsOne(int noOfDataProviderCalls) {
         // Expected:
-        assertThat(noOfDataProvderCalls).isEqualTo(1);
+        assertThat(noOfDataProviderCalls).isEqualTo(1);
     }
 
     @ParameterizedTest
     @UseDataProvider("dataProviderCachedDataProviderResults")
-    void testCachedDataProviderResultsTwo(int noOfDataProvderCalls) {
+    void testCachedDataProviderResultsTwo(int noOfDataProviderCalls) {
         // Expected:
-        assertThat(noOfDataProvderCalls).isEqualTo(1);
+        assertThat(noOfDataProviderCalls).isEqualTo(1);
     }
 
     @DataProvider(cache = false)
@@ -51,14 +51,14 @@ class CacheDataProviderResultsAcceptanceTest {
 
     @ParameterizedTest
     @UseDataProvider("dataProviderDoNotCacheDataProviderResults")
-    public void testDoNotCacheDataProviderResultsOne(int noOfDataProvderCalls) {
+    void testDoNotCacheDataProviderResultsOne(int noOfDataProvderCalls) {
         // Expected:
         assertThat(noOfDataProvderCalls).isEqualTo(noOfTestsCallsUsingNotCachedDataProvider.incrementAndGet());
     }
 
     @ParameterizedTest
     @UseDataProvider("dataProviderDoNotCacheDataProviderResults")
-    public void testDoNotCacheCachedDataProviderResultsTwo(int noOfDataProvderCalls) {
+    void testDoNotCacheCachedDataProviderResultsTwo(int noOfDataProvderCalls) {
         // Expected:
         assertThat(noOfDataProvderCalls).isEqualTo(noOfTestsCallsUsingNotCachedDataProvider.incrementAndGet());
     }
