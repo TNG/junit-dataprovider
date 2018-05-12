@@ -1,9 +1,12 @@
 package com.tngtech.java.junit.dataprovider;
 
 import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+import static com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext.generateLocations;
+import static com.tngtech.junit.dataprovider.resolver.ResolveStrategy.UNTIL_FIRST_MATCH;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,6 +28,9 @@ import com.tngtech.java.junit.dataprovider.internal.DataConverter;
 import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodResolver;
 import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
+import com.tngtech.junit.dataprovider.resolver.DataProviderMethodResolver;
+import com.tngtech.junit.dataprovider.resolver.DataProviderMethodResolverHelper;
+import com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext;
 
 /**
  * A custom runner for JUnit that allows the usage of <a href="http://testng.org/">TestNG</a>-like dataproviders. Data
@@ -138,12 +144,16 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
             List<FrameworkMethod> dataProviderMethods = getDataProviderMethods(testMethod);
             if (dataProviderMethods.isEmpty()) {
-                Class<? extends DataProviderMethodResolver>[] resolvers = testMethod.getAnnotation(UseDataProvider.class).resolver();
+                Class<? extends com.tngtech.junit.dataprovider.resolver.DataProviderMethodResolver>[] resolvers = testMethod
+                        .getAnnotation(UseDataProvider.class).resolver();
 
                 String message = "No valid dataprovider found for test '" + testMethod.getName() + "' using ";
-                if (resolvers.length == 1 && DefaultDataProviderMethodResolver.class.equals(resolvers[0])) {
+                if (resolvers.length == 1 && (DefaultDataProviderMethodResolver.class.equals(resolvers[0])
+                        || com.tngtech.junit.dataprovider.resolver.DefaultDataProviderMethodResolver.class
+                                .equals(resolvers[0]))) {
                     message += "the default resolver. By convention the dataprovider method name must either be equal to the test methods name, have a certain replaced or additional prefix (see JavaDoc of "
-                            + DefaultDataProviderMethodResolver.class + " or is explicitely set by @UseDataProvider#value()";
+                            + DefaultDataProviderMethodResolver.class.getSimpleName()
+                            + " or is explicitely set by @UseDataProvider#value()";
                 } else {
                     message += "custom resolvers: " + Arrays.toString(resolvers)
                     + ". Please examine their javadoc and / or implementation.";
@@ -248,11 +258,10 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         UseDataProvider useDataProvider = testMethod.getAnnotation(UseDataProvider.class);
         if (useDataProvider == null) {
             result.add(null);
+
         } else {
             for (Class<? extends DataProviderMethodResolver> resolverClass : useDataProvider.resolver()) {
-                DataProviderMethodResolver resolver = getResolverInstanceInt(resolverClass);
-
-                List<FrameworkMethod> dataProviderMethods = resolver.resolve(testMethod, useDataProvider);
+                List<FrameworkMethod> dataProviderMethods = resolve(resolverClass, testMethod, useDataProvider);
                 if (ResolveStrategy.UNTIL_FIRST_MATCH.equals(useDataProvider.resolveStrategy()) && !dataProviderMethods.isEmpty()) {
                     result.addAll(dataProviderMethods);
                     break;
@@ -266,6 +275,33 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         return result;
     }
 
+    private List<FrameworkMethod> resolve(Class<? extends DataProviderMethodResolver> resolverClass,
+            FrameworkMethod testMethod, UseDataProvider useDataProvider) {
+
+        // If resolver is subclass of old DataProviderMethodResolver
+        if (com.tngtech.java.junit.dataprovider.DataProviderMethodResolver.class.isAssignableFrom(resolverClass)) {
+            @SuppressWarnings("unchecked")
+            com.tngtech.java.junit.dataprovider.DataProviderMethodResolver resolver = getResolverInstanceInt(
+                    (Class<? extends com.tngtech.java.junit.dataprovider.DataProviderMethodResolver>) resolverClass);
+            return resolver.resolve(testMethod, useDataProvider);
+        }
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        List<Class<? extends DataProviderMethodResolver>> resolverClasses = (List) Arrays.asList(resolverClass);
+        List<Class<?>> locations = generateLocations(testMethod.getMethod().getDeclaringClass(),
+                useDataProvider.location());
+
+        DataProviderResolverContext context = new DataProviderResolverContext(testMethod.getMethod(),
+                resolverClasses, UNTIL_FIRST_MATCH, locations, DataProvider.class, useDataProvider.value());
+        List<Method> methods = DataProviderMethodResolverHelper.findDataProviderMethods(context);
+
+        List<FrameworkMethod> result = new ArrayList<FrameworkMethod>();
+        for (Method method : methods) {
+            result.add(new FrameworkMethod(method));
+        }
+        return result;
+    }
+
     /**
      * Returns a new instance of {@link DataProviderMethodResolver}. This method is required for testing. It calls
      * {@link Class#newInstance()} which needs to be stubbed while testing.
@@ -273,8 +309,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * This method is package private (= visible) for testing.
      * </p>
      */
-    DataProviderMethodResolver getResolverInstanceInt(Class<? extends DataProviderMethodResolver> resolverClass) {
-        Constructor<? extends DataProviderMethodResolver> constructor;
+    com.tngtech.java.junit.dataprovider.DataProviderMethodResolver getResolverInstanceInt(
+            Class<? extends com.tngtech.java.junit.dataprovider.DataProviderMethodResolver> resolverClass) {
+        Constructor<? extends com.tngtech.java.junit.dataprovider.DataProviderMethodResolver> constructor;
         try {
             constructor = resolverClass.getDeclaredConstructor();
             constructor.setAccessible(true);

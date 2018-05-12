@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodResolver;
+import com.tngtech.junit.dataprovider.resolver.DefaultDataProviderMethodResolver;
 
 /**
  * Annotate a test method for using it with a dataprovider. The {@link #resolver()} is used to find a proper dataprovider.
@@ -16,6 +16,14 @@ import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodRes
 @Target(ElementType.METHOD)
 public @interface UseDataProvider {
 
+    /**
+     * @deprecated This enum will be removed in version 3.0. It has to be replaced with
+     *             {@link com.tngtech.junit.dataprovider.resolver.ResolveStrategy} from
+     *             {@code junit-dataprovider-core} as soon as migrating to the new version. <br>
+     *             Reason: Enums cannot be extended and therefore it is not possible to already add compatibility to new
+     *             API. However, just imports must be adjusted as the enum and its instances are equally named.
+     */
+    @Deprecated
     public enum ResolveStrategy {
         /**
          * Tries to find valid dataprovider methods looping over the provided {@link UseDataProvider#resolver()} until the first non-empty
@@ -58,7 +66,7 @@ public @interface UseDataProvider {
      *
      * @return the resolver which are used to derive the dataprovider method
      */
-    Class<? extends DataProviderMethodResolver>[] resolver() default { DefaultDataProviderMethodResolver.class };
+    Class<? extends com.tngtech.junit.dataprovider.resolver.DataProviderMethodResolver>[] resolver() default DefaultDataProviderMethodResolver.class;
 
     /**
      * @return strategy how to resolve the dataprovider methods which corresponds to the test method where this annotation is applied.

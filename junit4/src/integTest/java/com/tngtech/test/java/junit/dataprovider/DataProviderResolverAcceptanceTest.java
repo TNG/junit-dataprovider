@@ -48,16 +48,27 @@ public class DataProviderResolverAcceptanceTest {
         }
     }
 
+    private static class DataProviderStartWithTestMethodNameResolverNew
+            extends com.tngtech.junit.dataprovider.resolver.DefaultDataProviderMethodResolver {
+        @Override
+        protected boolean isMatchingNameConvention(String testMethodName, String dataProviderMethodName) {
+            return dataProviderMethodName.startsWith(testMethodName);
+        }
+    }
+
     private static AtomicInteger counter;
+    private static AtomicInteger counterNew;
 
     @BeforeClass
     public static void setupClass() {
         counter = new AtomicInteger(0);
+        counterNew = new AtomicInteger(0);
     }
 
     @AfterClass
     public static void tearDownClass() {
         assertThat(counter.get()).isEqualTo(6);
+        assertThat(counterNew.get()).isEqualTo(6);
     }
 
     @DataProvider
@@ -94,6 +105,16 @@ public class DataProviderResolverAcceptanceTest {
     public void testNumber(Number number) {
         // When:
         int count = counter.incrementAndGet();
+
+        // Then:
+        assertThat(count).isEqualTo(number.intValue());
+    }
+
+    @Test
+    @UseDataProvider(resolver = DataProviderStartWithTestMethodNameResolverNew.class)
+    public void testNum(Number number) {
+        // When:
+        int count = counterNew.incrementAndGet();
 
         // Then:
         assertThat(count).isEqualTo(number.intValue());

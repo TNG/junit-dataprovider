@@ -48,8 +48,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * original test method name is uppercased, e.g. {@code shouldReturnTwoForOnePlusOne} corresponds to
  * {@code dataProviderShouldReturnTwoForOnePlusOne}.</li>
  * </ul>
+ *
+ * @deprecated Use {@link com.tngtech.junit.dataprovider.resolver.DefaultDataProviderMethodResolver} from
+ *             {@code junit-dataprovider-core} instead. JUnit4 internals can handle both. This class will be removed in
+ *             version 3.0.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
+@Deprecated
 public class DefaultDataProviderMethodResolver
         extends com.tngtech.junit.dataprovider.resolver.DefaultDataProviderMethodResolver
         implements DataProviderMethodResolver {

@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,6 +40,7 @@ import com.tngtech.java.junit.dataprovider.internal.DataConverter;
 import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodResolver;
 import com.tngtech.java.junit.dataprovider.internal.TestGenerator;
 import com.tngtech.java.junit.dataprovider.internal.TestValidator;
+import com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -697,6 +699,11 @@ public class DataProviderRunnerTest extends BaseTest {
         public List<FrameworkMethod> resolve(FrameworkMethod testMethod, UseDataProvider useDataProvider) {
             return null;
         }
+
+        @Override
+        public List<Method> resolve(DataProviderResolverContext context) {
+            return null;
+        }
     }
 
     private static abstract class AbstractClass implements DataProviderMethodResolver {
@@ -713,6 +720,11 @@ public class DataProviderRunnerTest extends BaseTest {
         public List<FrameworkMethod> resolve(FrameworkMethod testMethod, UseDataProvider useDataProvider) {
             return null;
         }
+
+        @Override
+        public List<Method> resolve(DataProviderResolverContext context) {
+            return null;
+        }
     }
 
     private static class PrivateDefaultConstructor implements DataProviderMethodResolver {
@@ -722,6 +734,11 @@ public class DataProviderRunnerTest extends BaseTest {
 
         @Override
         public List<FrameworkMethod> resolve(FrameworkMethod testMethod, UseDataProvider useDataProvider) {
+            return null;
+        }
+
+        @Override
+        public List<Method> resolve(DataProviderResolverContext context) {
             return null;
         }
     }
