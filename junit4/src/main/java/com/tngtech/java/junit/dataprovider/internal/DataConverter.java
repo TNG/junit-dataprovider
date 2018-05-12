@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.internal.convert.ObjectArrayConverter;
-import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
-import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
+import com.tngtech.junit.dataprovider.convert.ObjectArrayConverter;
+import com.tngtech.junit.dataprovider.convert.SingleArgConverter;
+import com.tngtech.junit.dataprovider.convert.StringConverter;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 

@@ -8,7 +8,12 @@ import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+/**
+ * @deprecated Use {@link com.tngtech.junit.dataprovider.convert.StringConverter} of {@code core/} instead. JUnit4
+ *             internals can handle both. This class will be removed in version 3.0.
+ */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
+@Deprecated
 public class StringConverter extends com.tngtech.junit.dataprovider.convert.StringConverter {
 
     protected static final Object OBJECT_NO_CONVERSION = com.tngtech.junit.dataprovider.convert.StringConverter.OBJECT_NO_CONVERSION;

@@ -5,7 +5,12 @@ import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+/**
+ * @deprecated Use {@link com.tngtech.junit.dataprovider.convert.ObjectArrayConverter} of {@code core/} instead. Public
+ *             API kept the same. This class will be removed in version 3.0.
+ */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
+@Deprecated
 public class ObjectArrayConverter extends com.tngtech.junit.dataprovider.convert.ObjectArrayConverter {
 
     @Override

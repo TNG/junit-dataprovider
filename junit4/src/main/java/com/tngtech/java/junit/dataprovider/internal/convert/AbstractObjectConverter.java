@@ -5,7 +5,12 @@ import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotN
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+/**
+ * @deprecated Use {@link com.tngtech.junit.dataprovider.convert.AbstractObjectConverter} instead. Public API kept the
+ *             same. This class will be removed in version 3.0.
+ */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
+@Deprecated
 public abstract class AbstractObjectConverter<V>
         extends com.tngtech.junit.dataprovider.convert.AbstractObjectConverter<V> {
 
