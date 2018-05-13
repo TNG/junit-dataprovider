@@ -22,10 +22,10 @@ public class DataProviderPlaceholderFormatter implements DataProviderTestNameFor
         String result = nameFormat;
         for (BasePlaceholder placeholder : placeholders) {
             if (placeholder instanceof com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder) {
-                com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder placeHolder = (com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder) placeholder;
-                synchronized (placeHolder) {
-                    placeHolder.setContext(testMethod, invocationIndex, arguments.toArray());
-                    result = placeHolder.process(result);
+                com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder castedPlaceholder = (com.tngtech.java.junit.dataprovider.internal.placeholder.BasePlaceholder) placeholder;
+                synchronized (castedPlaceholder) {
+                    castedPlaceholder.setContext(testMethod, invocationIndex, arguments.toArray());
+                    result = castedPlaceholder.process(result);
                 }
 
             } else {

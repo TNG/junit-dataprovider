@@ -20,8 +20,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @see DataProvider#format()
  * @see Placeholders
+ *
+ * @deprecated Use {@link com.tngtech.junit.dataprovider.placeholder.BasePlaceholder} of {@code core/} instead. JUnit4
+ *             internals can handle both. This class will be removed in version 3.0.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS", justification = "for backwards compatibility and easier migration to core")
+@Deprecated
 public abstract class BasePlaceholder extends com.tngtech.junit.dataprovider.placeholder.BasePlaceholder {
 
     protected Method method;

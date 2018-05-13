@@ -9,7 +9,7 @@ import com.tngtech.junit.dataprovider.placeholder.ArgumentPlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
 
 /**
- * This placeholder format the parameters of a dataprovider test as comma-separated {@link String} according to the
+ * This placeholder formats the parameters of a dataprovider test as comma-separated {@link String} according to the
  * given index or range subscript (see {@link DataProvider#format()}. Furthermore the following parameter values are
  * treated specially:
  * <table summary="Special {@link String} treatment">
@@ -34,7 +34,11 @@ import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
  * <td>{@link Object#toString()}</td>
  * </tr>
  * </table>
+ *
+ * @deprecated Use {@link com.tngtech.junit.dataprovider.placeholder.ArgumentPlaceholder} instead. JUnit4 internals can
+ *             handle both. This class will be removed in version 3.0.
  */
+@Deprecated
 public class ParameterPlaceholder extends ArgumentPlaceholder {
 
     /**

@@ -26,7 +26,12 @@ import com.tngtech.junit.dataprovider.placeholder.BasePlaceholder;
  * }
  * </code>
  * </pre>
+ *
+ * @deprecated Extend and use {@link com.tngtech.java.junit.dataprovider.format.DataProviderPlaceholderFormatter}, set a
+ *             list of supported placeholders and put it into {@link DataProvider#formatter()} instead . This class will
+ *             be removed in version 3.0.
  */
+@Deprecated
 public class Placeholders {
 
     private static final List<BasePlaceholder> placeholders = new ArrayList<BasePlaceholder>();
