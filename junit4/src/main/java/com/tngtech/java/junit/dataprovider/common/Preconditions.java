@@ -1,5 +1,11 @@
 package com.tngtech.java.junit.dataprovider.common;
 
+/**
+ * @deprecated Use {@link com.tngtech.junit.dataprovider.Preconditions} from {@code junit-dataprovider-core} instead.
+ *             Only the package name need to be changed as the semantics of all methods is remained equal. This class
+ *             will be removed in version 3.0.
+ */
+@Deprecated
 public class Preconditions {
 
     public static <T> T checkNotNull(T object, String errorMessage) {

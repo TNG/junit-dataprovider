@@ -5,6 +5,12 @@ import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotN
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @deprecated Use {@link com.tngtech.junit.dataprovider.DataProviders} from {@code junit-dataprovider-core} instead.
+ *             Only the package name need to be changed and {@link #testForEach(Iterable)} is no longer available as the
+ *             semantics of all other methods is remained equal. This class will be removed in version 3.0.
+ */
+@Deprecated
 public class DataProviders {
 
     /**
@@ -64,7 +70,8 @@ public class DataProviders {
      * @param args which are wrapped in {@link Object} arrays and combined to {@link Object}{@code [][]}
      * @return an array which contains {@link Object} arrays for each single element in the given {@link Iterable}
      * @throws NullPointerException iif given {@code args} is {@code null}
-     * @deprecated since 1.12.0 {@link Iterable}{@code <?>} can directly be returned from any dataprovider method
+     * @deprecated since 1.12.0 {@link Iterable}{@code <?>} can directly be returned from any dataprovider method. This
+     *             will be removed in version 3.0.
      */
     @Deprecated
     public static <T> Object[][] testForEach(Iterable<T> args) {
