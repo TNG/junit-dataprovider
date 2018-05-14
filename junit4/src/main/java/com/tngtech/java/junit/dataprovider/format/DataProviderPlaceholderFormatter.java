@@ -1,8 +1,13 @@
 package com.tngtech.java.junit.dataprovider.format;
 
+import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.tngtech.java.junit.dataprovider.Placeholders;
 import com.tngtech.junit.dataprovider.format.DataProviderTestNameFormatter;
 import com.tngtech.junit.dataprovider.placeholder.BasePlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
@@ -12,9 +17,32 @@ public class DataProviderPlaceholderFormatter implements DataProviderTestNameFor
     private final String nameFormat;
     private final List<? extends BasePlaceholder> placeholders;
 
+    /**
+     * @param nameFormat for formatting test name using placeholders, not {@code null}
+     * @param additionalPlaceholders which should be added to beginning of the list of default placeholders, not
+     *            {@code null}
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public DataProviderPlaceholderFormatter(String nameFormat, BasePlaceholder... additionalPlaceholders) {
+        this.nameFormat = checkNotNull(nameFormat, "'nameFormat' must not be null");
+        checkNotNull(additionalPlaceholders, "'additionalPlaceholders' must not be null");
+
+        List list = new ArrayList();
+        for (BasePlaceholder placeholder : additionalPlaceholders) {
+            list.add(placeholder);
+        }
+        list.addAll(Placeholders.all());
+        this.placeholders = Collections.unmodifiableList(list);
+    }
+
+    /**
+     * @param nameFormat for formatting test name using placeholders, not {@code null}
+     * @param placeholders to be set as list of default placeholders, not {@code null}
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public DataProviderPlaceholderFormatter(String nameFormat, List<? extends BasePlaceholder> placeholders) {
-        this.nameFormat = nameFormat;
-        this.placeholders = placeholders;
+        this.nameFormat = checkNotNull(nameFormat, "'nameFormat' must not be null");
+        this.placeholders = new ArrayList(checkNotNull(placeholders, "'placeholders' must not be null"));
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.tngtech.java.junit.dataprovider;
 import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkArgument;
 import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -92,11 +93,20 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         }
 
         try {
-            return nameFormatter.getDeclaredConstructor().newInstance().format(getMethod(), idx,
-                    Arrays.asList(parameters));
+            DataProviderTestNameFormatter instance = null;
+            for (Constructor<?> constructor : nameFormatter.getConstructors()) {
+                if (constructor.getParameterCount() == 1 && String.class.equals(constructor.getParameterTypes()[0])) {
+                    instance = (DataProviderTestNameFormatter) constructor.newInstance(nameFormat);
+                    break;
+                }
+            }
+            if (instance == null) {
+                instance = nameFormatter.newInstance();
+            }
+            return instance.format(getMethod(), idx, Arrays.asList(parameters));
         } catch (InstantiationException e) {
             throw new IllegalStateException(String
-                    .format("Could not instantiate name formatter using default constructor '%s'.", nameFormatter),
+                    .format("Could not instantiate name formatter using default constructor of '%s'.", nameFormatter),
                     e);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(
@@ -104,9 +114,6 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         } catch (InvocationTargetException e) {
             throw new IllegalStateException(String.format("Default constructor of name formatter '%s' has thrown: %s",
                     nameFormatter, e.getMessage()), e);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException(
-                    String.format("Default constructor not found for name formatter '%s'.", nameFormatter), e);
         } catch (Exception e) {
             throw new IllegalStateException(String.format(
                     "Unexpected exception while finding and invoking default constructor of name formatter '%s': %s",
