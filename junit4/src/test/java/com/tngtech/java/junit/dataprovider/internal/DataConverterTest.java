@@ -28,7 +28,6 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.internal.convert.ObjectArrayConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.SingleArgConverter;
 import com.tngtech.java.junit.dataprovider.internal.convert.StringConverter;
-import com.tngtech.junit.dataprovider.convert.ConverterContext;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataConverterTest extends BaseTest {
@@ -461,7 +460,7 @@ public class DataConverterTest extends BaseTest {
 
         // Then:
         assertThat(result).hasSize(1);
-        verify(stringConverter).convert(eq(data[0]), eq(false), eq(parameterTypes), any(ConverterContext.class), eq(0));
+        verify(stringConverter).convert(eq(data[0]), eq(false), eq(parameterTypes), any(DataProvider.class), eq(0));
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }
 
@@ -477,9 +476,9 @@ public class DataConverterTest extends BaseTest {
         // Then:
         assertThat(result).hasSize(2);
         InOrder inOrder = inOrder(objectArrayConverter, singleArgConverter, stringConverter);
-        inOrder.verify(stringConverter).convert(eq(data[0]), eq(false), eq(parameterTypes), any(ConverterContext.class),
+        inOrder.verify(stringConverter).convert(eq(data[0]), eq(false), eq(parameterTypes), any(DataProvider.class),
                 eq(0));
-        inOrder.verify(stringConverter).convert(eq(data[1]), eq(false), eq(parameterTypes), any(ConverterContext.class),
+        inOrder.verify(stringConverter).convert(eq(data[1]), eq(false), eq(parameterTypes), any(DataProvider.class),
                 eq(1));
         verifyNoMoreInteractions(objectArrayConverter, singleArgConverter, stringConverter);
     }

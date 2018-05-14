@@ -5,6 +5,7 @@ import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotN
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
@@ -82,6 +83,17 @@ public class DataConverter extends com.tngtech.junit.dataprovider.convert.DataCo
     public List<Object[]> convert(Object data, boolean isVarargs, Class<?>[] parameterTypes, DataProvider dataProvider) {
         checkNotNull(dataProvider, "dataProvider must not be null");
 
+        // backwards compatibility to old JUnit4 API
+        if (data instanceof String[]
+                && stringConverter instanceof com.tngtech.java.junit.dataprovider.internal.convert.StringConverter) {
+            List<Object[]> result = new ArrayList<Object[]>();
+            int idx = 0;
+            for (String argString : (String[]) data) {
+                result.add(((com.tngtech.java.junit.dataprovider.internal.convert.StringConverter) stringConverter)
+                        .convert(argString, isVarargs, parameterTypes, dataProvider, idx++));
+            }
+            return result;
+        }
         ConverterContext context = new ConverterContext(objectArrayConverter, singleArgConverter, stringConverter,
                 dataProvider.splitBy(), dataProvider.convertNulls(), dataProvider.trimValues(),
                 dataProvider.ignoreEnumCase());
