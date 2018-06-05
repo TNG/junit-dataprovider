@@ -1,7 +1,7 @@
 package com.tngtech.java.junit.dataprovider;
 
-import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkArgument;
-import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+import static com.tngtech.junit.dataprovider.Preconditions.checkArgument;
+import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

@@ -1,6 +1,6 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
-import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;

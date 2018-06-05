@@ -1,6 +1,6 @@
 package com.tngtech.java.junit.dataprovider;
 
-import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

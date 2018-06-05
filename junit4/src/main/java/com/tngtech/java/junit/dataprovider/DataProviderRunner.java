@@ -1,6 +1,6 @@
 package com.tngtech.java.junit.dataprovider;
 
-import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 import static com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext.generateLocations;
 import static com.tngtech.junit.dataprovider.resolver.ResolveStrategy.UNTIL_FIRST_MATCH;
 
