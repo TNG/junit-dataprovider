@@ -60,8 +60,8 @@ project(':core') {
     dependencies {
         testCompile group: 'junit', name: 'junit', version: '4.12'
 
-        testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
-        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
+        testCompile group: 'org.assertj', name: 'assertj-core', version: '1.9.1'
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.19.0'
     }
 
     jar {
