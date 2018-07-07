@@ -81,7 +81,7 @@ pipeline {
             post {
                 always {
                     dry canComputeNew: false, defaultEncoding: '', healthy: '', pattern: 'build/reports/cpd/*.xml', unHealthy: ''
-                    findbugs defaultEncoding: '', excludePattern: '**/*Test.java', healthy: '', includePattern: '', pattern: '**/build/reports/findbugs/*.xml', unHealthy: '', unstableNewAll: '0'
+                    findbugs defaultEncoding: '', excludePattern: '**/*Test.java', healthy: '', includePattern: '', pattern: '**/build/reports/spotbugs/*.xml', unHealthy: '', unstableNewAll: '0'
                     jacoco classPattern: '**/build/classes/*/main/', execPattern: '**/build/jacoco/*.exec', sourcePattern: '**/src/main/java'
                     warnings canComputeNew: false, canResolveRelativePaths: false, categoriesPattern: '', consoleParsers: [[parserName: 'Java Compiler (Eclipse)'], [parserName: 'Java Compiler (javac)'], [parserName: 'JavaDoc Tool']], defaultEncoding: 'UTF-8', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', unHealthy: ''
                 }
