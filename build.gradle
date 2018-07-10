@@ -10,8 +10,10 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.kt3k.coveralls' version '2.3.1'
     id 'de.aaschmid.cpd' version '1.1'
+
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.6.3'
 }
 
 ext {
@@ -315,6 +317,37 @@ cpdCheck {
     ignoreFailures = true
     minimumTokenCount = 25
     source = subprojects*.sourceSets*.main*.java*.srcDirs + subprojects*.sourceSets*.test*.java*.srcDirs // only check java source code
+}
+
+// -- coveralls gradle plugin multi-module project workaround ---------------------------------------------------------
+def publishedProjects = subprojects.findAll()
+
+task jacocoMerge(type: JacocoMerge) {
+    doFirst {
+        executionData = files(executionData.findAll { it.exists() })
+    }
+    publishedProjects.each { subproject ->
+        executionData subproject.tasks.withType(Test)
+    }
+}
+
+task jacocoRootReport(type: JacocoReport) {
+    description = 'Generates an aggregate report from all subprojects'
+    dependsOn publishedProjects.test, jacocoMerge
+
+    additionalSourceDirs = files(publishedProjects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories = files(publishedProjects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(publishedProjects.sourceSets.main.output)
+    executionData jacocoMerge.destinationFile
+
+    reports {
+        xml.enabled = true // required by coveralls
+    }
+}
+
+coveralls {
+    sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
 
 // -- build and publish artifacts -------------------------------------------------------------------------------------

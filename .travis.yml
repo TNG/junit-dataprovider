@@ -24,4 +24,4 @@ jdk:
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}
-  - ./gradlew jacocoTestReport coveralls
+  - ./gradlew jacocoRootReport coveralls
