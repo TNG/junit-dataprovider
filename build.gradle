@@ -129,7 +129,7 @@ project(':junit4') {
     }
 
     tasks.withType(JavaCompile) {
-        options.compilerArgs += [ '-Xlint:-options' ]
+        options.compilerArgs += [ '-Xlint:-options', '-Xlint:-deprecation' ]
     }
 
     jar {
