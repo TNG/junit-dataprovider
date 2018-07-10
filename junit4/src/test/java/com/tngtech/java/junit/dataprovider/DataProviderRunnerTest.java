@@ -42,6 +42,7 @@ import com.tngtech.java.junit.dataprovider.internal.TestValidator;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+@SuppressWarnings({ "unchecked", "deprecation" })
 public class DataProviderRunnerTest extends BaseTest {
 
     // for testing exceptions in @BeforeClass
@@ -172,7 +173,6 @@ public class DataProviderRunnerTest extends BaseTest {
 
         doAnswer(new Answer<Void>() {
             @Override
-            @SuppressWarnings("unchecked")
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 ((List<Throwable>) invocation.getArguments()[0]).add(new Error());
                 return null;
@@ -252,7 +252,7 @@ public class DataProviderRunnerTest extends BaseTest {
         doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
         doReturn(emptyList()).when(underTest).getDataProviderMethods(testMethod);
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(new Class[] { DefaultDataProviderMethodResolver.class }).when(useDataProvider).resolver();
+        doReturn(new Class<?>[] { DefaultDataProviderMethodResolver.class }).when(useDataProvider).resolver();
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -274,7 +274,7 @@ public class DataProviderRunnerTest extends BaseTest {
         doReturn(asList(testMethod)).when(testClass).getAnnotatedMethods(UseDataProvider.class);
         doReturn(Collections.emptyList()).when(underTest).getDataProviderMethods(testMethod);
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(new Class[] { null, DefaultDataProviderMethodResolver.class }).when(useDataProvider).resolver();
+        doReturn(new Class<?>[] { null, DefaultDataProviderMethodResolver.class }).when(useDataProvider).resolver();
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -362,7 +362,8 @@ public class DataProviderRunnerTest extends BaseTest {
     public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
         // Given:
         underTest.computedTestMethods = null;
-        doReturn(new ArrayList<FrameworkMethod>()).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
+        doReturn(new ArrayList<FrameworkMethod>()).when(underTest)
+                .generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
 
         // When:
         List<FrameworkMethod> result = underTest.computeTestMethods();
@@ -601,7 +602,8 @@ public class DataProviderRunnerTest extends BaseTest {
         final List<FrameworkMethod> expected3 = Arrays.asList(mock(FrameworkMethod.class));
 
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(new Class[] { DataProviderMethodResolver.class, DataProviderMethodResolver.class, DataProviderMethodResolver.class })
+        doReturn(new Class<?>[] { DataProviderMethodResolver.class, DataProviderMethodResolver.class,
+                DataProviderMethodResolver.class })
                 .when(useDataProvider).resolver();
         doReturn(ResolveStrategy.UNTIL_FIRST_MATCH).when(useDataProvider).resolveStrategy();
 
@@ -629,7 +631,8 @@ public class DataProviderRunnerTest extends BaseTest {
         final List<FrameworkMethod> expected3 = Arrays.asList(mock(FrameworkMethod.class));
 
         doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(new Class[] { DataProviderMethodResolver.class, DataProviderMethodResolver.class, DataProviderMethodResolver.class })
+        doReturn(new Class<?>[] { DataProviderMethodResolver.class, DataProviderMethodResolver.class,
+                DataProviderMethodResolver.class })
         .when(useDataProvider).resolver();
         doReturn(ResolveStrategy.AGGREGATE_ALL_MATCHES).when(useDataProvider).resolveStrategy();
 

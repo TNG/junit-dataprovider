@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.tngtech.java.junit.dataprovider.BaseTest;
 import com.tngtech.java.junit.dataprovider.DataProvider;
@@ -83,7 +83,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldCorrectlyParseAllPrimitiveTypes() {
         // Given:
         String data = "true,1,c,2,3,4,5.5,6.6";
-        Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
+        Class<?>[] parameterTypes = new Class<?>[] { boolean.class, byte.class, char.class, short.class, int.class,
                 long.class, float.class, double.class };
 
         doReturn(",").when(dataProvider).splitBy();
@@ -99,7 +99,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldCorrectlyParseAllPrimitiveTypesAsJavaString() {
         // Given:
         String data = "-5;2014l;-1.234567f;-901e-3";
-        Class<?>[] parameterTypes = new Class[] { int.class, long.class, float.class, double.class };
+        Class<?>[] parameterTypes = new Class<?>[] { int.class, long.class, float.class, double.class };
 
         doReturn(";").when(dataProvider).splitBy();
 
@@ -114,7 +114,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldNotTrimValuesIfSettingsTrimIsFalse() {
         // Given:
         String data = " foo|  bar   |baz    ";
-        Class<?>[] parameterTypes = new Class[] { String.class, String.class, String.class };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, String.class, String.class };
 
         doReturn("\\|").when(dataProvider).splitBy();
 
@@ -129,7 +129,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldTrimAndParseAllPrimitiveTypesIfSettingsTrimIsTrue() {
         // Given:
         String data = "   false   ;    11    ;    z    ;  22       ;   33   ;44      ;   55.55     ;  66.66     ";
-        Class<?>[] parameterTypes = new Class[] { boolean.class, byte.class, char.class, short.class, int.class,
+        Class<?>[] parameterTypes = new Class<?>[] { boolean.class, byte.class, char.class, short.class, int.class,
                 long.class, float.class, double.class };
 
         doReturn(";").when(dataProvider).splitBy();
@@ -146,7 +146,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldTrimNonSpaceWhitespaceCharsIfSettingsTrimIsTrue() {
         // Given:
         String data = "\n-1f\n,\r-2\r,\t3.0d\t";
-        Class<?>[] parameterTypes = new Class[] { float.class, int.class, double.class };
+        Class<?>[] parameterTypes = new Class<?>[] { float.class, int.class, double.class };
 
         doReturn(",").when(dataProvider).splitBy();
         doReturn(true).when(dataProvider).trimValues();
@@ -162,7 +162,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldNotTrimNonBreakingSpaceEvenIfSettingsTrimIsTrue() {
         // Given:
         String data = "\u00A0test\u00A0";
-        Class<?>[] parameterTypes = new Class[] { String.class };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class };
 
         doReturn(true).when(dataProvider).trimValues();
 
@@ -177,7 +177,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldCorrectlyHandleLeadingEmptyString() {
         // Given:
         String data = "/true";
-        Class<?>[] parameterTypes = new Class[] { String.class, boolean.class };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, boolean.class };
 
         doReturn("/").when(dataProvider).splitBy();
         doReturn(true).when(dataProvider).trimValues();
@@ -193,7 +193,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldCorrectlyHandleTrailingEmptyString() {
         // Given:
         String data = "1 ";
-        Class<?>[] parameterTypes = new Class[] { int.class, String.class };
+        Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class };
 
         doReturn(" ").when(dataProvider).splitBy();
         doReturn(true).when(dataProvider).trimValues();
@@ -209,7 +209,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldThrowIllegalArgumentExceptionIfCharHasNotLengthOne() {
         // Given:
         String data = "noChar";
-        Class<?>[] parameterTypes = new Class[] { char.class };
+        Class<?>[] parameterTypes = new Class<?>[] { char.class };
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 40);
@@ -221,7 +221,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldThrowIllegalArgumentExceptionIfValueOfThrowsNumberFormatException() {
         // Given:
         String data = "noInt";
-        Class<?>[] parameterTypes = new Class[] { int.class };
+        Class<?>[] parameterTypes = new Class<?>[] { int.class };
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 41);
@@ -233,7 +233,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldThrowIllegalArgumentExceptionForTargetTypeConstructorWithStringArgWhichThrowsException() {
         // Given:
         String data = "noInt";
-        Class<?>[] parameterTypes = new Class[] { BigInteger.class };
+        Class<?>[] parameterTypes = new Class<?>[] { BigInteger.class };
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 42);
@@ -245,7 +245,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldThrowIllegalArgumentExceptionForUnsupportedTargetType() {
         // Given:
         String data = "noObject";
-        Class<?>[] parameterTypes = new Class[] { Object.class };
+        Class<?>[] parameterTypes = new Class<?>[] { Object.class };
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 43);
@@ -257,7 +257,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldCorrectlyParseEnum() {
         // Given:
         String data = " VAL1,  VAL2 ";
-        Class<?>[] parameterTypes = new Class[] { TestEnum.class, TestEnum.class };
+        Class<?>[] parameterTypes = new Class<?>[] { TestEnum.class, TestEnum.class };
 
         doReturn(",").when(dataProvider).splitBy();
         doReturn(true).when(dataProvider).trimValues();
@@ -273,7 +273,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldThrowIllegalArgumentExceptionIfEnumValuesIsInvalid() {
         // Given:
         String data = "Val1";
-        Class<?>[] parameterTypes = new Class[] { TestEnum.class };
+        Class<?>[] parameterTypes = new Class<?>[] { TestEnum.class };
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 51);
@@ -285,7 +285,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldCorrectlyParseEnumIgnoringCase() {
         // Given:
         String data = "Val1,val2";
-        Class<?>[] parameterTypes = new Class[] { TestEnum.class, TestEnum.class };
+        Class<?>[] parameterTypes = new Class<?>[] { TestEnum.class, TestEnum.class };
 
         doReturn(",").when(dataProvider).splitBy();
         doReturn(true).when(dataProvider).ignoreEnumCase();
@@ -301,7 +301,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldThrowIllegalArgumentExceptionIfEnumValueIsInvalid() {
         // Given:
         String data = "UNKNOW_ENUM_VALUE";
-        Class<?>[] parameterTypes = new Class[] { TestEnum.class };
+        Class<?>[] parameterTypes = new Class<?>[] { TestEnum.class };
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 51);
@@ -313,7 +313,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldCorrectlyParseClass() {
         // Given:
         String data = " java.lang.Thread,  com.tngtech.java.junit.dataprovider.DataProviderRunner ";
-        Class<?>[] parameterTypes = new Class[] { Class.class, Class.class };
+        Class<?>[] parameterTypes = new Class<?>[] { Class.class, Class.class };
 
         doReturn(",").when(dataProvider).splitBy();
         doReturn(true).when(dataProvider).trimValues();
@@ -329,7 +329,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldThrowIllegalArgumentExceptionIfClassNameIsInvalid() {
         // Given:
         String data = "String";
-        Class<?>[] parameterTypes = new Class[] { Class.class };
+        Class<?>[] parameterTypes = new Class<?>[] { Class.class };
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 55);
@@ -341,7 +341,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldCorrectlyParseAllPrimitiveWrapperTypes() {
         // Given:
         String data = "true,1,c,2,3,4,5.5,6.6";
-        Class<?>[] parameterTypes = new Class[] { Boolean.class, Byte.class, Character.class, Short.class,
+        Class<?>[] parameterTypes = new Class<?>[] { Boolean.class, Byte.class, Character.class, Short.class,
                 Integer.class, Long.class, Float.class, Double.class };
 
         doReturn(",").when(dataProvider).splitBy();
@@ -359,7 +359,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldParseNullValuesAsStringIfSettingsConvertNullsIsFalse() {
         // Given:
         String data = "null#null";
-        Class<?>[] parameterTypes = new Class[] { String.class, String.class };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, String.class };
 
         doReturn("#").when(dataProvider).splitBy();
 
@@ -374,7 +374,7 @@ public class StringConverterTest extends BaseTest {
     public void testConvertShouldParseNullValuesAsNullObjectIfSettingsConvertNullsIsTrue() {
         // Given:
         String data = "null,null,foo";
-        Class<?>[] parameterTypes = new Class[] { String.class, String.class, String.class };
+        Class<?>[] parameterTypes = new Class<?>[] { String.class, String.class, String.class };
 
         doReturn(",").when(dataProvider).splitBy();
         doReturn(true).when(dataProvider).convertNulls();

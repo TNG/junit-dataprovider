@@ -3,6 +3,7 @@ package com.tngtech.java.junit.dataprovider;
 import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkArgument;
 import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -91,7 +92,8 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         }
 
         try {
-            return nameFormatter.newInstance().format(getMethod(), idx, Arrays.asList(parameters));
+            return nameFormatter.getDeclaredConstructor().newInstance().format(getMethod(), idx,
+                    Arrays.asList(parameters));
         } catch (InstantiationException e) {
             throw new IllegalStateException(String
                     .format("Could not instantiate name formatter using default constructor '%s'.", nameFormatter),
@@ -99,6 +101,16 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(
                     String.format("Default constructor not accessable of name formatter '%s'.", nameFormatter), e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException(String.format("Default constructor of name formatter '%s' has thrown: %s",
+                    nameFormatter, e.getMessage()), e);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(
+                    String.format("Default constructor not found for name formatter '%s'.", nameFormatter), e);
+        } catch (Exception e) {
+            throw new IllegalStateException(String.format(
+                    "Unexpected exception while finding and invoking default constructor of name formatter '%s': %s",
+                    nameFormatter, e.getMessage()), e);
         }
     }
 
