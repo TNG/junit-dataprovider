@@ -72,6 +72,22 @@ public class DataProviderFilterTest extends BaseTest {
     }
 
     @Test
+    public void testShouldRunShouldCallOriginalFilterShouldRunIfGivenDescriptionContainsOr() {
+        // Given:
+        doReturn("Matching description Method failing1[0: 0](Test1) OR Method failing2[0: 0](Test2)").when(filter)
+                .describe();
+        Description description = setupDescription(true, "failing1[0: 0](Test1)");
+
+        // When:
+        underTest.shouldRun(description);
+
+        // Then:
+        verify(filter).describe();
+        verify(filter).shouldRun(description);
+        verifyNoMoreInteractions(filter);
+    }
+
+    @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodName() {
         // Given:
         doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();

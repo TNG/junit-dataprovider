@@ -61,8 +61,10 @@ public class DataProviderFilter extends Filter {
 
     @Override
     public boolean shouldRun(Description description) {
-        Matcher filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filter.describe());
-        if (!filterDescriptionMatcher.find()) {
+        String filterDescription = filter.describe();
+
+        Matcher filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filterDescription);
+        if (filterDescription.contains(" OR ") || !filterDescriptionMatcher.find()) {
             return filter.shouldRun(description);
         }
         String methodName = filterDescriptionMatcher.group(GROUP_METHOD_NAME);
