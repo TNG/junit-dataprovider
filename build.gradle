@@ -1,15 +1,5 @@
-buildscript {
-    repositories {
-        maven {
-            url 'https://plugins.gradle.org/m2/'
-        }
-    }
-    dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.2'
-    }
-}
-
 plugins {
+    id 'com.github.spotbugs' version '1.6.5' apply false
     id 'de.aaschmid.cpd' version '1.1'
 
     id 'jacoco'
@@ -32,10 +22,6 @@ if (!hasProperty('junitJupiterVersion')) { // set default junit version if not s
 }
 println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
-}
-
 allprojects {
     repositories {
         mavenCentral()
@@ -50,7 +36,7 @@ subprojects {
     apply plugin: 'osgi'
 
     group = 'com.tngtech.junit.dataprovider'
-    version = '2.4'
+    version = '2.5-SNAPSHOT'
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
@@ -348,9 +334,9 @@ task jacocoRootReport(type: JacocoReport) {
     description = 'Generates an aggregate report from all subprojects'
     dependsOn publishedProjects.test, jacocoMerge
 
-    additionalSourceDirs = files(publishedProjects.sourceSets.main.allSource.srcDirs)
-    sourceDirectories = files(publishedProjects.sourceSets.main.allSource.srcDirs)
-    classDirectories = files(publishedProjects.sourceSets.main.output)
+    additionalSourceDirs.from files(publishedProjects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories.from  files(publishedProjects.sourceSets.main.allSource.srcDirs)
+    classDirectories.from files(publishedProjects.sourceSets.main.output)
     executionData jacocoMerge.destinationFile
 
     reports {
@@ -459,13 +445,7 @@ subprojects {
  */
 class TouchTestResults extends DefaultTask {
     @InputFiles
-    def tasks
-
-    @javax.inject.Inject
-    public TouchTestResults(org.gradle.internal.reflect.Instantiator instantiator) {
-        super()
-        tasks = new org.gradle.api.internal.tasks.DefaultTaskCollection(DefaultTask.class, instantiator, project)
-    }
+    def tasks = []
 
     def tasks(Test... testTasks) {
         tasks.addAll(testTasks)
