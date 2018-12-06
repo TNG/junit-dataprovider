@@ -1,24 +1,27 @@
 plugins {
-    id 'com.github.spotbugs' version '1.6.5' apply false
-    id 'de.aaschmid.cpd' version '1.2'
 
-    id 'jacoco'
-    id 'com.github.kt3k.coveralls' version '2.6.3'
+    id "com.github.spotbugs" version "1.6.5" apply false
+    id "de.aaschmid.cpd" version "1.2"
+
+    id "biz.aQute.bnd.builder" version "4.1.0" apply false
+
+    id "jacoco"
+    id "com.github.kt3k.coveralls" version "2.6.3"
 }
 
 ext {
-    isBuildOnJenkins = System.env['BUILD_TAG']?.startsWith('jenkins-') ?: false
+    isBuildOnJenkins = System.env["BUILD_TAG"]?.startsWith("jenkins-") ?: false
 }
-ext.skipSpotBugs = hasProperty('skipSpotBugs')
+ext.skipSpotBugs = hasProperty("skipSpotBugs")
 println "Using skipSpotBugs = ${skipSpotBugs} for current build."
 
-if (!hasProperty('junit4Version')) { // set default junit version if not set via command line
-    ext.junit4Version = '4.12'
+if (!hasProperty("junit4Version")) { // set default junit version if not set via command line
+    ext.junit4Version = "4.12"
 }
 println "Using JUnit4 version ${junit4Version} for current build."
 
-if (!hasProperty('junitJupiterVersion')) { // set default junit version if not set via command line
-    ext.junitJupiterVersion = '5.2.0'
+if (!hasProperty("junitJupiterVersion")) { // set default junit version if not set via command line
+    ext.junitJupiterVersion = "5.2.0"
 }
 println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
 
@@ -29,63 +32,63 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'eclipse'
-    apply plugin: 'jacoco'
-    apply plugin: 'java-library'
-    apply plugin: 'com.github.spotbugs'
-    apply plugin: 'osgi'
+    apply plugin: "eclipse"
+    apply plugin: "jacoco"
+    apply plugin: "java-library"
+    apply plugin: "com.github.spotbugs"
+    apply plugin: "osgi"
 
-    group = 'com.tngtech.junit.dataprovider'
-    version = '2.5-SNAPSHOT'
+    group = "com.tngtech.junit.dataprovider"
+    version = "2.5-SNAPSHOT"
 
     tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
-        options.compilerArgs += [ '-Xlint:all', '-Werror' ]
+        options.encoding = "UTF-8"
+        options.compilerArgs += [ "-Xlint:all", "-Werror" ]
     }
 
     tasks.withType(Jar) {
         from(project.rootDir) {
-            include 'LICENSE.md', 'LICENSE-notice.md'
-            into 'META-INF'
+            include "LICENSE.md", "LICENSE-notice.md"
+            into "META-INF"
         }
     }
 
     dependencies {
-        implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '3.1.5'
+        implementation group: "com.github.spotbugs", name: "spotbugs-annotations", version: "3.1.5"
     }
 }
 
-project(':core') {
-    archivesBaseName = 'junit-dataprovider-core'
-    description = 'The common core for a TestNG like dataprovider runner for JUnit.'
+project(":core") {
+    archivesBaseName = "junit-dataprovider-core"
+    description = "The common core for a TestNG like dataprovider runner for JUnit."
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile group: "junit", name: "junit", version: "4.12"
 
-        testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
-        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
+        testCompile group: "org.assertj", name: "assertj-core", version: "1.7.1"
+        testCompile group: "org.mockito", name: "mockito-core", version: "2.18.3"
     }
 
     tasks.withType(JavaCompile) {
-        options.compilerArgs += [ '-Xlint:-options' ]
+        options.compilerArgs += [ "-Xlint:-options" ]
     }
 
     jar {
         manifest {
             attributes(
-                'Automatic-Module-Name': 'com.tngtech.junit.dataprovider.core'
+                "Automatic-Module-Name": "com.tngtech.junit.dataprovider.core"
             )
         }
     }
 }
 
-project(':junit4') {
-    apply plugin: 'groovy'
+project(":junit4") {
+    apply plugin: "groovy"
 
-    archivesBaseName = 'junit4-dataprovider'
-    description = 'A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features.'
+    archivesBaseName = "junit4-dataprovider"
+    description = "A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features."
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
@@ -103,30 +106,30 @@ project(':junit4') {
     }
 
     dependencies {
-        api project(':core')
-        api group: 'junit', name: 'junit', version: junit4Version
+        api project(":core")
+        api group: "junit", name: "junit", version: junit4Version
 
-        implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '3.1.5'
+        implementation group: "com.github.spotbugs", name: "spotbugs-annotations", version: "3.1.5"
 
-        testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.1'
-        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
+        testCompile group: "org.assertj", name: "assertj-core", version: "1.7.1"
+        testCompile group: "org.mockito", name: "mockito-core", version: "2.18.3"
 
-        integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.7'
+        integTestCompile group: "org.codehaus.groovy", name: "groovy", version: "2.4.7"
     }
 
     tasks.withType(JavaCompile) {
-        options.compilerArgs += [ '-Xlint:-options' ]
+        options.compilerArgs += [ "-Xlint:-options" ]
     }
 
     jar {
         manifest {
             attributes(
-                'Automatic-Module-Name': 'com.tngtech.junit.dataprovider.junit4'
+                "Automatic-Module-Name": "com.tngtech.junit.dataprovider.junit4"
             )
         }
     }
 
-    task integTest(dependsOn: integTestClasses, type: Test, group: 'verification', description: 'Runs all integration tests.') {
+    task integTest(dependsOn: integTestClasses, type: Test, group: "verification", description: "Runs all integration tests.") {
         ignoreFailures = isBuildOnJenkins
 
         classpath = sourceSets.integTest.runtimeClasspath
@@ -139,8 +142,8 @@ project(':junit4') {
     build.dependsOn touchIntegTestResultsForJenkins
 }
 
-configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
-    apply plugin: 'groovy'
+configure(subprojects.findAll{ p -> p.name.startsWith("junit-jupiter") }) {
+    apply plugin: "groovy"
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -158,24 +161,24 @@ configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
     }
 
     dependencies {
-        api project(':core')
-        api group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
+        api project(":core")
+        api group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitJupiterVersion
 
-        testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
-        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
+        testCompile group: "org.assertj", name: "assertj-core", version: "3.8.0"
+        testCompile group: "org.mockito", name: "mockito-core", version: "2.18.3"
 
-        integTestCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.12'
+        integTestCompile group: "org.codehaus.groovy", name: "groovy", version: "2.4.12"
     }
 
     tasks.withType(JavaCompile) {
-        options.compilerArgs += [ '-parameters' ]
+        options.compilerArgs += [ "-parameters" ]
     }
 
     test {
         useJUnitPlatform()
     }
 
-    task integTest(dependsOn: integTestClasses, type: Test, group: 'verification', description: 'Runs all integration tests.') {
+    task integTest(dependsOn: integTestClasses, type: Test, group: "verification", description: "Runs all integration tests.") {
         ignoreFailures = isBuildOnJenkins
 
         classpath = sourceSets.integTest.runtimeClasspath
@@ -190,31 +193,31 @@ configure(subprojects.findAll{ p -> p.name.startsWith('junit-jupiter') }) {
     build.dependsOn touchIntegTestResultsForJenkins
 }
 
-project(':junit-jupiter') {
-    archivesBaseName = 'junit-jupiter-dataprovider'
-    description = 'A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.'
+project(":junit-jupiter") {
+    archivesBaseName = "junit-jupiter-dataprovider"
+    description = "A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider."
 
     jar {
         manifest {
             attributes(
-                'Automatic-Module-Name': 'com.tngtech.junit.dataprovider.jupiter'
+                "Automatic-Module-Name": "com.tngtech.junit.dataprovider.jupiter"
             )
         }
     }
 }
 
-project(':junit-jupiter-params') {
-    archivesBaseName = 'junit-jupiter-params-dataprovider'
-    description = 'A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider.'
+project(":junit-jupiter-params") {
+    archivesBaseName = "junit-jupiter-params-dataprovider"
+    description = "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider."
 
     dependencies {
-        api group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
+        api group: "org.junit.jupiter", name: "junit-jupiter-params", version: junitJupiterVersion
     }
 
     jar {
         manifest {
             attributes(
-                'Automatic-Module-Name': 'com.tngtech.junit.dataprovider.jupiter.params'
+                "Automatic-Module-Name": "com.tngtech.junit.dataprovider.jupiter.params"
             )
         }
     }
@@ -226,24 +229,24 @@ subprojects {
         manifest {
             def now = new Date()
 
-            def company = 'TNG Technology Consulting GmbH'
-            def today = now.format('yyyy-MM-dd')
+            def company = "TNG Technology Consulting GmbH"
+            def today = now.format("yyyy-MM-dd")
             def copyright = "${now[Calendar.YEAR]} ${company}"
-            def projectLicense = 'Apache License v2.0, January 2004'
+            def projectLicense = "Apache License v2.0, January 2004"
 
             attributes(
-                'Built-By': "Gradle ${gradle.gradleVersion}",
-                'Built-Date': today, // using now would destroy incremental build feature
-                'Specification-Title': archivesBaseName,
-                'Specification-Version': version,
-                'Specification-Vendor': company,
-                'Implementation-Title': archivesBaseName,
-                'Implementation-Version': version,
-                'Implementation-Vendor': company,
-                'Issue-Tracker': 'https://github.com/TNG/junit-dataprovider/issues',
-                'Documentation-URL': 'https://github.com/TNG/junit-dataprovider/wiki',
-                'Copyright': copyright,
-                'License': projectLicense
+                "Built-By": "Gradle ${gradle.gradleVersion}",
+                "Built-Date": today, // using now would destroy incremental build feature
+                "Specification-Title": archivesBaseName,
+                "Specification-Version": version,
+                "Specification-Vendor": company,
+                "Implementation-Title": archivesBaseName,
+                "Implementation-Version": version,
+                "Implementation-Vendor": company,
+                "Issue-Tracker": "https://github.com/TNG/junit-dataprovider/issues",
+                "Documentation-URL": "https://github.com/TNG/junit-dataprovider/wiki",
+                "Copyright": copyright,
+                "License": projectLicense,
             )
 
             // OSGi / p2 plugin information
@@ -256,12 +259,12 @@ subprojects {
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+        classifier = "javadoc"
         from javadoc.destinationDir
     }
 
     task sourcesJar(type: Jar) {
-        classifier = 'sources'
+        classifier = "sources"
         from sourceSets.main.allSource
     }
 
@@ -287,11 +290,11 @@ subprojects {
         }
     }
     jacoco {
-        toolVersion = '0.8.1'
+        toolVersion = "0.8.1"
     }
 
     spotbugs {
-        toolVersion = '3.1.3'
+        toolVersion = "3.1.3"
         ignoreFailures = true
     }
 
@@ -305,10 +308,10 @@ subprojects {
 }
 
 cpd {
-    if (System.getProperty('java.version')[0..2] in [ '1.6' ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
-        toolVersion = '5.3.7'
+    if (System.getProperty("java.version")[0..2] in [ "1.6" ]) { // PMD / CPD v5.4.0 does not work with Java < v1.7 :-(
+        toolVersion = "5.3.7"
     } else {
-        toolVersion = '6.2.0'
+        toolVersion = "6.2.0"
     }
 }
 
@@ -331,7 +334,7 @@ task jacocoMerge(type: JacocoMerge) {
 }
 
 task jacocoRootReport(type: JacocoReport) {
-    description = 'Generates an aggregate report from all subprojects'
+    description = "Generates an aggregate report from all subprojects"
     dependsOn publishedProjects.test, jacocoMerge
 
     additionalSourceDirs.from files(publishedProjects.sourceSets.main.allSource.srcDirs)
@@ -350,21 +353,21 @@ coveralls {
 }
 
 // -- build and publish artifacts -------------------------------------------------------------------------------------
-if (!hasProperty('sonatypeUsername')) {
-    ext.sonatypeUsername = ''
+if (!hasProperty("sonatypeUsername")) {
+    ext.sonatypeUsername = ""
 }
-if (!hasProperty('sonatypePassword')) {
-    ext.sonatypePassword = ''
+if (!hasProperty("sonatypePassword")) {
+    ext.sonatypePassword = ""
 }
 
 subprojects {
-    apply plugin: 'maven'
-    apply plugin: 'signing'
+    apply plugin: "maven"
+    apply plugin: "signing"
 
     signing {
         // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
         required {
-            gradle.taskGraph.hasTask('uploadArchives')
+            gradle.taskGraph.hasTask("uploadArchives")
         }
         sign configurations.archives
     }
@@ -376,60 +379,60 @@ subprojects {
                     signing.signPom(deployment)
                 }
                 // username and password from gradle.properties
-                repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
                     authentication(userName: rootProject.sonatypeUsername, password: rootProject.sonatypePassword)
                 }
-                snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
                     authentication(userName: rootProject.sonatypeUsername, password: rootProject.sonatypePassword)
                 }
 
                 pom {
                     project {
                         name project.archivesBaseName
-                        packaging 'jar'
+                        packaging "jar"
                         description project.description
-                        url 'https://github.com/TNG/junit-dataprovider'
+                        url "https://github.com/TNG/junit-dataprovider"
 
                         scm {
-                            url 'scm:git@github.com:TNG/junit-dataprovider.git'
-                            connection 'scm:git@github.com:TNG/junit-dataprovider.git'
-                            developerConnection 'scm:git@github.com:TNG/junit-dataprovider.git'
+                            url "scm:git@github.com:TNG/junit-dataprovider.git"
+                            connection "scm:git@github.com:TNG/junit-dataprovider.git"
+                            developerConnection "scm:git@github.com:TNG/junit-dataprovider.git"
                         }
 
                         licenses {
                             license {
-                                name 'The Apache Software License, Version 2.0'
-                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                                distribution 'repo'
+                                name "The Apache Software License, Version 2.0"
+                                url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                                distribution "repo"
                             }
                         }
 
                         developers {
                             developer {
-                                id 'aaschmid'
-                                name 'Andreas Schmid'
+                                id "aaschmid"
+                                name "Andreas Schmid"
                             }
                         }
                     }
                     whenConfigured { pom ->
                         // JUnit4
-                        pom.dependencies.findAll{ dep -> dep.groupId == 'junit' && dep.artifactId == 'junit' &&
-                                dep.scope == 'compile' }.each{ dep ->
-                            dep.version = '[4.8.2,4.12]'
-                            dep.scope = 'provided'
+                        pom.dependencies.findAll{ dep -> dep.groupId == "junit" && dep.artifactId == "junit" &&
+                                dep.scope == "compile" }.each{ dep ->
+                            dep.version = "[4.8.2,4.12]"
+                            dep.scope = "provided"
                         }
                         // JUnit5
                         pom.dependencies.findAll{ dep ->
-                                ((dep.groupId == 'org.junit.jupiter' && dep.artifactId == 'junit-jupiter-engine') ||
-                                (dep.groupId == 'org.junit.jupiter' && dep.artifactId == 'junit-jupiter-params')) &&
-                                    dep.scope == 'compile'
+                                ((dep.groupId == "org.junit.jupiter" && dep.artifactId == "junit-jupiter-engine") ||
+                                (dep.groupId == "org.junit.jupiter" && dep.artifactId == "junit-jupiter-params")) &&
+                                    dep.scope == "compile"
                                 }.each{ dep ->
-                            dep.version = '[5.0.0-M6,6.0.0)'
-                            dep.scope = 'provided'
+                            dep.version = "[5.0.0-M6,6.0.0)"
+                            dep.scope = "provided"
                         }
                         // Remove all other dependencies
-                        pom.dependencies.removeAll{ dep -> dep.scope in [ 'compile', 'test' ] &&
-                                !(dep.groupId == 'com.tngtech.junit.dataprovider' && dep.artifactId == 'junit-dataprovider-core') }
+                        pom.dependencies.removeAll{ dep -> dep.scope in [ "compile", "test" ] &&
+                                !(dep.groupId == "com.tngtech.junit.dataprovider" && dep.artifactId == "junit-dataprovider-core") }
                     }
                 }
             }
@@ -441,7 +444,7 @@ subprojects {
 /**
  * Task to touch all junit xml report files for all given {@link Test} {@code tasks}.
  * This is required due to Jenkins fails if test output is created before build starts which
- * could happen using Gradle's up-to-date feature :(
+ * could happen using Gradles up-to-date feature :(
  */
 class TouchTestResults extends DefaultTask {
     @InputFiles
