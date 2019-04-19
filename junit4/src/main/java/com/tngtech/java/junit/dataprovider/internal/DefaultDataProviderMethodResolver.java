@@ -29,7 +29,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <li>Explicitly configured name using {@link UseDataProvider#value()}. (no fallback if dataprovider could not be found)</li>
  * <li>@{@link DataProvider} annotated method which name equals the test method name</li>
  * <li>@{@link DataProvider} annotated method whereby prefix is replaced by one out of the following:
- * <table border="1" summary="Prefix replacement overview.">
+ * <table border="1">
+ * <caption>Prefix replacement overview</caption>
  * <tr>
  * <th>prefix</th>
  * <th>replacement</th>
