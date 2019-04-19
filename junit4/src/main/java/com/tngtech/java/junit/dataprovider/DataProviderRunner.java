@@ -15,9 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 
 import com.tngtech.java.junit.dataprovider.UseDataProvider.ResolveStrategy;
@@ -181,6 +183,32 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
             computedTestMethods = generateExplodedTestMethodsFor(super.computeTestMethods());
         }
         return computedTestMethods;
+    }
+
+    @Override
+    protected Statement classBlock(final RunNotifier notifier) {
+        final Statement statementToWrap = super.classBlock(notifier);
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                try {
+                    statementToWrap.evaluate();
+                } finally {
+                    computedTestMethods = null; // release references to cached methods in order to allow GC
+                }
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This method is only overridden for visibility in testing in order to be allowd for stubbing it.
+     * </p>
+     */
+    @Override
+    protected Statement childrenInvoker(RunNotifier notifier) {
+        return super.childrenInvoker(notifier);
     }
 
     /**

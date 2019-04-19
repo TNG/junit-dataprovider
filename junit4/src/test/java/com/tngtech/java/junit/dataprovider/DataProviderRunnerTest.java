@@ -7,10 +7,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -20,12 +22,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.manipulation.Filter;
+import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -395,6 +400,31 @@ public class DataProviderRunnerTest extends BaseTest {
 
         verify(underTest).computeTestMethods();
         verifyNoMoreInteractions(underTest);
+    }
+
+    @Test // see https://github.com/TNG/junit-dataprovider/issues/116
+    public void testTODO() throws Throwable { // TODO
+        // Precondition:
+        assertThat(underTest.computedTestMethods).isNotNull();
+
+        // Given:
+        final AtomicBoolean statementCalled = new AtomicBoolean(false);
+        final Statement innerStatement = new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                statementCalled.set(true);
+            }
+        };
+
+        doReturn(new ArrayList<FrameworkMethod>()).when(underTest).computeTestMethods();
+        doReturn(innerStatement).when(underTest).childrenInvoker(null);
+
+        // When:
+        underTest.classBlock(null).evaluate();
+
+        // Then:
+        assertThat(statementCalled.get()).isTrue();
+        assertThat(underTest.computedTestMethods).isNull();
     }
 
     @Test(expected = NullPointerException.class)
