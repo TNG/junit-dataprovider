@@ -289,11 +289,11 @@ subprojects {
         }
     }
     jacoco {
-        toolVersion = "0.8.1"
+        toolVersion = "0.8.3"
     }
 
     spotbugs {
-        toolVersion = "3.1.3"
+        toolVersion = "3.1.12"
         ignoreFailures = true
     }
 

@@ -7,7 +7,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * This abstract placeholder is able to format arguments of a dataprovider test as comma-separated {@link String}
  * according to the given index or range subscript. Furthermore the following arguments are treated specially:
- * <table summary="Special {@link String} treatment">
+ * <table>
+ * <caption>Special {@link String} treatment</caption>
  * <tr>
  * <th>Argument value</th>
  * <th>target {@link String}</th>

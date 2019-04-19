@@ -125,7 +125,8 @@ public @interface DataProvider {
      * Format pattern to be used to generate test method description. The following placeholders are by default
      * available (for more information see their implementations in package
      * {@link com.tngtech.junit.dataprovider.placeholder}:
-     * <table border="1" summary="Possible placeholders">
+     * <table border="1">
+     * <caption>Possible placeholders</caption>
      * <tr>
      * <th>Placeholder</th>
      * <th>Aliases</th>

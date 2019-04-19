@@ -24,7 +24,8 @@ import java.util.List;
  * dataprovider could not be found)</li>
  * <li>Dataprovider method which name equals the test method name</li>
  * <li>Dataprovider method whereby prefix is replaced by one out of the following:
- * <table border="1" summary="Prefix replacement overview.">
+ * <table border="1">
+ * <caption>Prefix replacement overview</caption>
  * <tr>
  * <th>prefix</th>
  * <th>replacement</th>

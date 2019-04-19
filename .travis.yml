@@ -19,8 +19,10 @@ script:
   - mvn test
 
 jdk:
+  - openjdk8
   - oraclejdk8
   - oraclejdk9
+  - oraclejdk11
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}
