@@ -279,7 +279,6 @@ subprojects {
     build.dependsOn touchTestResultsForJenkins
 
     artifacts {
-        archives jar
         archives javadocJar
         archives sourcesJar
     }
