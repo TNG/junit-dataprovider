@@ -69,36 +69,6 @@ abstract class AbstractDataProviderArgumentProvider<SOURCE_ANNOTATION extends An
         checkNotNull(data, "'data' must not be null");
         checkNotNull(context, "'context' must not be null");
 
-        return dataConverter.convert(data, testMethod.isVarArgs(), testMethod.getParameterTypes(), context).stream()
-                .map(objects -> {
-                    Class<?>[] parameterTypes = testMethod.getParameterTypes();
-                    for (int idx = 0; idx < objects.length; idx++) {
-                        // TODO workaround for https://github.com/junit-team/junit5/issues/1092
-                        Class<?> parameterType = parameterTypes[idx];
-                        if (parameterType.isPrimitive()) {
-                            objects[idx] = convertToBoxedTypeAsWorkaroundForNotWorkingWideningAndUnboxingConversion(
-                                    objects[idx], parameterType);
-                        }
-                    }
-                    return objects;
-                }).map(Arguments::of);
-    }
-
-    private Object convertToBoxedTypeAsWorkaroundForNotWorkingWideningAndUnboxingConversion(Object result,
-            Class<?> parameterType) {
-        if (short.class.equals(parameterType)) {
-            return ((Number) result).shortValue();
-        } else if (byte.class.equals(parameterType)) {
-            return ((Number) result).byteValue();
-        } else if (int.class.equals(parameterType)) {
-            return ((Number) result).intValue();
-        } else if (long.class.equals(parameterType)) {
-            return ((Number) result).longValue();
-        } else if (float.class.equals(parameterType)) {
-            return ((Number) result).floatValue();
-        } else if (double.class.equals(parameterType)) {
-            return ((Number) result).doubleValue();
-        }
-        return result;
+        return dataConverter.convert(data, testMethod.isVarArgs(), testMethod.getParameterTypes(), context).stream().map(Arguments::of);
     }
 }

@@ -30,32 +30,6 @@ class DataProviderParameterResolver implements ParameterResolver {
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-        Object result = arguments.get(parameterContext.getIndex());
-
-        // TODO workaround for https://github.com/junit-team/junit5/issues/1092
-        Class<?> parameterType = parameterContext.getParameter().getType();
-        if (parameterType.isPrimitive()) {
-            return convertToBoxedTypeAsWorkaroundForNotWorkingWideningAndUnboxingConversion(result, parameterType);
-        }
-
-        return result;
-    }
-
-    private Object convertToBoxedTypeAsWorkaroundForNotWorkingWideningAndUnboxingConversion(Object result,
-            Class<?> parameterType) {
-        if (short.class.equals(parameterType)) {
-            return ((Number) result).shortValue();
-        } else if (byte.class.equals(parameterType)) {
-            return ((Number) result).byteValue();
-        } else if (int.class.equals(parameterType)) {
-            return ((Number) result).intValue();
-        } else if (long.class.equals(parameterType)) {
-            return ((Number) result).longValue();
-        } else if (float.class.equals(parameterType)) {
-            return ((Number) result).floatValue();
-        } else if (double.class.equals(parameterType)) {
-            return ((Number) result).doubleValue();
-        }
-        return result;
+        return arguments.get(parameterContext.getIndex());
     }
 }
