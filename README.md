@@ -22,6 +22,7 @@ Have a look to this repositories [Wiki](/../../wiki/) pages for documenation, us
     * [Requirements](/../../wiki/Getting-started#requirements)
     * [Download](/../../wiki/Getting-started#download)
     * [Usage](/../../wiki/Getting-started#usage)
+* [Version compatibility](/../../wiki/Version-compatibility)
 * [Migration guides](/../../wiki/Migration-guides)
     * [Migration from v1 to v2](/../../wiki/Migration-guides#migration-from-v1-to-v2)
     * [Migration to JUnit5](/../../wiki/Migration-guides#migration-to-junit5)

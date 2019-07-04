@@ -21,7 +21,7 @@ if (!hasProperty("junit4Version")) { // set default junit version if not set via
 println "Using JUnit4 version ${junit4Version} for current build."
 
 if (!hasProperty("junitJupiterVersion")) { // set default junit version if not set via command line
-    ext.junitJupiterVersion = "5.2.0"
+    ext.junitJupiterVersion = "5.4.0"
 }
 println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
 
