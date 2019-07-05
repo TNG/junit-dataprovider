@@ -3,8 +3,8 @@ dist: trusty
 sudo: false
 
 script:
-  - ./gradlew build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.4.0 -PskipSpotBugs
-  - ./gradlew build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.4.2 -PskipSpotBugs
+  - ./gradlew build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0-RC2 -PskipSpotBugs
+  - ./gradlew build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.0     -PskipSpotBugs
 
   - ./gradlew build
 
