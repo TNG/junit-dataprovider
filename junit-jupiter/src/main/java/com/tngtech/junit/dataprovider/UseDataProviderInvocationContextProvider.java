@@ -3,7 +3,7 @@ package com.tngtech.junit.dataprovider;
 import static com.tngtech.junit.dataprovider.Preconditions.checkArgument;
 import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 import static com.tngtech.junit.dataprovider.resolver.DataProviderMethodResolverHelper.findDataProviderMethods;
-import static org.junit.jupiter.engine.extension.ExtensionRegistry.createRegistryWithDefaultExtensions;
+import static org.junit.jupiter.engine.extension.MutableExtensionRegistry.createRegistryWithDefaultExtensions;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
@@ -158,9 +159,10 @@ public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION e
         }
         try {
             // TODO how to not require junit-jupiter-engine dependency and reuse already existing ExtensionRegistry?
-            ExtensionRegistry extensionRegistry = createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(emptyConfigurationParameters()));
+            ExtensionRegistry extensionRegistry = createRegistryWithDefaultExtensions(
+                    new DefaultJupiterConfiguration(emptyConfigurationParameters()));
             Object data = executableInvoker.invoke(dataProviderMethod, context.getTestInstance().orElse(null), context,
-                    extensionRegistry);
+                    extensionRegistry, InvocationInterceptor::interceptTestFactoryMethod);
             if (cacheDataProviderResult) {
                 store.put(dataProviderMethod, data);
             }
