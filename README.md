@@ -2,7 +2,7 @@
 [![Coverage Status](https://coveralls.io/repos/TNG/junit-dataprovider/badge.png?branch=master)](https://coveralls.io/r/TNG/junit-dataprovider)
 [![codebeat badge](https://codebeat.co/badges/78ac5f0b-6686-4d77-a531-d562c8485474)](https://codebeat.co/projects/github-com-tng-junit-dataprovider)
 [![Maven Central](https://img.shields.io/maven-central/v/com.tngtech.junit.dataprovider/junit-dataprovider-core.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.tngtech.junit.dataprovider%22)
-[![License](https://img.shields.io/github/license/TNG/junit-dataprovider.svg)](https://github.com/TNG/junit-dataprovider/blob/master/LICENSE.md)
+[![License](https://img.shields.io/github/license/TNG/junit-dataprovider.svg)](https://github.com/TNG/junit-dataprovider/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/TNG/junit-dataprovider.svg)](https://github.com/TNG/junit-dataprovider/issues)
 [![Forks](https://img.shields.io/github/forks/TNG/junit-dataprovider.svg)](https://github.com/TNG/junit-dataprovider/network)
 [![Stars](https://img.shields.io/github/stars/TNG/junit-dataprovider.svg)](https://github.com/TNG/junit-dataprovider/stargazers)
