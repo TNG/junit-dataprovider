@@ -73,10 +73,10 @@ project(":core") {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
     dependencies {
-        testCompile group: "junit", name: "junit", version: "4.12"
+        testImplementation group: "junit", name: "junit", version: "4.12"
 
-        testCompile group: "org.assertj", name: "assertj-core", version: "1.7.1"
-        testCompile group: "org.mockito", name: "mockito-core", version: "2.18.3"
+        testImplementation group: "org.assertj", name: "assertj-core", version: "1.7.1"
+        testImplementation group: "org.mockito", name: "mockito-core", version: "2.18.3"
     }
 
     tasks.withType(JavaCompile) {
@@ -117,10 +117,10 @@ project(":junit4") {
         api project(":core")
         api group: "junit", name: "junit", version: junit4Version
 
-        testCompile group: "org.assertj", name: "assertj-core", version: "1.7.1"
-        testCompile group: "org.mockito", name: "mockito-core", version: "2.18.3"
+        testImplementation group: "org.assertj", name: "assertj-core", version: "1.7.1"
+        testImplementation group: "org.mockito", name: "mockito-core", version: "2.18.3"
 
-        integTestCompile group: "org.codehaus.groovy", name: "groovy", version: "2.4.7"
+        integTestImplementation group: "org.codehaus.groovy", name: "groovy", version: "2.4.7"
     }
 
     tasks.withType(JavaCompile) {
@@ -170,10 +170,10 @@ configure(subprojects.findAll{ p -> p.name.startsWith("junit-jupiter") }) {
         api project(":core")
         api group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitJupiterVersion
 
-        testCompile group: "org.assertj", name: "assertj-core", version: "3.8.0"
-        testCompile group: "org.mockito", name: "mockito-core", version: "2.18.3"
+        testImplementation group: "org.assertj", name: "assertj-core", version: "3.8.0"
+        testImplementation group: "org.mockito", name: "mockito-core", version: "2.18.3"
 
-        integTestCompile group: "org.codehaus.groovy", name: "groovy", version: "2.4.12"
+        integTestImplementation group: "org.codehaus.groovy", name: "groovy", version: "2.4.12"
     }
 
     tasks.withType(JavaCompile) {
@@ -244,10 +244,10 @@ subprojects {
                 "Built-By": "Gradle ${gradle.gradleVersion}",
                 "Built-Date": today, // using now would destroy incremental build feature
                 "Specification-Title": archivesBaseName,
-                "Specification-Version": version,
+                "Specification-Version": archiveVersion,
                 "Specification-Vendor": company,
                 "Implementation-Title": archivesBaseName,
-                "Implementation-Version": version,
+                "Implementation-Version": archiveVersion,
                 "Implementation-Vendor": company,
                 "Issue-Tracker": "https://github.com/TNG/junit-dataprovider/issues",
                 "Documentation-URL": "https://github.com/TNG/junit-dataprovider/wiki",
