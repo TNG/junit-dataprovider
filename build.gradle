@@ -53,6 +53,17 @@ subprojects {
         compileOnly group: "com.github.spotbugs", name: "spotbugs-annotations", version: "3.1.5"
         testImplementation group: "com.github.spotbugs", name: "spotbugs-annotations", version: "3.1.5"
     }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    javadoc {
+        if(JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
 }
 
 project(":core") {
@@ -246,16 +257,6 @@ subprojects {
         }
     }
 
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = "javadoc"
-        from javadoc.destinationDir
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = "sources"
-        from sourceSets.main.allSource
-    }
-
     test {
         ignoreFailures = isBuildOnJenkins
     }
@@ -265,12 +266,6 @@ subprojects {
         enabled = isBuildOnJenkins
     }
     build.dependsOn touchTestResultsForJenkins
-
-    artifacts {
-        archives jar
-        archives javadocJar
-        archives sourcesJar
-    }
 
     jacocoTestReport {
         reports {
