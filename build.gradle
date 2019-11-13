@@ -2,7 +2,7 @@ plugins {
     id "com.github.spotbugs" version "2.0.1" apply false
     id "de.aaschmid.cpd" version "3.1"
 
-
+    // id "biz.aQute.bnd.builder" version "4.2.0" apply false
     id "jacoco"
     id "com.github.kt3k.coveralls" version "2.8.4"
 }
@@ -332,7 +332,11 @@ coveralls {
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
 
-// -- build and publish artifacts -------------------------------------------------------------------------------------
+// -- sign and publish artifacts -------------------------------------------------------------------------------------
+
+ext.isReleaseVersion = !project.version.endsWith("-SNAPSHOT")
+
+// username and password from gradle.properties otherwise empty
 if (!hasProperty("sonatypeUsername")) {
     ext.sonatypeUsername = ""
 }
@@ -341,82 +345,73 @@ if (!hasProperty("sonatypePassword")) {
 }
 
 subprojects {
-    apply plugin: "maven"
+    apply plugin: "maven-publish"
     apply plugin: "signing"
 
-    signing {
-        // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
-        required {
-            gradle.taskGraph.hasTask("uploadArchives")
-        }
-        sign configurations.archives
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = isReleaseVersion // signing of these artifacts causes failure for snapshot versions
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { deployment ->
-                    signing.signPom(deployment)
-                }
-                // username and password from gradle.properties
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: rootProject.sonatypeUsername, password: rootProject.sonatypePassword)
-                }
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: rootProject.sonatypeUsername, password: rootProject.sonatypePassword)
-                }
-
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = project.archivesBaseName
+                from components.java
                 pom {
-                    project {
-                        name project.archivesBaseName
-                        packaging "jar"
-                        description project.description
-                        url "https://github.com/TNG/junit-dataprovider"
+                    name = project.archivesBaseName
+                    packaging = "jar"
+                    description = project.description
+                    url = "https://github.com/TNG/junit-dataprovider"
 
-                        scm {
-                            url "scm:git@github.com:TNG/junit-dataprovider.git"
-                            connection "scm:git@github.com:TNG/junit-dataprovider.git"
-                            developerConnection "scm:git@github.com:TNG/junit-dataprovider.git"
-                        }
-
-                        licenses {
-                            license {
-                                name "The Apache Software License, Version 2.0"
-                                url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                                distribution "repo"
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id "aaschmid"
-                                name "Andreas Schmid"
-                            }
+                    developers {
+                        developer {
+                            id = "aaschmid"
+                            name = "Andreas Schmid"
+                            email = "service@aaschmid.de"
                         }
                     }
-                    whenConfigured { pom ->
-                        // JUnit4
-                        pom.dependencies.findAll{ dep -> dep.groupId == "junit" && dep.artifactId == "junit" &&
-                                dep.scope == "compile" }.each{ dep ->
-                            dep.version = "[4.8.2,4.12]"
-                            dep.scope = "provided"
+
+                    licenses {
+                        license {
+                            name = "The Apache Software License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                            distribution = "repo"
                         }
-                        // JUnit5
-                        pom.dependencies.findAll{ dep ->
-                                ((dep.groupId == "org.junit.jupiter" && dep.artifactId == "junit-jupiter-engine") ||
-                                (dep.groupId == "org.junit.jupiter" && dep.artifactId == "junit-jupiter-params")) &&
-                                    dep.scope == "compile"
-                                }.each{ dep ->
-                            dep.version = "[5.0.0-M6,6.0.0)"
-                            dep.scope = "provided"
-                        }
-                        // Remove all other dependencies
-                        pom.dependencies.removeAll{ dep -> dep.scope in [ "compile", "test" ] &&
-                                !(dep.groupId == "com.tngtech.junit.dataprovider" && dep.artifactId == "junit-dataprovider-core") }
+                    }
+
+                    scm {
+                        connection = "scm:git@github.com:TNG/junit-dataprovider.git"
+                        developerConnection = "scm:git@github.com:TNG/junit-dataprovider.git"
+                        url = "scm:git@github.com:TNG/junit-dataprovider.git"
                     }
                 }
             }
         }
+
+        repositories {
+            maven {
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                url = isReleaseVersion ? releasesRepoUrl : snapshotRepoUrl
+
+                credentials  {
+                    username = sonatypeUsername
+                    password = sonatypePassword
+                }
+
+                metadataSources {
+                    gradleMetadata()
+                }
+            }
+        }
+    }
+
+    // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
+    signing {
+        required {
+            isReleaseVersion && gradle.taskGraph.hasTask("publish")
+        }
+        sign publishing.publications.mavenJava
     }
 }
 
