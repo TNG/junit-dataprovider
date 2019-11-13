@@ -50,8 +50,8 @@ subprojects {
     }
 
     dependencies {
-        compileOnly group: "com.github.spotbugs", name: "spotbugs-annotations", version: "3.1.5"
-        testImplementation group: "com.github.spotbugs", name: "spotbugs-annotations", version: "3.1.5"
+        compileOnly "com.github.spotbugs:spotbugs-annotations:3.1.5"
+        testImplementation "com.github.spotbugs:spotbugs-annotations:3.1.5"
     }
 
     java {
@@ -73,10 +73,10 @@ project(":core") {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
     dependencies {
-        testImplementation group: "junit", name: "junit", version: "4.12"
+        testImplementation "junit:junit:4.12"
 
-        testImplementation group: "org.assertj", name: "assertj-core", version: "1.7.1"
-        testImplementation group: "org.mockito", name: "mockito-core", version: "2.18.3"
+        testImplementation "org.assertj:assertj-core:1.7.1"
+        testImplementation "org.mockito:mockito-core:2.18.3"
     }
 
     tasks.withType(JavaCompile) {
@@ -115,12 +115,12 @@ project(":junit4") {
 
     dependencies {
         api project(":core")
-        api group: "junit", name: "junit", version: junit4Version
+        api "junit:junit:${junit4Version}"
 
-        testImplementation group: "org.assertj", name: "assertj-core", version: "1.7.1"
-        testImplementation group: "org.mockito", name: "mockito-core", version: "2.18.3"
+        testImplementation "org.assertj:assertj-core:1.7.1"
+        testImplementation "org.mockito:mockito-core:2.18.3"
 
-        integTestImplementation group: "org.codehaus.groovy", name: "groovy", version: "2.4.7"
+        integTestImplementation "org.codehaus.groovy:groovy:2.4.7"
     }
 
     tasks.withType(JavaCompile) {
@@ -168,12 +168,12 @@ configure(subprojects.findAll{ p -> p.name.startsWith("junit-jupiter") }) {
 
     dependencies {
         api project(":core")
-        api group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitJupiterVersion
+        api "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 
-        testImplementation group: "org.assertj", name: "assertj-core", version: "3.8.0"
-        testImplementation group: "org.mockito", name: "mockito-core", version: "2.18.3"
+        testImplementation "org.assertj:assertj-core:3.8.0"
+        testImplementation "org.mockito:mockito-core:2.18.3"
 
-        integTestImplementation group: "org.codehaus.groovy", name: "groovy", version: "2.4.12"
+        integTestImplementation "org.codehaus.groovy:groovy:2.4.12"
     }
 
     tasks.withType(JavaCompile) {
@@ -217,7 +217,7 @@ project(":junit-jupiter-params") {
     description = "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider."
 
     dependencies {
-        api group: "org.junit.jupiter", name: "junit-jupiter-params", version: junitJupiterVersion
+        api "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
     }
 
     jar {
