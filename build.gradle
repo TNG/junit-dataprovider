@@ -16,19 +16,19 @@ plugins {
 
 ext {
     isBuildOnJenkins = System.env["BUILD_TAG"]?.startsWith("jenkins-") ?: false
-}
-ext.skipSpotBugs = hasProperty("skipSpotBugs")
-println "Using skipSpotBugs = ${skipSpotBugs} for current build."
+    skipSpotBugs = hasProperty("skipSpotBugs")
+    println "Using skipSpotBugs = ${skipSpotBugs} for current build."
 
-if (!hasProperty("junit4Version")) { // set default junit version if not set via command line
-    ext.junit4Version = "4.12"
-}
-println "Using JUnit4 version ${junit4Version} for current build."
+    if (!hasProperty("junit4Version")) { // set default junit version if not set via command line
+        junit4Version = "4.12"
+    }
+    println "Using JUnit4 version ${junit4Version} for current build."
 
-if (!hasProperty("junitJupiterVersion")) { // set default junit version if not set via command line
-    ext.junitJupiterVersion = "5.5.2"
+    if (!hasProperty("junitJupiterVersion")) { // set default junit version if not set via command line
+        junitJupiterVersion = "5.5.2"
+    }
+    println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
 }
-println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
 
 allprojects {
     repositories {
@@ -68,8 +68,8 @@ subprojects {
     }
 
     javadoc {
-        if(JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption("html5", true)
         }
     }
 }
