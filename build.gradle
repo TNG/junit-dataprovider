@@ -110,7 +110,6 @@ project(":junit4") {
         api project(":core")
         api group: "junit", name: "junit", version: junit4Version
 
-        compileOnly group: "com.github.spotbugs", name: "spotbugs-annotations", version: "3.1.5"
         testCompile group: "org.assertj", name: "assertj-core", version: "1.7.1"
         testCompile group: "org.mockito", name: "mockito-core", version: "2.18.3"
 
