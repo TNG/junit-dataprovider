@@ -384,6 +384,23 @@ subprojects {
                         developerConnection = "scm:git@github.com:TNG/junit-dataprovider.git"
                         url = "scm:git@github.com:TNG/junit-dataprovider.git"
                     }
+
+                    withXml {
+                        asNode().dependencies."*".each{ dep ->
+                            // JUnit4
+                            if (dep.groupId.text() == "junit" && dep.artifactId.text() == "junit") {
+                                dep.version.first().setValue("[4.10,4.12]")
+                                dep.scope.first().setValue("provided")
+                            }
+
+                            // JUnit5
+                            if ((dep.groupId.text() == "org.junit.jupiter" && dep.artifactId.text() == "junit-jupiter-engine") ||
+                                    (dep.groupId.text() == "org.junit.jupiter" && dep.artifactId.text() == "junit-jupiter-params")) {
+                                dep.version.first().setValue("[5.5.0-M6,6.0.0)")
+                                dep.scope.first().setValue("provided")
+                            }
+                        }
+                    }
                 }
             }
         }
