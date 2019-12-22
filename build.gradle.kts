@@ -178,6 +178,66 @@ project(":junit4") {
     }
 }
 
+configure(subprojects.filter { p -> p.name.startsWith("junit-jupiter") }) {
+    apply<GroovyPlugin>()
+
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    configure<SourceSetContainer> {
+        create("integTest") {
+            compileClasspath += named("main").get().output + named("test").get().output
+            runtimeClasspath += named("main").get().output + named("test").get().output
+        }
+    }
+
+    configurations {
+        "integTestImplementation" {
+            extendsFrom(configurations["testImplementation"])
+        }
+    }
+
+    dependencies {
+        "api"(project(":core"))
+        "api"("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+
+        "testImplementation"("org.assertj:assertj-core:3.8.0")
+        "testImplementation"("org.mockito:mockito-core:2.18.3")
+
+        "integTestImplementation"("org.codehaus.groovy:groovy:2.4.12")
+    }
+
+    tasks {
+        withType<JavaCompile> {
+            options.compilerArgs.addAll(listOf("-parameters"))
+        }
+
+        named<Test>("test") {
+            useJUnitPlatform()
+        }
+
+        val integTest = register<Test>("integTest") {
+            group = "verification"
+            description = "Runs all integration tests."
+
+            ignoreFailures = isBuildOnJenkins
+
+            classpath = project.the<SourceSetContainer>()["integTest"].runtimeClasspath
+            testClassesDirs = project.the<SourceSetContainer>()["integTest"].output.classesDirs
+
+            useJUnitPlatform()
+            dependsOn(named("integTestClasses"))
+        }
+        val touchIntegTestResultsForJenkins = register<TouchTestResults>("touchIntegTestResultsForJenkins") {
+            tasks(integTest)
+            enabled = isBuildOnJenkins
+        }
+        getByName("build").dependsOn(touchIntegTestResultsForJenkins)
+    }
+}
+
 // -- Custom tasks ------------------------------------------------------------
 /**
  * Task to touch all junit xml report files for all given {@link Test} {@code tasks}.
