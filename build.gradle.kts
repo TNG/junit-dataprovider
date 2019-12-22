@@ -110,4 +110,101 @@ project(":core") {
     }
 }
 
+project(":junit4") {
+    apply<GroovyPlugin>()
+
+    configure<BasePluginConvention> {
+        archivesBaseName = "junit4-dataprovider"
+        description = "A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features."
+    }
+
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.VERSION_1_6
+        targetCompatibility = JavaVersion.VERSION_1_6
+    }
+
+    configure<SourceSetContainer> {
+        create("integTest") {
+            compileClasspath += named("main").get().output + named("test").get().output
+            runtimeClasspath += named("main").get().output + named("test").get().output
+        }
+    }
+
+    configurations {
+        "integTestImplementation" {
+            extendsFrom(configurations["testImplementation"])
+        }
+    }
+
+    dependencies {
+        "api"(project(":core"))
+        "api"("junit:junit:${junit4Version}")
+
+        "testImplementation"("org.assertj:assertj-core:1.7.1")
+        "testImplementation"("org.mockito:mockito-core:2.18.3")
+
+        "integTestImplementation"("org.codehaus.groovy:groovy:2.4.7")
+    }
+
+    tasks {
+        withType<JavaCompile> {
+            options.compilerArgs.addAll(listOf("-Xlint:-options"))
+        }
+
+        named<Jar>("jar") {
+            manifest {
+                attributes(
+                        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.junit4"
+                )
+            }
+        }
+
+        val integTest = register<Test>("integTest") {
+            group = "verification"
+            description = "Runs all integration tests."
+
+            ignoreFailures = isBuildOnJenkins
+
+            classpath = project.the<SourceSetContainer>()["integTest"].runtimeClasspath
+            testClassesDirs = project.the<SourceSetContainer>()["integTest"].output.classesDirs
+
+            dependsOn(named("integTestClasses"))
+        }
+        val touchIntegTestResultsForJenkins = register<TouchTestResults>("touchIntegTestResultsForJenkins") {
+            tasks(integTest)
+            enabled = isBuildOnJenkins
+        }
+        getByName("build").dependsOn(touchIntegTestResultsForJenkins)
+    }
+}
+
+// -- Custom tasks ------------------------------------------------------------
+/**
+ * Task to touch all junit xml report files for all given {@link Test} {@code tasks}.
+ * This is required due to Jenkins fails if test output is created before build starts which
+ * could happen using Gradles up-to-date feature :(
+ */
+open class TouchTestResults : DefaultTask() {
+    @InputFiles
+    val tasks = mutableListOf<TaskProvider<Test>>()
+
+    fun tasks(vararg testTasks: TaskProvider<Test>) {
+        tasks.addAll(testTasks)
+        mustRunAfter(testTasks)
+    }
+
+    @TaskAction
+    fun touch() {
+        tasks.forEach { test ->
+            val testResultsDir = test.get().reports.junitXml.destination
+            if (testResultsDir.exists()) {
+                val timestamp = System.currentTimeMillis()
+                testResultsDir.listFiles()?.forEach { file ->
+                    file.setLastModified(timestamp)
+                }
+            }
+        }
+    }
+}
+
 apply(from = "legacy.build.gradle")
