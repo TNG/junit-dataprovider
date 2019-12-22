@@ -37,4 +37,44 @@ allprojects {
     }
 }
 
+subprojects {
+    apply<JacocoPlugin>()
+    apply<JavaLibraryPlugin>()
+    apply<com.github.spotbugs.SpotBugsPlugin>()
+    apply<aQute.bnd.gradle.BndBuilderPlugin>()
+
+    group = "com.tngtech.junit.dataprovider"
+    version = "2.7-SNAPSHOT"
+
+    dependencies {
+        "compileOnly"("com.github.spotbugs:spotbugs-annotations:3.1.5")
+        "testImplementation"("com.github.spotbugs:spotbugs-annotations:3.1.5")
+    }
+
+    configure<JavaPluginExtension> {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    tasks {
+        withType<JavaCompile> {
+            options.encoding = "UTF-8"
+            options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+        }
+
+        withType<Jar> {
+            from(project.rootDir) {
+                include("LICENSE.md", "LICENSE-notice.md")
+                into("META-INF")
+            }
+        }
+
+        named<Javadoc>("javadoc") {
+            if (JavaVersion.current().isJava9Compatible) {
+                (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
+            }
+        }
+    }
+}
+
 apply(from = "legacy.build.gradle")
