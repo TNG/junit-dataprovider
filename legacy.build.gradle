@@ -1,30 +1,3 @@
-ext {
-    isBuildOnJenkins = System.env["BUILD_TAG"]?.startsWith("jenkins-") ?: false
-    skipSpotBugs = hasProperty("skipSpotBugs")
-    println("Using skipSpotBugs = ${skipSpotBugs} for current build.")
-
-    if (!hasProperty("junit4Version")) { // set default junit version if not set via command line
-        junit4Version = "4.12"
-    }
-    println("Using JUnit4 version ${junit4Version} for current build.")
-
-    if (!hasProperty("junitJupiterVersion")) { // set default junit version if not set via command line
-        junitJupiterVersion = "5.5.2"
-    }
-    println("Using JUnit Jupiter version ${junitJupiterVersion} for current build.")
-}
-
-buildScan {
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-    }
-}
-
 subprojects {
     apply(plugin: "jacoco")
     apply(plugin: "java-library")
