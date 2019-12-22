@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "biz.aQute.bnd:biz.aQute.bnd.gradle:4.3.1"
+        classpath("biz.aQute.bnd:biz.aQute.bnd.gradle:4.3.1")
     }
 }
 plugins {
@@ -17,17 +17,17 @@ plugins {
 ext {
     isBuildOnJenkins = System.env["BUILD_TAG"]?.startsWith("jenkins-") ?: false
     skipSpotBugs = hasProperty("skipSpotBugs")
-    println "Using skipSpotBugs = ${skipSpotBugs} for current build."
+    println("Using skipSpotBugs = ${skipSpotBugs} for current build.")
 
     if (!hasProperty("junit4Version")) { // set default junit version if not set via command line
         junit4Version = "4.12"
     }
-    println "Using JUnit4 version ${junit4Version} for current build."
+    println("Using JUnit4 version ${junit4Version} for current build.")
 
     if (!hasProperty("junitJupiterVersion")) { // set default junit version if not set via command line
         junitJupiterVersion = "5.5.2"
     }
-    println "Using JUnit Jupiter version ${junitJupiterVersion} for current build."
+    println("Using JUnit Jupiter version ${junitJupiterVersion} for current build.")
 }
 
 buildScan {
@@ -42,10 +42,10 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: "jacoco"
-    apply plugin: "java-library"
-    apply plugin: "com.github.spotbugs"
-    apply plugin: "biz.aQute.bnd.builder"
+    apply(plugin: "jacoco")
+    apply(plugin: "java-library")
+    apply(plugin: "com.github.spotbugs")
+    apply(plugin: "biz.aQute.bnd.builder")
 
     group = "com.tngtech.junit.dataprovider"
     version = "2.7-SNAPSHOT"
@@ -57,14 +57,14 @@ subprojects {
 
     tasks.withType(Jar) {
         from(project.rootDir) {
-            include "LICENSE.md", "LICENSE-notice.md"
-            into "META-INF"
+            include("LICENSE.md", "LICENSE-notice.md")
+            into("META-INF")
         }
     }
 
     dependencies {
-        compileOnly "com.github.spotbugs:spotbugs-annotations:3.1.5"
-        testImplementation "com.github.spotbugs:spotbugs-annotations:3.1.5"
+        compileOnly("com.github.spotbugs:spotbugs-annotations:3.1.5")
+        testImplementation("com.github.spotbugs:spotbugs-annotations:3.1.5")
     }
 
     java {
@@ -86,10 +86,10 @@ project(":core") {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_6
 
     dependencies {
-        testImplementation "junit:junit:4.12"
+        testImplementation("junit:junit:4.12")
 
-        testImplementation "org.assertj:assertj-core:1.7.1"
-        testImplementation "org.mockito:mockito-core:2.18.3"
+        testImplementation("org.assertj:assertj-core:1.7.1")
+        testImplementation("org.mockito:mockito-core:2.18.3")
     }
 
     tasks.withType(JavaCompile) {
@@ -106,7 +106,7 @@ project(":core") {
 }
 
 project(":junit4") {
-    apply plugin: "groovy"
+    apply(plugin: "groovy")
 
     archivesBaseName = "junit4-dataprovider"
     description = "A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features."
@@ -122,18 +122,18 @@ project(":junit4") {
 
     configurations {
         integTestImplementation {
-            extendsFrom testImplementation
+            extendsFrom(testImplementation)
         }
     }
 
     dependencies {
-        api project(":core")
-        api "junit:junit:${junit4Version}"
+        api(project(":core"))
+        api("junit:junit:${junit4Version}")
 
-        testImplementation "org.assertj:assertj-core:1.7.1"
-        testImplementation "org.mockito:mockito-core:2.18.3"
+        testImplementation("org.assertj:assertj-core:1.7.1")
+        testImplementation("org.mockito:mockito-core:2.18.3")
 
-        integTestImplementation "org.codehaus.groovy:groovy:2.4.7"
+        integTestImplementation("org.codehaus.groovy:groovy:2.4.7")
     }
 
     tasks.withType(JavaCompile) {
@@ -155,14 +155,14 @@ project(":junit4") {
         testClassesDirs = sourceSets.integTest.output.classesDirs
     }
     task touchIntegTestResultsForJenkins(type: TouchTestResults) {
-        tasks integTest
+        tasks(integTest)
         enabled = isBuildOnJenkins
     }
-    build.dependsOn touchIntegTestResultsForJenkins
+    build.dependsOn(touchIntegTestResultsForJenkins)
 }
 
 configure(subprojects.findAll{ p -> p.name.startsWith("junit-jupiter") }) {
-    apply plugin: "groovy"
+    apply(plugin: "groovy")
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -175,18 +175,18 @@ configure(subprojects.findAll{ p -> p.name.startsWith("junit-jupiter") }) {
 
     configurations {
         integTestImplementation {
-            extendsFrom testImplementation
+            extendsFrom(testImplementation)
         }
     }
 
     dependencies {
-        api project(":core")
-        api "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+        api(project(":core"))
+        api("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
 
-        testImplementation "org.assertj:assertj-core:3.8.0"
-        testImplementation "org.mockito:mockito-core:2.18.3"
+        testImplementation("org.assertj:assertj-core:3.8.0")
+        testImplementation("org.mockito:mockito-core:2.18.3")
 
-        integTestImplementation "org.codehaus.groovy:groovy:2.4.12"
+        integTestImplementation("org.codehaus.groovy:groovy:2.4.12")
     }
 
     tasks.withType(JavaCompile) {
@@ -206,10 +206,10 @@ configure(subprojects.findAll{ p -> p.name.startsWith("junit-jupiter") }) {
         useJUnitPlatform()
     }
     task touchIntegTestResultsForJenkins(type: TouchTestResults) {
-        tasks integTest
+        tasks(integTest)
         enabled = isBuildOnJenkins
     }
-    build.dependsOn touchIntegTestResultsForJenkins
+    build.dependsOn(touchIntegTestResultsForJenkins)
 }
 
 project(":junit-jupiter") {
@@ -230,7 +230,7 @@ project(":junit-jupiter-params") {
     description = "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider."
 
     dependencies {
-        api "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+        api("org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}")
     }
 
     jar {
@@ -281,10 +281,10 @@ subprojects {
     }
 
     task touchTestResultsForJenkins(type: TouchTestResults) {
-        tasks test
+        tasks(test)
         enabled = isBuildOnJenkins
     }
-    build.dependsOn touchTestResultsForJenkins
+    build.dependsOn(touchTestResultsForJenkins)
 
     jacocoTestReport {
         reports {
@@ -328,18 +328,18 @@ task jacocoMerge(type: JacocoMerge) {
         executionData = files(executionData.findAll { it.exists() })
     }
     publishedProjects.each { subproject ->
-        executionData subproject.tasks.withType(Test)
+        executionData(subproject.tasks.withType(Test))
     }
 }
 
 task jacocoRootReport(type: JacocoReport) {
     description = "Generates an aggregate report from all subprojects"
-    dependsOn publishedProjects.test, jacocoMerge
+    dependsOn(publishedProjects.test, jacocoMerge)
 
-    additionalSourceDirs.from files(publishedProjects.sourceSets.main.allSource.srcDirs)
-    sourceDirectories.from  files(publishedProjects.sourceSets.main.allSource.srcDirs)
-    classDirectories.from files(publishedProjects.sourceSets.main.output)
-    executionData jacocoMerge.destinationFile
+    additionalSourceDirs.from(files(publishedProjects.sourceSets.main.allSource.srcDirs))
+    sourceDirectories.from (files(publishedProjects.sourceSets.main.allSource.srcDirs))
+    classDirectories.from(files(publishedProjects.sourceSets.main.output))
+    executionData(jacocoMerge.destinationFile)
 
     reports {
         xml.enabled = true // required by coveralls
@@ -364,8 +364,8 @@ if (!hasProperty("sonatypePassword")) {
 }
 
 subprojects {
-    apply plugin: "maven-publish"
-    apply plugin: "signing"
+    apply(plugin: "maven-publish")
+    apply(plugin: "signing")
 
     tasks.withType(GenerateModuleMetadata) {
         enabled = isReleaseVersion // signing of these artifacts causes failure for snapshot versions
@@ -375,7 +375,7 @@ subprojects {
         publications {
             mavenJava(MavenPublication) {
                 artifactId = project.archivesBaseName
-                from components.java
+                from(components.java)
                 pom {
                     name = project.archivesBaseName
                     packaging = "jar"
@@ -447,7 +447,7 @@ subprojects {
         required {
             isReleaseVersion && gradle.taskGraph.hasTask("publish")
         }
-        sign publishing.publications.mavenJava
+        sign(publishing.publications.mavenJava)
     }
 }
 
