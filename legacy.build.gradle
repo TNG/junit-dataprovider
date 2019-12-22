@@ -1,32 +1,3 @@
-project(":junit-jupiter") {
-    archivesBaseName = "junit-jupiter-dataprovider"
-    description = "A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider."
-
-    jar {
-        manifest {
-            attributes(
-                "Automatic-Module-Name": "com.tngtech.junit.dataprovider.jupiter"
-            )
-        }
-    }
-}
-
-project(":junit-jupiter-params") {
-    archivesBaseName = "junit-jupiter-params-dataprovider"
-    description = "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider."
-
-    dependencies {
-        api("org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}")
-    }
-
-    jar {
-        manifest {
-            attributes(
-                "Automatic-Module-Name": "com.tngtech.junit.dataprovider.jupiter.params"
-            )
-        }
-    }
-}
 
 // configure after properties are set and integration tests are added
 subprojects {

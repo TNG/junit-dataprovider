@@ -238,6 +238,40 @@ configure(subprojects.filter { p -> p.name.startsWith("junit-jupiter") }) {
     }
 }
 
+project(":junit-jupiter") {
+    configure<BasePluginConvention> {
+        archivesBaseName = "junit-jupiter-dataprovider"
+        description = "A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider."
+    }
+
+    tasks.named<Jar>("jar") {
+        manifest {
+            attributes(
+                    "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter"
+            )
+        }
+    }
+}
+
+project(":junit-jupiter-params") {
+    configure<BasePluginConvention> {
+        archivesBaseName = "junit-jupiter-params-dataprovider"
+        description = "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider."
+    }
+
+    dependencies {
+        "api"("org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}")
+    }
+
+    tasks.named<Jar>("jar") {
+        manifest {
+            attributes(
+                    "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter.params"
+            )
+        }
+    }
+}
+
 // -- Custom tasks ------------------------------------------------------------
 /**
  * Task to touch all junit xml report files for all given {@link Test} {@code tasks}.
