@@ -77,4 +77,37 @@ subprojects {
     }
 }
 
+project(":core") {
+    configure<BasePluginConvention> {
+        archivesBaseName = "junit-dataprovider-core"
+        description = "The common core for a TestNG like dataprovider runner for JUnit."
+    }
+
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.VERSION_1_6
+        targetCompatibility = JavaVersion.VERSION_1_6
+    }
+
+    dependencies {
+        "testImplementation"("junit:junit:4.12")
+
+        "testImplementation"("org.assertj:assertj-core:1.7.1")
+        "testImplementation"("org.mockito:mockito-core:2.18.3")
+    }
+
+    tasks {
+        withType<JavaCompile> {
+            options.compilerArgs.addAll(listOf("-Xlint:-options"))
+        }
+
+        named<Jar>("jar") {
+            manifest {
+                attributes(
+                        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.core"
+                )
+            }
+        }
+    }
+}
+
 apply(from = "legacy.build.gradle")
