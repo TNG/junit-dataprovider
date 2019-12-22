@@ -3,10 +3,9 @@ dist: trusty
 sudo: false
 
 script:
-  - ./gradlew build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0-RC2 -PskipSpotBugs
-  - ./gradlew build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.0     -PskipSpotBugs
-
-  - ./gradlew build
+  - ./gradlew --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0-RC2 -PskipSpotBugs
+  - ./gradlew --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.0     -PskipSpotBugs
+  - ./gradlew --scan build
 
   - cd ${TRAVIS_BUILD_DIR}/junit4/
   - mvn test
@@ -26,4 +25,4 @@ jdk:
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}
-  - ./gradlew jacocoRootReport coveralls
+  - ./gradlew --scan jacocoRootReport coveralls
