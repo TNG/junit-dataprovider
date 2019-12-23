@@ -272,6 +272,77 @@ project(":junit-jupiter-params") {
     }
 }
 
+// configure after properties are set and integration tests are added
+subprojects {
+    configure<JacocoPluginExtension> {
+        toolVersion = "0.8.3"
+    }
+
+    configure<com.github.spotbugs.SpotBugsExtension> {
+        toolVersion = "3.1.12"
+        isIgnoreFailures = true
+    }
+
+    tasks {
+        named<Jar>("jar") {
+            manifest {
+                val now = java.time.LocalDate.now()
+
+                val title = project.the<BasePluginConvention>().archivesBaseName
+                val company = "TNG Technology Consulting GmbH"
+                val today = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                val copyright = "${now.year} $company"
+
+                attributes(
+                        "Built-By" to "Gradle ${gradle.gradleVersion}",
+                        "Built-Date" to today, // using now would destroy incremental build feature
+                        "Specification-Title" to title,
+                        "Specification-Version" to archiveVersion,
+                        "Specification-Vendor" to company,
+                        "Implementation-Title" to title,
+                        "Implementation-Version" to archiveVersion,
+                        "Implementation-Vendor" to company,
+                        "Issue-Tracker" to "https://github.com/TNG/junit-dataprovider/issues",
+                        "Documentation-URL" to "https://github.com/TNG/junit-dataprovider/wiki",
+                        "Copyright" to copyright,
+                        "License" to "Apache License v2.0, January 2004",
+
+                        // OSGi / p2 plugin information
+                        "Bundle-Copyright" to copyright,
+                        "Bundle-Name" to title,
+                        "Bundle-SymbolicName" to "${project.group}.$title",
+                        "Bundle-Vendor" to company,
+                        "Export-Package" to "com.tngtech.junit.dataprovider.*"
+                )
+            }
+        }
+
+        val test = named<Test>("test") {
+            ignoreFailures = isBuildOnJenkins
+        }
+
+        val touchTestResultsForJenkins = register<TouchTestResults>("touchTestResultsForJenkins") {
+            tasks(test)
+            enabled = isBuildOnJenkins
+        }
+        getByName("build").dependsOn(touchTestResultsForJenkins)
+
+        named<JacocoReport>("jacocoTestReport") {
+            reports {
+                xml.isEnabled = true // coveralls plugin depends on xml format report
+            }
+        }
+
+        withType<com.github.spotbugs.SpotBugsTask> {
+            enabled = !skipSpotBugs
+        }
+
+        plugins.withType<LifecycleBasePlugin> {
+            get("check").dependsOn(rootProject.tasks["cpdCheck"])
+        }
+    }
+}
+
 // -- Custom tasks ------------------------------------------------------------
 /**
  * Task to touch all junit xml report files for all given {@link Test} {@code tasks}.
