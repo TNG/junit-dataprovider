@@ -139,30 +139,3 @@ subprojects {
         sign(publishing.publications.mavenJava)
     }
 }
-
-// -- Custom tasks ------------------------------------------------------------
-/**
- * Task to touch all junit xml report files for all given {@link Test} {@code tasks}.
- * This is required due to Jenkins fails if test output is created before build starts which
- * could happen using Gradles up-to-date feature :(
- */
-class TouchTestResults extends DefaultTask {
-    @InputFiles
-    def tasks = []
-
-    def tasks(Test... testTasks) {
-        tasks.addAll(testTasks)
-        mustRunAfter(testTasks)
-    }
-
-    @TaskAction
-    void touch() {
-        tasks.each { test ->
-            def testResultsDir = test.reports.junitXml.destination
-            if (testResultsDir.exists()) {
-                def timestamp = System.currentTimeMillis()
-                testResultsDir.eachFile{ file -> file.lastModified = timestamp }
-            }
-        }
-    }
-}
