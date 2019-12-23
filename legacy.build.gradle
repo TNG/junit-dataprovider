@@ -9,37 +9,6 @@ cpdCheck {
     source = subprojects*.sourceSets*.main*.java*.srcDirs + subprojects*.sourceSets*.test*.java*.srcDirs // only check java source code
 }
 
-// -- coveralls gradle plugin multi-module project workaround ---------------------------------------------------------
-def publishedProjects = subprojects.findAll()
-
-task jacocoMerge(type: JacocoMerge) {
-    doFirst {
-        executionData = files(executionData.findAll { it.exists() })
-    }
-    publishedProjects.each { subproject ->
-        executionData(subproject.tasks.withType(Test))
-    }
-}
-
-task jacocoRootReport(type: JacocoReport) {
-    description = "Generates an aggregate report from all subprojects"
-    dependsOn(publishedProjects.test, jacocoMerge)
-
-    additionalSourceDirs.from(files(publishedProjects.sourceSets.main.allSource.srcDirs))
-    sourceDirectories.from (files(publishedProjects.sourceSets.main.allSource.srcDirs))
-    classDirectories.from(files(publishedProjects.sourceSets.main.output))
-    executionData(jacocoMerge.destinationFile)
-
-    reports {
-        xml.enabled = true // required by coveralls
-    }
-}
-
-coveralls {
-    sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
-    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
-}
-
 // -- sign and publish artifacts -------------------------------------------------------------------------------------
 
 ext.isReleaseVersion = !project.version.endsWith("-SNAPSHOT")

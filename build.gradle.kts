@@ -343,6 +343,38 @@ subprojects {
     }
 }
 
+// -- coveralls plugin multi-module project workaround ---------------------------------------------------------
+val publishedProjects = subprojects.filter { true }
+
+val jacocoMerge = tasks.register("jacocoMerge", JacocoMerge::class) {
+    doFirst {
+        executionData = files(executionData.filter { it.exists() })
+    }
+    publishedProjects.forEach { p ->
+        executionData(p.tasks.withType(Test::class))
+    }
+}
+
+val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
+    description = "Generates an aggregate report from all subprojects"
+
+    additionalSourceDirs.from(publishedProjects.flatMap { p -> p.the<SourceSetContainer>()["main"].allSource.srcDirs })
+    sourceDirectories.from(publishedProjects.flatMap { p -> p.the<SourceSetContainer>()["main"].allSource.srcDirs })
+    classDirectories.from(publishedProjects.flatMap { p -> p.the<SourceSetContainer>()["main"].output })
+
+    executionData(jacocoMerge.get().destinationFile)
+
+    reports {
+        xml.isEnabled = true // required by coveralls
+    }
+    dependsOn(publishedProjects.map { p -> p.tasks["test"] }, jacocoMerge)
+}
+
+coveralls {
+    sourceDirs = publishedProjects.flatMap { p -> p.the<SourceSetContainer>()["main"].allSource.srcDirs }.map { f -> f.absolutePath }
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
+
 // -- Custom tasks ------------------------------------------------------------
 /**
  * Task to touch all junit xml report files for all given {@link Test} {@code tasks}.
