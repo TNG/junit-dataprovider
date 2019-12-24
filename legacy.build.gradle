@@ -1,14 +1,3 @@
-cpd {
-    // Use Java 8 and later to execute cpd successfully
-    toolVersion = "6.13.0"
-}
-
-cpdCheck {
-    ignoreFailures = true
-    minimumTokenCount = 25
-    source = subprojects*.sourceSets*.main*.java*.srcDirs + subprojects*.sourceSets*.test*.java*.srcDirs // only check java source code
-}
-
 // -- sign and publish artifacts -------------------------------------------------------------------------------------
 
 ext.isReleaseVersion = !project.version.endsWith("-SNAPSHOT")

@@ -343,6 +343,21 @@ subprojects {
     }
 }
 
+configure<de.aaschmid.gradle.plugins.cpd.CpdExtension> {
+    // Use Java 8 and later to execute cpd successfully
+    toolVersion = "6.13.0"
+}
+
+tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
+    ignoreFailures = true
+    minimumTokenCount = 25
+    setSource(files(
+            // only check java source code
+            subprojects.flatMap { p -> p.the<SourceSetContainer>()["main"].java.srcDirs },
+            subprojects.flatMap { p -> p.the<SourceSetContainer>()["test"].java.srcDirs }
+    ))
+}
+
 // -- coveralls plugin multi-module project workaround ---------------------------------------------------------
 val publishedProjects = subprojects.filter { true }
 
