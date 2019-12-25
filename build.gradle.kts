@@ -174,7 +174,7 @@ project(":junit4") {
     }
 }
 
-configure(subprojects.filter { p -> p.name.startsWith("junit-jupiter") }) {
+configure(subprojects.filter { it.name.startsWith("junit-jupiter") }) {
     apply<GroovyPlugin>()
 
     configure<JavaPluginExtension> {
@@ -355,8 +355,8 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
     minimumTokenCount = 25
     setSource(files(
             // only check java source code
-            subprojects.flatMap { p -> p.the<SourceSetContainer>()["main"].java.srcDirs },
-            subprojects.flatMap { p -> p.the<SourceSetContainer>()["test"].java.srcDirs }
+            subprojects.flatMap { it.the<SourceSetContainer>()["main"].java.srcDirs },
+            subprojects.flatMap { it.the<SourceSetContainer>()["test"].java.srcDirs }
     ))
 }
 
@@ -367,29 +367,27 @@ val jacocoMerge = tasks.register("jacocoMerge", JacocoMerge::class) {
     doFirst {
         executionData = files(executionData.filter { it.exists() })
     }
-    publishedProjects.forEach { p ->
-        executionData(p.tasks.withType(Test::class))
-    }
+    publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
 }
 
 val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
     description = "Generates an aggregate report from all subprojects"
 
-    additionalSourceDirs.from(publishedProjects.flatMap { p -> p.the<SourceSetContainer>()["main"].allSource.srcDirs })
-    sourceDirectories.from(publishedProjects.flatMap { p -> p.the<SourceSetContainer>()["main"].allSource.srcDirs })
-    classDirectories.from(publishedProjects.flatMap { p -> p.the<SourceSetContainer>()["main"].output })
+    additionalSourceDirs.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
+    sourceDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
+    classDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].output })
 
     executionData(jacocoMerge.get().destinationFile)
 
     reports {
         xml.isEnabled = true // required by coveralls
     }
-    dependsOn(publishedProjects.map { p -> p.tasks.named("test") }, jacocoMerge)
+    dependsOn(publishedProjects.map { it.tasks.named("test") }, jacocoMerge)
 }
 
 coveralls {
-    sourceDirs = publishedProjects.flatMap { p -> p.the<SourceSetContainer>()["main"].allSource.srcDirs }.map { f -> f.absolutePath }
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    sourceDirs = publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs }.map { it.absolutePath }
 }
 
 // -- sign and publish artifacts -------------------------------------------------------------------------------------
@@ -444,26 +442,27 @@ subprojects {
 
                     withXml {
                         fun org.w3c.dom.NodeList.asElementList() = (0 until length).map { this::item }.filterIsInstance<org.w3c.dom.Element>()
+                        fun org.w3c.dom.NodeList.onlyElement() = if (length == 1) item(0) else throw kotlin.IllegalStateException("Expected only one element but got $length.")
 
                         asElement()
                                 .getElementsByTagName("dependencies")
                                 .asElementList()
-                                .flatMap { deps -> deps.childNodes.asElementList() }
+                                .flatMap { it.childNodes.asElementList() }
                                 .forEach { dep ->
-                                    val groupId = dep.getElementsByTagName("groupId").item(0)
-                                    val artifactId = dep.getElementsByTagName("artifactId").item(0)
+                                    val groupId = dep.getElementsByTagName("groupId").onlyElement()
+                                    val artifactId = dep.getElementsByTagName("artifactId").onlyElement()
 
                                     // JUnit4
                                     if (groupId.textContent == "junit" && artifactId.textContent == "junit") {
-                                        dep.getElementsByTagName("version").item(0).textContent = "[4.10,4.12]"
-                                        dep.getElementsByTagName("scope").item(0).textContent = "provided"
+                                        dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,4.12]"
+                                        dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
                                     }
 
                                     // JUnit5
                                     if ((groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-engine") ||
                                             (groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-params")) {
-                                        dep.getElementsByTagName("version").item(0).textContent = "[5.5.0-M6,6.0.0)"
-                                        dep.getElementsByTagName("scope").item(0).textContent = "provided"
+                                        dep.getElementsByTagName("version").onlyElement().textContent = "[5.5.0-M6,6.0.0)"
+                                        dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
                                     }
                                 }
                     }
@@ -522,13 +521,11 @@ open class TouchTestResults : DefaultTask() {
 
     @TaskAction
     fun touch() {
-        tasks.forEach { test ->
-            val testResultsDir = test.get().reports.junitXml.destination
+        tasks.forEach { task ->
+            val testResultsDir = task.get().reports.junitXml.destination
             if (testResultsDir.exists()) {
                 val timestamp = System.currentTimeMillis()
-                testResultsDir.listFiles()?.forEach { file ->
-                    file.setLastModified(timestamp)
-                }
+                testResultsDir.listFiles()?.forEach { it.setLastModified(timestamp) }
             }
         }
     }
