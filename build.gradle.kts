@@ -118,7 +118,7 @@ project(":junit4") {
     }
 
     configure<SourceSetContainer> {
-        create("integTest") {
+        register("integTest") {
             compileClasspath += named("main").get().output + named("test").get().output
             runtimeClasspath += named("main").get().output + named("test").get().output
         }
@@ -168,7 +168,9 @@ project(":junit4") {
             tasks(integTest)
             enabled = isBuildOnJenkins
         }
-        getByName("build").dependsOn(touchIntegTestResultsForJenkins)
+        named("build") {
+            dependsOn(touchIntegTestResultsForJenkins)
+        }
     }
 }
 
@@ -181,7 +183,7 @@ configure(subprojects.filter { p -> p.name.startsWith("junit-jupiter") }) {
     }
 
     configure<SourceSetContainer> {
-        create("integTest") {
+        register("integTest") {
             compileClasspath += named("main").get().output + named("test").get().output
             runtimeClasspath += named("main").get().output + named("test").get().output
         }
@@ -228,7 +230,9 @@ configure(subprojects.filter { p -> p.name.startsWith("junit-jupiter") }) {
             tasks(integTest)
             enabled = isBuildOnJenkins
         }
-        getByName("build").dependsOn(touchIntegTestResultsForJenkins)
+        named("build") {
+            dependsOn(touchIntegTestResultsForJenkins)
+        }
     }
 }
 
@@ -319,7 +323,9 @@ subprojects {
             tasks(test)
             enabled = isBuildOnJenkins
         }
-        getByName("build").dependsOn(touchTestResultsForJenkins)
+        named("build") {
+            dependsOn(touchTestResultsForJenkins)
+        }
 
         named<JacocoReport>("jacocoTestReport") {
             reports {
@@ -332,7 +338,9 @@ subprojects {
         }
 
         plugins.withType<LifecycleBasePlugin> {
-            get("check").dependsOn(rootProject.tasks["cpdCheck"])
+            named("check") {
+                dependsOn(rootProject.tasks["cpdCheck"])
+            }
         }
     }
 }
@@ -376,7 +384,7 @@ val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
     reports {
         xml.isEnabled = true // required by coveralls
     }
-    dependsOn(publishedProjects.map { p -> p.tasks["test"] }, jacocoMerge)
+    dependsOn(publishedProjects.map { p -> p.tasks.named("test") }, jacocoMerge)
 }
 
 coveralls {
@@ -401,7 +409,7 @@ subprojects {
 
     configure<PublishingExtension> {
         publications {
-            create<MavenPublication>("mavenJava") {
+            register<MavenPublication>("mavenJava") {
                 val archivesBaseName = project.the<BasePluginConvention>().archivesBaseName
                 artifactId = archivesBaseName
                 from(components["java"])
