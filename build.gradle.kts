@@ -337,10 +337,8 @@ subprojects {
             enabled = !skipSpotBugs
         }
 
-        plugins.withType<LifecycleBasePlugin> {
-            named("check") {
-                dependsOn(rootProject.tasks["cpdCheck"])
-            }
+        named("check") {
+            dependsOn(rootProject.tasks["cpdCheck"])
         }
     }
 }
