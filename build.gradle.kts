@@ -14,27 +14,10 @@ println("buildOnJenkins = $isBuildOnJenkins for current build.")
 val skipSpotBugs by extra(hasProperty("skipSpotBugs"))
 println("Using skipSpotBugs = $skipSpotBugs for current build.")
 
-// set default junit versions if not set via command line
-val junit4Version by extra(findProperty("junit4Version")?.toString() ?: "4.12")
-println("Using JUnit4 version $junit4Version for current build.")
-val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.5.2")
-println("Using JUnit Jupiter version $junitJupiterVersion for current build.")
-
-class Dependency {
-    val spotBugsAnnotations = "com.github.spotbugs:spotbugs-annotations:3.1.12"
-
-    val junit4 = "junit:junit:$junit4Version"
-    val junitJupiterEngine = "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
-    val junitJupiterParams = "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion"
-
-    val assertJ6 = "org.assertj:assertj-core:1.7.1"
-    val mockito6 = "org.mockito:mockito-core:2.28.2"
-    val assertJ8 = "org.assertj:assertj-core:3.14.0"
-    val mockito8 = "org.mockito:mockito-core:3.2.4"
-
-    val groovy = "org.codehaus.groovy:groovy:2.5.8"
-}
-val dependency = Dependency() // required because using `object` does not work using properties from outside
+val dependency = Dependencies(
+        findProperty("junit4Version")?.toString() ?: "4.12",
+        findProperty("junitJupiterVersion")?.toString() ?: "5.5.2"
+)
 
 buildScan {
     termsOfServiceUrl = "https://gradle.com/terms-of-service"
