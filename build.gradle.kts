@@ -73,8 +73,8 @@ subprojects {
         }
 
         withType<Jar> {
-            from(project.rootDir) {
-                include("LICENSE.md", "LICENSE-notice.md")
+            from(rootProject.rootDir) {
+                include("LICENSE", "NOTICE")
                 into("META-INF")
             }
         }
