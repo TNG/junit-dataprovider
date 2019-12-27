@@ -20,6 +20,22 @@ println("Using JUnit4 version $junit4Version for current build.")
 val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.5.2")
 println("Using JUnit Jupiter version $junitJupiterVersion for current build.")
 
+class Dependency {
+    val spotBugsAnnotations = "com.github.spotbugs:spotbugs-annotations:3.1.12"
+
+    val junit4 = "junit:junit:$junit4Version"
+    val junitJupiterEngine = "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
+    val junitJupiterParams = "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion"
+
+    val assertJ6 = "org.assertj:assertj-core:1.7.1"
+    val mockito6 = "org.mockito:mockito-core:2.28.2"
+    val assertJ8 = "org.assertj:assertj-core:3.14.0"
+    val mockito8 = "org.mockito:mockito-core:3.2.4"
+
+    val groovy = "org.codehaus.groovy:groovy:2.5.8"
+}
+val dependency = Dependency() // required because using `object` does not work using properties from outside
+
 buildScan {
     termsOfServiceUrl = "https://gradle.com/terms-of-service"
     termsOfServiceAgree = "yes"
@@ -41,8 +57,8 @@ subprojects {
     version = "2.7-SNAPSHOT"
 
     dependencies {
-        "compileOnly"("com.github.spotbugs:spotbugs-annotations:3.1.5")
-        "testImplementation"("com.github.spotbugs:spotbugs-annotations:3.1.5")
+        "compileOnly"(dependency.spotBugsAnnotations)
+        "testImplementation"(dependency.spotBugsAnnotations)
     }
 
     configure<JavaPluginExtension> {
@@ -83,10 +99,10 @@ project(":core") {
     }
 
     dependencies {
-        "testImplementation"("junit:junit:4.12")
+        "testImplementation"(dependency.junit4)
 
-        "testImplementation"("org.assertj:assertj-core:1.7.1")
-        "testImplementation"("org.mockito:mockito-core:2.18.3")
+        "testImplementation"(dependency.assertJ6)
+        "testImplementation"(dependency.mockito6)
     }
 
     tasks {
@@ -132,12 +148,12 @@ project(":junit4") {
 
     dependencies {
         "api"(project(":core"))
-        "api"("junit:junit:${junit4Version}")
+        "api"(dependency.junit4)
 
-        "testImplementation"("org.assertj:assertj-core:1.7.1")
-        "testImplementation"("org.mockito:mockito-core:2.18.3")
+        "testImplementation"(dependency.assertJ6)
+        "testImplementation"(dependency.mockito6)
 
-        "integTestImplementation"("org.codehaus.groovy:groovy:2.4.7")
+        "integTestImplementation"(dependency.groovy)
     }
 
     tasks {
@@ -197,12 +213,12 @@ configure(subprojects.filter { it.name.startsWith("junit-jupiter") }) {
 
     dependencies {
         "api"(project(":core"))
-        "api"("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+        "api"(dependency.junitJupiterEngine)
 
-        "testImplementation"("org.assertj:assertj-core:3.8.0")
-        "testImplementation"("org.mockito:mockito-core:2.18.3")
+        "testImplementation"(dependency.assertJ8)
+        "testImplementation"(dependency.mockito8)
 
-        "integTestImplementation"("org.codehaus.groovy:groovy:2.4.12")
+        "integTestImplementation"(dependency.groovy)
     }
 
     tasks {
@@ -258,7 +274,7 @@ project(":junit-jupiter-params") {
     }
 
     dependencies {
-        "api"("org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}")
+        "api"(dependency.junitJupiterParams)
     }
 
     tasks.named<Jar>("jar") {
