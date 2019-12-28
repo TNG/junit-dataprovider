@@ -10,7 +10,7 @@ class Dependencies(private val junit4Version: String, private val junitJupiterVe
     val junitJupiterEngine = "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
     val junitJupiterParams = "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion"
 
-    val assertJ6 = "org.assertj:assertj-core:1.7.1"
+    val assertJ6 = "org.assertj:assertj-core:1.6.0"
     val mockito6 = "org.mockito:mockito-core:2.28.2"
     val assertJ8 = "org.assertj:assertj-core:3.14.0"
     val mockito8 = "org.mockito:mockito-core:3.2.4"
