@@ -389,7 +389,11 @@ val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
 
     additionalSourceDirs.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
     sourceDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
-    classDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].output })
+    classDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].output.asFileTree.matching {
+        // exclude FQDN duplicates -- both are annotations and therefore mostly irrelevant for coverage
+        exclude("com/tngtech/junit/dataprovider/DataProvider.class")
+        exclude("com/tngtech/junit/dataprovider/UseDataProvider.class")
+    }})
 
     executionData(jacocoMerge.get().destinationFile)
 
