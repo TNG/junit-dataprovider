@@ -326,7 +326,10 @@ subprojects {
                         "Bundle-Name" to title,
                         "Bundle-SymbolicName" to "${project.group}.$title",
                         "Bundle-Vendor" to company,
-                        "Export-Package" to "com.tngtech.junit.dataprovider.*"
+                        "Export-Package" to "com.tngtech.junit.dataprovider.*",
+
+                        // Bnd plugin instructions -- remove field because it breaks caching builds with included linux timestamp
+                        "-removeheaders" to "Bnd-LastModified"
                 )
             }
         }
