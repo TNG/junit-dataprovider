@@ -31,7 +31,7 @@ public class DataProviderVarargsAcceptanceTest {
     @UseDataProvider("dataProviderLongVarargs")
     public void testLongVarargs(Long... longs) {
         for (Long l : longs) {
-            assertNotNull(l);
+            assertThat(l).isNotNull();
         }
     }
 
@@ -45,7 +45,7 @@ public class DataProviderVarargsAcceptanceTest {
     // @formatter:on
     public void testStringVarargs(String... strings) {
         for (String s : strings) {
-            assertNotNull(s);
+            assertThat(s).isNotNull();
         }
     }
 
@@ -63,9 +63,9 @@ public class DataProviderVarargsAcceptanceTest {
     @Test
     @UseDataProvider("dataProviderIntVarargsWithLeadingCharArgument")
     public void testIntVarargsWithLeadingCharArgument(char c, int... is) {
-        assertNotNull(c);
+        assertThat(c).isNotNull();
         for (int i : is) {
-            assertNotNull(i);
+            assertThat(i).isNotNull();
         }
     }
 
@@ -78,10 +78,9 @@ public class DataProviderVarargsAcceptanceTest {
         })
     // @formatter:on
     public void testStringVarargsWithLeadingSizeArgument(int i, String... strings) {
-        assertNotNull(strings);
         assertThat(strings).hasSize(i);
         for (String s : strings) {
-            assertNotNull(s);
+            assertThat(s).isNotNull();
         }
     }
 }

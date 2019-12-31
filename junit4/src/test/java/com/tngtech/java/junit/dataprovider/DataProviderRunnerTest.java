@@ -419,7 +419,7 @@ public class DataProviderRunnerTest extends BaseTest {
         underTest.filter(filter);
 
         // Then:
-        assertThat(underTest.getDescription().getChildren().size()).isGreaterThan(0);
+        assertThat(underTest.getDescription()).isNotEmpty();
     }
 
     @Test
@@ -683,7 +683,7 @@ public class DataProviderRunnerTest extends BaseTest {
         DataProviderMethodResolver result = underTest.getResolverInstanceInt(PrivateDefaultConstructor.class);
 
         // Then:
-        assertThat(result).isNotNull().isInstanceOf(PrivateDefaultConstructor.class);
+        assertThat(result).isInstanceOf(PrivateDefaultConstructor.class);
     }
 
     // -- helper classes to test with ------------------------------------------------------------------------------------------------------

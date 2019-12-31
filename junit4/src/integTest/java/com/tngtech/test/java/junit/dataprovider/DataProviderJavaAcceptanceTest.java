@@ -264,7 +264,7 @@ public class DataProviderJavaAcceptanceTest {
     // @formatter:off
     public void testStringLength(String str, int expectedLength) {
         // Expect:
-        assertThat(str.length()).isEqualTo(expectedLength);
+        assertThat(str).hasSize(expectedLength);
     }
 
     // @formatter:off
@@ -278,7 +278,7 @@ public class DataProviderJavaAcceptanceTest {
     // @formatter:off
     public void testStringLength2(String str, int expectedLength) {
         // Expect:
-        assertThat(str.length()).isEqualTo(expectedLength);
+        assertThat(str).hasSize(expectedLength);
     }
 
     // @formatter:off
