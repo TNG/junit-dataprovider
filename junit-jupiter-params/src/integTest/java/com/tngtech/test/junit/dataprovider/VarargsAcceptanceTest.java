@@ -60,9 +60,9 @@ class VarargsAcceptanceTest {
     @ParameterizedTest
     @UseDataProvider("dataProviderIntVarargsWithLeadingCharArgument")
     void testIntVarargsWithLeadingCharArgument(char c, int... is) {
-        assertNotNull(c);
+        assertThat(c).isNotNull();
         for (int i : is) {
-            assertNotNull(i);
+            assertThat(i).isNotNegative();
         }
     }
 
@@ -75,7 +75,6 @@ class VarargsAcceptanceTest {
         })
     // @formatter:on
     void testStringVarargsWithLeadingSizeArgument(int i, String... strings) {
-        assertNotNull(strings);
         assertThat(strings).hasSize(i);
         for (String s : strings) {
             assertNotNull(s);

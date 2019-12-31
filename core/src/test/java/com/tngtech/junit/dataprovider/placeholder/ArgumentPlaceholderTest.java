@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -675,9 +676,7 @@ public class ArgumentPlaceholderTest {
     private List<Object> list(Object first, Object... remaining) {
         List<Object> result = new ArrayList<Object>();
         result.add(first);
-        for (Object object : remaining) {
-            result.add(object);
-        }
+        Collections.addAll(result, remaining);
         return result;
     }
 }

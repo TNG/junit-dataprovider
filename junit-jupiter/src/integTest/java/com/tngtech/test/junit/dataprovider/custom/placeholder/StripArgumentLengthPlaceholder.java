@@ -17,7 +17,7 @@ class StripArgumentLengthPlaceholder extends ArgumentPlaceholder {
         for (int i = 0; i < arguments.size(); i++) {
             String formattedParameter = format(arguments.get(i));
             if (formattedParameter.length() > maxLength) {
-                stringBuilder.append(formattedParameter.substring(0, maxLength - 5));
+                stringBuilder.append(formattedParameter, 0, maxLength - 5);
                 stringBuilder.append("...");
                 stringBuilder.append(formattedParameter.substring(formattedParameter.length() - 2));
             } else {

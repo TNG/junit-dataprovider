@@ -366,7 +366,7 @@ public class DataProviderRunnerTest extends BaseTest {
     public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
         // Given:
         underTest.computedTestMethods = null;
-        when(underTest.generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class))).thenReturn(new ArrayList<FrameworkMethod>());
+        doReturn(new ArrayList<FrameworkMethod>()).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
 
         // When:
         List<FrameworkMethod> result = underTest.computeTestMethods();
@@ -387,7 +387,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         underTest.computedTestMethods = expected;
 
-        when(underTest.generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class))).thenReturn(expected);
+        doReturn(expected).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
 
         // When:
         List<FrameworkMethod> result = underTest.computeTestMethods();
@@ -419,7 +419,7 @@ public class DataProviderRunnerTest extends BaseTest {
         underTest.filter(filter);
 
         // Then:
-        assertThat(underTest.getDescription()).isNotEmpty();
+        assertThat(underTest.getDescription().getChildren()).isNotEmpty();
     }
 
     @Test

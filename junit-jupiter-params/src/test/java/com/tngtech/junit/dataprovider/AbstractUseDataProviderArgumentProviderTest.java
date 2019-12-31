@@ -25,12 +25,7 @@ public class AbstractUseDataProviderArgumentProviderTest {
 
     private AbstractUseDataProviderArgumentProvider<Annotation, Annotation> underTest;
 
-    private final Annotation dataProviderAnnotation = new Annotation() {
-        @Override
-        public Class<? extends Annotation> annotationType() {
-            return Annotation.class;
-        }
-    };
+    private final Annotation dataProviderAnnotation = () -> Annotation.class;
     @SuppressWarnings("unchecked")
     private final Class<Annotation> dataProviderAnnotationClass = (Class<Annotation>) dataProviderAnnotation.getClass();
 
@@ -46,7 +41,7 @@ public class AbstractUseDataProviderArgumentProviderTest {
     private Store store;
 
     @BeforeEach
-    void setup() throws Exception {
+    void setup() {
         underTest = new AbstractUseDataProviderArgumentProvider<Annotation, Annotation>(dataProviderAnnotationClass,
                 dataConverter) {
             @Override

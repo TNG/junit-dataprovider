@@ -27,7 +27,7 @@ public class CustomPlaceholderAcceptanceTest {
             for (int i = 0; i < parameters.length; i++) {
                 String formattedParameter = format(parameters[i]);
                 if (formattedParameter.length() > maxLength) {
-                    stringBuilder.append(formattedParameter.substring(0, maxLength - 5));
+                    stringBuilder.append(formattedParameter, 0, maxLength - 5);
                     stringBuilder.append("...");
                     stringBuilder.append(formattedParameter.substring(formattedParameter.length() - 2));
                 } else {

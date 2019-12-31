@@ -15,7 +15,7 @@ import com.tngtech.junit.dataprovider.UseDataProvider;
 @TestInstance(Lifecycle.PER_CLASS)
 class StringDataProviderAcceptanceTest {
 
-    @DataProvider(splitBy = "\\|", trimValues = true)
+    @DataProvider(splitBy = "\\|")
     String[] dataProviderFileExistence() {
         // @formatter:off
         return new String[] {
@@ -56,7 +56,7 @@ class StringDataProviderAcceptanceTest {
         "a              |  1",
         "abc            |  3",
         "veryLongString | 14",
-    }, splitBy = "\\|", trimValues = true, convertNulls = true)
+    }, splitBy = "\\|")
     // @formatter:off
     void testStringLength2(String str, int expectedLength) {
         // Expect:
@@ -97,7 +97,7 @@ class StringDataProviderAcceptanceTest {
     @DataProvider({ "null", "", })
     void testIsEmptyString2(String str) {
         // When:
-        boolean isEmpty = (str == null) ? true : str.isEmpty();
+        boolean isEmpty = (str == null) || str.isEmpty();
 
         // Then:
         assertThat(isEmpty).isTrue();

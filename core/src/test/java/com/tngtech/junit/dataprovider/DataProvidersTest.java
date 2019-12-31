@@ -7,6 +7,7 @@ import static com.tngtech.junit.dataprovider.DataProviders.crossProductSingleArg
 import static com.tngtech.junit.dataprovider.DataProviders.testForEach;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
@@ -248,7 +249,7 @@ public class DataProvidersTest {
 
         // When:
         @SuppressWarnings("unchecked")
-        Object[][] result = crossProduct(asList(asList(1), asList(2), asList(3)),
+        Object[][] result = crossProduct(asList(singletonList(1), singletonList(2), singletonList(3)),
                 Collections.<Iterable<Object>>emptyList());
 
         // Then:
@@ -262,7 +263,7 @@ public class DataProvidersTest {
         // When:
         @SuppressWarnings("unchecked")
         Object[][] result = crossProduct(Collections.<Iterable<Object>>emptyList(),
-                asList(asList(1), asList(2), asList(3)));
+                asList(singletonList(1), singletonList(2), singletonList(3)));
 
         // Then:
         assertThat(result).isEqualTo(new Object[][] {});
@@ -274,7 +275,9 @@ public class DataProvidersTest {
 
         // When:
         @SuppressWarnings("unchecked")
-        Object[][] result = crossProduct(asList(asList(1), asList(2), asList(3)), asList(asList(4), asList(5)));
+        Object[][] result = crossProduct(
+                asList(singletonList(1), singletonList(2), singletonList(3)),
+                asList(singletonList(4), singletonList(5)));
 
         // Then:
         assertThat(result).isEqualTo(new Object[][] { { 1, 4 }, { 1, 5 }, { 2, 4 }, { 2, 5 }, { 3, 4 }, { 3, 5 } });
@@ -328,9 +331,9 @@ public class DataProvidersTest {
                 .isEqualTo(new Object[][] { { 1, 4 }, { 1, 5.0 }, { "2", 4 }, { "2", 5.0 }, { 3l, 4 }, { 3l, 5.0 } });
     }
 
-    // -- test data ----------------------------------------------------------------------------------------------------
+    // -- Test data ----------------------------------------------------------------------------------------------------
 
-    protected static enum TestEnum {
+    protected enum TestEnum {
         VAL1, VAL2, VAL3
     }
 }

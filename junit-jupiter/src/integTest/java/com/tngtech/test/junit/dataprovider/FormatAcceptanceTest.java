@@ -20,8 +20,7 @@ class FormatAcceptanceTest {
     static class PlusTestNameFormatter implements DataProviderTestNameFormatter {
         @Override
         public String format(Method testMethod, int invocationIndex, List<Object> arguments) {
-            return String.format("%s: %2d + %2d = %2d", testMethod.getName(), arguments.get(0), arguments.get(1),
-                    arguments.get(2));
+            return String.format("%s: %2d + %2d = %2d", testMethod.getName(), arguments.get(0), arguments.get(1), arguments.get(2));
         }
     }
 

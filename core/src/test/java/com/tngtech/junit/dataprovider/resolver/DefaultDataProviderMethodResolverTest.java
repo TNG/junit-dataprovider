@@ -113,7 +113,7 @@ public class DefaultDataProviderMethodResolverTest {
     @Test
     public void testFindAnnotatedMethodsShouldNotShadowedMethodsHavingAnnotation() {
         // Given:
-        final List<Class<?>> locations = Arrays.<Class<?>>asList(ShadowingTestChild.class);
+        final List<Class<?>> locations = Collections.<Class<?>>singletonList(ShadowingTestChild.class);
 
         // When:
         List<Method> result = underTest.findAnnotatedMethods(locations, TestAnnotation.class);

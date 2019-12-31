@@ -35,8 +35,8 @@ public class ObjectArrayConverter extends AbstractObjectConverter<Object[]> {
             result = new Object[parameterTypes.length];
 
             int lastArgIdx = parameterTypes.length - 1;
-            for (int idx = 0; idx < lastArgIdx; idx++) {
-                result[idx] = data[idx];
+            if (lastArgIdx >= 0) {
+                System.arraycopy(data, 0, result, 0, lastArgIdx);
             }
             result[lastArgIdx] = convertVararg(data, parameterTypes[lastArgIdx].getComponentType(), lastArgIdx);
 

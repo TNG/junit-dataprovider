@@ -155,7 +155,7 @@ public class DefaultDataProviderMethodResolver implements DataProviderMethodReso
             public int compare(Method method1, Method method2) {
                 String name1 = method1.getName();
                 String name2 = method2.getName();
-                int comparison = Integer.compare(name1.hashCode(), name2.hashCode());
+                int comparison = name1.hashCode() < name2.hashCode() ? -1 : name1.hashCode() == name2.hashCode() ? 0 : 1;
                 if (comparison == 0) {
                     comparison = name1.compareTo(name2);
                     if (comparison == 0) {

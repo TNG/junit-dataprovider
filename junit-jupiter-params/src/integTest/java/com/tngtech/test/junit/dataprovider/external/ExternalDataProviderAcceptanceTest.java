@@ -14,7 +14,7 @@ class ExternalDataProviderAcceptanceTest {
         // Given:
 
         // When:
-        boolean isGreaterThanTwo = (str == null) ? false : str.length() > 2;
+        boolean isGreaterThanTwo = (str != null) && str.length() > 2;
 
         // Then:
         assertThat(isGreaterThanTwo).isEqualTo(expected);

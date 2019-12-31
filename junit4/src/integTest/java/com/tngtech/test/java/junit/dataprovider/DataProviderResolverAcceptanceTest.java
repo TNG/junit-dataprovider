@@ -1,5 +1,6 @@
 package com.tngtech.test.java.junit.dataprovider;
 
+import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -81,8 +82,8 @@ public class DataProviderResolverAcceptanceTest {
     public static Iterable<Set<Integer>> testNumberB() {
         // @formatter:off
         return Arrays.asList(
-                Collections.singleton(2),
-                Collections.singleton(Integer.valueOf(3))
+                singleton(2),
+                singleton(Integer.valueOf(3))
             );
         // @formatter:on
     }

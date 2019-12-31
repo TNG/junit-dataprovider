@@ -67,41 +67,41 @@ public abstract class AbstractObjectConverter<V> {
     }
 
     private boolean isWrappedInstance(Class<?> clazz, Object object) {
-        return (boolean.class.equals(clazz) && Boolean.class.isInstance(object))
-                || (byte.class.equals(clazz) && Byte.class.isInstance(object))
-                || (char.class.equals(clazz) && Character.class.isInstance(object))
-                || (double.class.equals(clazz) && Double.class.isInstance(object))
-                || (float.class.equals(clazz) && Float.class.isInstance(object))
-                || (int.class.equals(clazz) && Integer.class.isInstance(object))
-                || (long.class.equals(clazz) && Long.class.isInstance(object))
-                || (short.class.equals(clazz) && Short.class.isInstance(object))
-                || (void.class.equals(clazz) && Void.class.isInstance(object));
+        return (boolean.class.equals(clazz) && object instanceof Boolean)
+                || (byte.class.equals(clazz) && object instanceof Byte)
+                || (char.class.equals(clazz) && object instanceof Character)
+                || (double.class.equals(clazz) && object instanceof Double)
+                || (float.class.equals(clazz) && object instanceof Float)
+                || (int.class.equals(clazz) && object instanceof Integer)
+                || (long.class.equals(clazz) && object instanceof Long)
+                || (short.class.equals(clazz) && object instanceof Short)
+                || (void.class.equals(clazz) && object instanceof Void);
     }
 
     private boolean isWideningConversion(Class<?> clazz, Object object) {
         // byte to short, int, long, float, or double
         if ((short.class.equals(clazz) || int.class.equals(clazz) || long.class.equals(clazz)
                 || float.class.equals(clazz) || double.class.equals(clazz))
-                && Byte.class.isInstance(object)) {
+                && object instanceof Byte) {
             return true;
         }
 
         // short or char to int, long, float, or double
         if ((int.class.equals(clazz) || long.class.equals(clazz) || float.class.equals(clazz) || double.class
-                .equals(clazz)) && (Short.class.isInstance(object) || Character.class.isInstance(object))) {
+                .equals(clazz)) && (object instanceof Short || object instanceof Character)) {
             return true;
         }
         // int to long, float, or double
         if ((long.class.equals(clazz) || float.class.equals(clazz) || double.class.equals(clazz))
-                && Integer.class.isInstance(object)) {
+                && object instanceof Integer) {
             return true;
         }
         // long to float or double
-        if ((float.class.equals(clazz) || double.class.equals(clazz)) && Long.class.isInstance(object)) {
+        if ((float.class.equals(clazz) || double.class.equals(clazz)) && object instanceof Long) {
             return true;
         }
         // float to double
-        if ((double.class.equals(clazz)) && Float.class.isInstance(object)) {
+        if ((double.class.equals(clazz)) && object instanceof Float) {
             return true;
         }
         return false;

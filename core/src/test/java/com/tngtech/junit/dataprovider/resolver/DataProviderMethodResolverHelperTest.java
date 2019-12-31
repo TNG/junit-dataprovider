@@ -2,6 +2,7 @@ package com.tngtech.junit.dataprovider.resolver;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -83,8 +84,8 @@ public class DataProviderMethodResolverHelperTest {
     public void testFindDataProviderMethodsShouldReturnEmptyListIfSingleResolverReturnsEmptyList() {
         // Given:
         @SuppressWarnings("unchecked")
-        List<Class<? extends DataProviderMethodResolver>> resolverClasses = Arrays
-                .<Class<? extends DataProviderMethodResolver>>asList(TestResolver.class);
+        List<Class<? extends DataProviderMethodResolver>> resolverClasses =
+                Collections.<Class<? extends DataProviderMethodResolver>>singletonList(TestResolver.class);
         when(context.getResolverClasses()).thenReturn(resolverClasses);
 
         TestResolver.methods = emptyList();
@@ -108,7 +109,7 @@ public class DataProviderMethodResolverHelperTest {
         when(context.getResolverClasses()).thenReturn(resolverClasses);
         when(context.getResolveStrategy()).thenReturn(ResolveStrategy.UNTIL_FIRST_MATCH);
 
-        TestResolver.methods = asList(method);
+        TestResolver.methods = singletonList(method);
 
         // When:
         List<Method> result = DataProviderMethodResolverHelper.findDataProviderMethods(context);
@@ -149,7 +150,7 @@ public class DataProviderMethodResolverHelperTest {
         when(context.getResolverClasses()).thenReturn(resolverClasses);
         when(context.getResolveStrategy()).thenReturn(ResolveStrategy.AGGREGATE_ALL_MATCHES);
 
-        TestResolver.methods = asList(method);
+        TestResolver.methods = singletonList(method);
 
         // When:
         List<Method> result = DataProviderMethodResolverHelper.findDataProviderMethods(context);
@@ -163,8 +164,8 @@ public class DataProviderMethodResolverHelperTest {
     public void testFindDataProviderMethodsShouldThrowIllegalArgumentExceptionIfResolverClassHasNoDefaultConstructorExists() {
         // Given:
         @SuppressWarnings("unchecked")
-        final List<Class<? extends DataProviderMethodResolver>> resolverClasses = Arrays
-                .<Class<? extends DataProviderMethodResolver>>asList(NoDefaultConstructor.class);
+        final List<Class<? extends DataProviderMethodResolver>> resolverClasses =
+                Collections.<Class<? extends DataProviderMethodResolver>>singletonList(NoDefaultConstructor.class);
 
         when(context.getResolverClasses()).thenReturn(resolverClasses);
 
@@ -181,8 +182,8 @@ public class DataProviderMethodResolverHelperTest {
     public void testFindDataProviderMethodsShouldThrowIllegalArgumentExceptionIfResolverClassHasIsAbstract() {
         // Given:
         @SuppressWarnings("unchecked")
-        final List<Class<? extends DataProviderMethodResolver>> resolverClasses = Arrays
-                .<Class<? extends DataProviderMethodResolver>>asList(AbstractClass.class);
+        final List<Class<? extends DataProviderMethodResolver>> resolverClasses =
+                Collections.<Class<? extends DataProviderMethodResolver>>singletonList(AbstractClass.class);
 
         when(context.getResolverClasses()).thenReturn(resolverClasses);
 
@@ -200,8 +201,8 @@ public class DataProviderMethodResolverHelperTest {
     public void testFindDataProviderMethodsShouldThrowIllegalArgumentExceptionIfResolverClassesDefaultConstructorThrowsException() {
         // Given:
         @SuppressWarnings("unchecked")
-        final List<Class<? extends DataProviderMethodResolver>> resolverClasses = Arrays
-                .<Class<? extends DataProviderMethodResolver>>asList(ExceptionInDefaultConstructor.class);
+        final List<Class<? extends DataProviderMethodResolver>> resolverClasses =
+                Collections.<Class<? extends DataProviderMethodResolver>>singletonList(ExceptionInDefaultConstructor.class);
 
         when(context.getResolverClasses()).thenReturn(resolverClasses);
 

@@ -27,7 +27,7 @@ class NameConventionAcceptanceTest {
         // Given:
 
         // When:
-        boolean isEmpty = (str == null) ? true : str.isEmpty();
+        boolean isEmpty = (str == null) || str.isEmpty();
 
         // Then:
         assertThat(isEmpty).isTrue();

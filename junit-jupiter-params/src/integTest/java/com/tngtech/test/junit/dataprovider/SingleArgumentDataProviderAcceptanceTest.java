@@ -34,7 +34,7 @@ class SingleArgumentDataProviderAcceptanceTest {
 
     @DataProvider
     static List<Object> dataProviderSingleArgListOfObject() {
-        return Arrays.<Object> asList(null, "", "1", "123");
+        return Arrays.asList(null, "", "1", "123");
     }
 
     @ParameterizedTest

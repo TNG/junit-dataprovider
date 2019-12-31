@@ -36,7 +36,7 @@ public class DataProviderResolverContextTest {
     private final static String dataProviderName = "dataProviderName";
 
     @Test
-    public void testGenerateLocationsShouldThrowNullPointerExceptionIfTestClassIsNull() throws Exception {
+    public void testGenerateLocationsShouldThrowNullPointerExceptionIfTestClassIsNull() {
         // Given:
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'testClass' must not be null");
@@ -48,7 +48,7 @@ public class DataProviderResolverContextTest {
     }
 
     @Test
-    public void testGenerateLocationsShouldReturnExplicitLocationsIfNotNull() throws Exception {
+    public void testGenerateLocationsShouldReturnExplicitLocationsIfNotNull() {
         // Given:
         Class<?>[] explicitLocations = { SingleArgConverter.class, StringConverter.class };
 
@@ -60,7 +60,7 @@ public class DataProviderResolverContextTest {
     }
 
     @Test
-    public void testGenerateLocationsShouldReturnTestClassIfExplicitLocationsAreNull() throws Exception {
+    public void testGenerateLocationsShouldReturnTestClassIfExplicitLocationsAreNull() {
         // Given:
         Class<?>[] explicitLocations = null;
 
@@ -72,7 +72,7 @@ public class DataProviderResolverContextTest {
     }
 
     @Test
-    public void testGenerateLocationsShouldReturnTestClassIfExplicitLocationsAreEmpty() throws Exception {
+    public void testGenerateLocationsShouldReturnTestClassIfExplicitLocationsAreEmpty() {
         // Given:
         Class<?>[] explicitLocations = {};
 

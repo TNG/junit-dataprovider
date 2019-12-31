@@ -19,7 +19,7 @@ public class ReplacementDataTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void testOfShouldThrowNullPointerExceptionIfTestMethodIsNull() throws Exception {
+    public void testOfShouldThrowNullPointerExceptionIfTestMethodIsNull() {
         // Given:
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'testMethod' must not be null");
@@ -31,7 +31,7 @@ public class ReplacementDataTest {
     }
 
     @Test
-    public void testOfShouldThrowNullPointerExceptionIfArgumentsAreNull() throws Exception {
+    public void testOfShouldThrowNullPointerExceptionIfArgumentsAreNull() {
         // Given:
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'arguments' must not be null");
@@ -43,7 +43,7 @@ public class ReplacementDataTest {
     }
 
     @Test
-    public void testOfShouldCreateReplacementDataProperly() throws Exception {
+    public void testOfShouldCreateReplacementDataProperly() {
         // Given:
         final Method testMethod = Methods.anyMethod();
         final int testIndex = 10;
@@ -60,7 +60,7 @@ public class ReplacementDataTest {
     }
 
     @Test
-    public void testGetArgumentsShouldReturnUnmodifiableListToKeepReplacementDataImmutable() throws Exception {
+    public void testGetArgumentsShouldReturnUnmodifiableListToKeepReplacementDataImmutable() {
         // Given:
         ReplacementData underTest = ReplacementData.of(Methods.anyMethod(), 11, Arrays.<Object>asList("1", 2, 3L));
         List<Object> arguments = underTest.getArguments();
@@ -74,7 +74,7 @@ public class ReplacementDataTest {
     }
 
     @Test
-    public void testHashCodeShouldReturnSameResultForEqualObjects() throws Exception {
+    public void testHashCodeShouldReturnSameResultForEqualObjects() {
         // Given:
         final Method testMethod = Methods.anyMethod();
         final int testIndex = 20;
@@ -92,7 +92,7 @@ public class ReplacementDataTest {
     }
 
     @Test
-    public void testEqualsShouldReturnFalseForUnequalObjects() throws Exception {
+    public void testEqualsShouldReturnFalseForUnequalObjects() {
         // Given:
         final Method testMethod = Methods.anyMethod();
         final List<Object> arguments = Arrays.<Object>asList("1", 2, 3L);
@@ -108,7 +108,7 @@ public class ReplacementDataTest {
     }
 
     @Test
-    public void testEqualsShouldReturnTrueForEqualObjects() throws Exception {
+    public void testEqualsShouldReturnTrueForEqualObjects() {
         // Given:
         final Method testMethod = Methods.anyMethod();
         final int testIndex = 32;

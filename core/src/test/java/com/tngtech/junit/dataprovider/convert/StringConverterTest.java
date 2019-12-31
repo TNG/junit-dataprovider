@@ -629,13 +629,13 @@ public class StringConverterTest {
         assertThat(result).isEqualTo(StringConverter.OBJECT_NO_CONVERSION);
     }
 
-    // -- test data ----------------------------------------------------------------------------------------------------
+    // -- Test data ----------------------------------------------------------------------------------------------------
 
-    protected static enum TestEnum {
+    protected enum TestEnum {
         VAL1, VAL2, VAL3
     }
 
-    // -- helper methods -----------------------------------------------------------------------------------------------
+    // -- Helper methods -----------------------------------------------------------------------------------------------
 
     private Date date(int year, int month, int day) {
         GregorianCalendar calendar = new GregorianCalendar();

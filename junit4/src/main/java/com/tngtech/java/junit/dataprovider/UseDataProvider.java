@@ -31,7 +31,7 @@ import com.tngtech.java.junit.dataprovider.internal.DefaultDataProviderMethodRes
 @Target(ElementType.METHOD)
 public @interface UseDataProvider {
 
-    public enum ResolveStrategy {
+    enum ResolveStrategy {
         /**
          * Tries to find valid dataprovider methods looping over the provided {@link UseDataProvider#resolver()} until the first non-empty
          * result is returned or no further resolver is available.

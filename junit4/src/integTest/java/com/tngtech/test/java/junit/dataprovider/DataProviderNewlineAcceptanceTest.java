@@ -21,7 +21,7 @@ public class DataProviderNewlineAcceptanceTest {
         public String toString() {
             StringBuilder b = new StringBuilder();
             for (int i = 0; i < lines; i++) {
-                b.append("Line " + i + "\n");
+                b.append("Line ").append(i).append("\n");
             }
             return b.toString();
         }

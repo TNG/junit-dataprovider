@@ -22,12 +22,7 @@ class AbstractDataProviderInvocationContextProviderTest {
 
     private AbstractDataProviderInvocationContextProvider<Annotation> underTest;
 
-    private final Annotation testAnnotation = new Annotation() {
-        @Override
-        public Class<? extends Annotation> annotationType() {
-            return Annotation.class;
-        }
-    };
+    private final Annotation testAnnotation = () -> Annotation.class;
     @SuppressWarnings("unchecked")
     private final Class<Annotation> testAnnotationClass = (Class<Annotation>) testAnnotation.getClass();
 
@@ -53,8 +48,7 @@ class AbstractDataProviderInvocationContextProviderTest {
     }
 
     @Test
-    void testProvideTestTemplateInvocationContextsShouldThrowProperExceptionIfAnnotationIsNotPresent()
-            throws Exception {
+    void testProvideTestTemplateInvocationContextsShouldThrowProperExceptionIfAnnotationIsNotPresent() {
         // Given:
         when(extensionContext.getRequiredTestMethod()).thenReturn(testMethod);
 

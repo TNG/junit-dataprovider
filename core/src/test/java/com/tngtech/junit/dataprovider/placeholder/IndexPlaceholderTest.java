@@ -3,6 +3,7 @@ package com.tngtech.junit.dataprovider.placeholder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -17,7 +18,7 @@ public class IndexPlaceholderTest {
         // Given:
         final int index = 42;
 
-        ReplacementData data = ReplacementData.of(Methods.anyMethod(), index, Arrays.<Object>asList(0));
+        ReplacementData data = ReplacementData.of(Methods.anyMethod(), index, Collections.<Object>singletonList(0));
 
         // When:
         String result = underTest.process(data, "%i");

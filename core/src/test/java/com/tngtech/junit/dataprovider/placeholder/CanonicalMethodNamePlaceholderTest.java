@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class CanonicalMethodNamePlaceholderTest {
         // Given:
         final Method method = Methods.anyMethod();
 
-        ReplacementData data = ReplacementData.of(method, 0, Arrays.<Object>asList(0));
+        ReplacementData data = ReplacementData.of(method, 0, Collections.<Object>singletonList(0));
 
         // When:
         String result = underTest.process(data, "%cm");
