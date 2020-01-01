@@ -1,10 +1,10 @@
 package com.tngtech.java.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +44,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldCallOriginalFilterShouldRunIfOriginalFilterDescriptionCannotBeParsed() {
         // Given:
-        doReturn("invalid").when(filter).describe();
+        when(filter.describe()).thenReturn("invalid");
         Description description = setupDescription(true, "test(com.tngtech.Clazz)");
 
         // When:
@@ -59,7 +59,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldCallOriginalFilterShouldRunIfIsTestAndGivenDescriptionCannotBeParsed() {
         // Given:
-        doReturn("Method test(com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method test(com.tngtech.Clazz)");
         Description description = setupDescription(true, "invalid");
 
         // When:
@@ -74,8 +74,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldCallOriginalFilterShouldRunIfGivenDescriptionContainsOr() {
         // Given:
-        doReturn("Matching description Method failing1[0: 0](Test1) OR Method failing2[0: 0](Test2)").when(filter)
-                .describe();
+        when(filter.describe()).thenReturn("Matching description Method failing1[0: 0](Test1) OR Method failing2[0: 0](Test2)");
         Description description = setupDescription(true, "failing1[0: 0](Test1)");
 
         // When:
@@ -90,7 +89,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodName() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
         Description description = setupDescription(true, "testOther[1: ](com.tngtech.Clazz)");
 
         // When:
@@ -103,7 +102,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedPackageName() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
         Description description = setupDescription(true, "testMain[1: ](com.tngtech.other.Clazz)");
 
         // When:
@@ -116,7 +115,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedClassName() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
         Description description = setupDescription(true, "testMain[1: ](com.tngtech.ClazzOther)");
 
         // When:
@@ -129,7 +128,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHasNoMethodIdx() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
         Description description = setupDescription(true, "testMain(com.tngtech.Clazz)");
 
         // When:
@@ -142,7 +141,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodIdx() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
         Description description = setupDescription(true, "testMain[2: ](com.tngtech.Clazz)");
 
         // When:
@@ -155,7 +154,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveOnlyMethodNameAndEqualsExactlyWithoutPackage() {
         // Given:
-        doReturn("Method testMain(Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain(Clazz)");
         Description description = setupDescription(true, "testMain(Clazz)");
 
         // When:
@@ -169,7 +168,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveOnlyMethodNameAndEqualsExactly() {
         // Given:
-        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain(com.tngtech.Clazz)");
         Description description = setupDescription(true, "testMain(com.tngtech.Clazz)");
 
         // When:
@@ -182,7 +181,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndEqualsMethodNameAndClass() {
         // Given:
-        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain(com.tngtech.Clazz)");
         Description description = setupDescription(true, "testMain[1: ](com.tngtech.Clazz)");
 
         // When:
@@ -195,7 +194,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButFilterHasIndex() {
         // Given:
-        doReturn("Method testMain[2: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[2: ](com.tngtech.Clazz)");
 
         Description description = setupDescription(true, "testMain 1, 2, 3(com.tngtech.Clazz)");
 
@@ -210,7 +209,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButMethodNameIsNotTheSame() {
         // Given:
-        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain(com.tngtech.Clazz)");
 
         Description description = setupDescription(true, "testOther: test, 4(com.tngtech.Clazz)");
 
@@ -224,7 +223,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClassButClassIsNotTheSame() {
         // Given:
-        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain(com.tngtech.Clazz)");
 
         Description description = setupDescription(true, "testMain 8zBZ=(qzt)487(com.tngtech.OtherClazz)");
 
@@ -238,7 +237,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHavingSomeRandomCodeBetweenMethodNameAndClass() {
         // Given:
-        doReturn("Method testMain(com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain(com.tngtech.Clazz)");
 
         Description description = setupDescription(true, "testMain 298zBZ=)& %(/$(=93A SD4)i(qzt)487 5z2 59isf&(com.tngtech.Clazz)");
 
@@ -252,7 +251,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAddtionalMethodIdxAndEqualsExcatly() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
         Description description = setupDescription(true, "testMain[1: ](com.tngtech.Clazz)");
 
         // When:
@@ -265,7 +264,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueWhenDescriptionHaveAdditionalMethodIdxAndMethodParamsAreDifferentButIdxIsEqual() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
         Description description = setupDescription(true, "testMain[1: test](com.tngtech.Clazz)");
 
         // When:
@@ -278,7 +277,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueForMatchingChildDescription() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
 
         Description description = setupDescription(false, "", setupDescription(true, "testMain[1: ](com.tngtech.Clazz)"));
 
@@ -292,7 +291,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnTrueForMultipleChildDescriptionWithLastMatching() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
 
         // @formatter:off
         Description description = setupDescription(false, "",
@@ -312,7 +311,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testShouldRunShouldReturnFalseForMultipleChildAndFurtherChildDescriptionWithNonMatching() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
 
         // @formatter:off
         Description description = setupDescription(false, "testMain[2: ](com.tngtech.Clazz)",
@@ -336,7 +335,7 @@ public class DataProviderFilterTest extends BaseTest {
     @Test
     public void testDescribeShouldReturnFilterDescripe() {
         // Given:
-        doReturn("Method testMain[1: ](com.tngtech.Clazz)").when(filter).describe();
+        when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
 
         // When:
         String result = underTest.describe();
@@ -525,9 +524,9 @@ public class DataProviderFilterTest extends BaseTest {
             Description... childDescriptions) {
 
         Description description = mock(Description.class);
-        doReturn(isTest).when(description).isTest();
-        doReturn(descriptionDisplayName).when(description).getDisplayName();
-        doReturn(new ArrayList<Description>(Arrays.asList(childDescriptions))).when(description).getChildren();
+        when(description.isTest()).thenReturn(isTest);
+        when(description.getDisplayName()).thenReturn(descriptionDisplayName);
+        when(description.getChildren()).thenReturn(new ArrayList<Description>(Arrays.asList(childDescriptions)));
         return description;
     }
 

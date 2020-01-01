@@ -2,9 +2,9 @@ package com.tngtech.java.junit.dataprovider.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -76,10 +76,10 @@ public class TestValidatorTest extends BaseTest {
     @Test
     public void testValidateTestMethodShouldAddErrorIfDataProviderAndUseDataProviderTestMethod() {
         // Given:
-        doReturn("test1").when(testMethod).getName();
+        when(testMethod.getName()).thenReturn("test1");
 
-        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
+        when(testMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(testMethod.getAnnotation(UseDataProvider.class)).thenReturn(useDataProvider);
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -101,8 +101,8 @@ public class TestValidatorTest extends BaseTest {
     @Test
     public void testValidateTestMethodShouldCheckForPublicVoidNoArgIfNormalTestMethod() {
         // Given:
-        doReturn(null).when(testMethod).getAnnotation(DataProvider.class);
-        doReturn(null).when(testMethod).getAnnotation(UseDataProvider.class);
+        when(testMethod.getAnnotation(DataProvider.class)).thenReturn(null);
+        when(testMethod.getAnnotation(UseDataProvider.class)).thenReturn(null);
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -121,9 +121,9 @@ public class TestValidatorTest extends BaseTest {
     @Test
     public void testValidateTestMethodShouldCheckForPublicVoidIfDataProviderTestMethod() {
         // Given:
-        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
-        doReturn(null).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(getMethod("testOneArg")).when(testMethod).getMethod();
+        when(testMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(testMethod.getAnnotation(UseDataProvider.class)).thenReturn(null);
+        when(testMethod.getMethod()).thenReturn(getMethod("testOneArg"));
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -143,9 +143,9 @@ public class TestValidatorTest extends BaseTest {
     @Test
     public void testValidateTestMethodShouldCheckForPublicVoidIfUseDataProviderTestMethod() {
         // Given:
-        doReturn(null).when(testMethod).getAnnotation(DataProvider.class);
-        doReturn(useDataProvider).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(getMethod("testOneArg")).when(testMethod).getMethod();
+        when(testMethod.getAnnotation(DataProvider.class)).thenReturn(null);
+        when(testMethod.getAnnotation(UseDataProvider.class)).thenReturn(useDataProvider);
+        when(testMethod.getMethod()).thenReturn(getMethod("testOneArg"));
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -165,10 +165,10 @@ public class TestValidatorTest extends BaseTest {
     @Test
     public void testValidateTestMethodShouldAddErrorForNoArgTestMethodIfUseDataProviderTestMethodWithNoArgs() {
         // Given:
-        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
-        doReturn(null).when(testMethod).getAnnotation(UseDataProvider.class);
-        doReturn(getMethod("testNoArg")).when(testMethod).getMethod();
-        doReturn("testNoArg").when(testMethod).getName();
+        when(testMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(testMethod.getAnnotation(UseDataProvider.class)).thenReturn(null);
+        when(testMethod.getMethod()).thenReturn(getMethod("testNoArg"));
+        when(testMethod.getName()).thenReturn("testNoArg");
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
@@ -228,10 +228,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[0]).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("validDataProviderMethod"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(true);
+        when(dataProvider.value()).thenReturn(new String[0]);
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -247,10 +247,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethodWithFrameworkMethodParameter")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[0]).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("validDataProviderMethodWithFrameworkMethodParameter"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(true);
+        when(dataProvider.value()).thenReturn(new String[0]);
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -266,10 +266,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonPublicDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[0]).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("nonPublicDataProviderMethod"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(true);
+        when(dataProvider.value()).thenReturn(new String[0]);
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -286,10 +286,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonStaticDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[0]).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("nonStaticDataProviderMethod"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(true);
+        when(dataProvider.value()).thenReturn(new String[0]);
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -306,10 +306,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("wrongArgDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[0]).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("wrongArgDataProviderMethod"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(true);
+        when(dataProvider.value()).thenReturn(new String[0]);
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -327,10 +327,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("twoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[0]).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("twoArgDataProviderMethod"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(true);
+        when(dataProvider.value()).thenReturn(new String[0]);
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -348,10 +348,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(false).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[0]).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("validDataProviderMethod"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(false);
+        when(dataProvider.value()).thenReturn(new String[0]);
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -369,10 +369,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("validDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(true).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[] { "test" }).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("validDataProviderMethod"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(true);
+        when(dataProvider.value()).thenReturn(new String[] { "test" });
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);
@@ -390,10 +390,10 @@ public class TestValidatorTest extends BaseTest {
 
         List<Throwable> errors = new ArrayList<Throwable>();
 
-        doReturn(dataProviderName).when(dataProviderMethod).getName();
-        doReturn(getMethod("nonPublicNonStaticNonNoArgDataProviderMethod")).when(dataProviderMethod).getMethod();
-        doReturn(false).when(dataConverter).canConvert(any(Type.class));
-        doReturn(new String[] { "test" }).when(dataProvider).value();
+        when(dataProviderMethod.getName()).thenReturn(dataProviderName);
+        when(dataProviderMethod.getMethod()).thenReturn(getMethod("nonPublicNonStaticNonNoArgDataProviderMethod"));
+        when(dataConverter.canConvert(any(Type.class))).thenReturn(false);
+        when(dataProvider.value()).thenReturn(new String[] { "test" });
 
         // When:
         underTest.validateDataProviderMethod(dataProviderMethod, dataProvider, errors);

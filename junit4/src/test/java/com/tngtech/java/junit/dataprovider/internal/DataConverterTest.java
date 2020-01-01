@@ -4,10 +4,10 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class DataConverterTest extends BaseTest {
 
     @Before
     public void setup() {
-        doReturn(DataProvider.COMMA).when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(DataProvider.COMMA);
     }
 
     @Test

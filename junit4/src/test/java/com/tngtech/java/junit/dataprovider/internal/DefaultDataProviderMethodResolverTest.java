@@ -1,10 +1,11 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,13 +73,13 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "notAvailableDataProviderMethodName";
 
-        doReturn(testMethodName).when(testMethod).getName();
+        when(testMethod.getName()).thenReturn(testMethodName);
 
-        doReturn(dataProviderMethodName).when(useDataProvider).value();
-        doReturn(new Class<?>[0]).when(useDataProvider).location();
+        when(useDataProvider.value()).thenReturn(dataProviderMethodName);
+        when(useDataProvider.location()).thenReturn(new Class<?>[0]);
 
-        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class<?>[0]);
-        doReturn(emptyList()).when(underTest).findDataProviderMethods(asList(testClass), testMethodName, dataProviderMethodName);
+        doReturn(singletonList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class<?>[0]);
+        doReturn(emptyList()).when(underTest).findDataProviderMethods(singletonList(testClass), testMethodName, dataProviderMethodName);
 
         // When:
         List<FrameworkMethod> result = underTest.resolve(testMethod, useDataProvider);
@@ -93,13 +94,13 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "availableDataProviderMethodName";
 
-        doReturn(testMethodName).when(testMethod).getName();
+        when(testMethod.getName()).thenReturn(testMethodName);
 
-        doReturn(dataProviderMethodName).when(useDataProvider).value();
-        doReturn(new Class<?>[0]).when(useDataProvider).location();
+        when(useDataProvider.value()).thenReturn(dataProviderMethodName);
+        when(useDataProvider.location()).thenReturn(new Class<?>[0]);
 
-        doReturn(asList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class<?>[0]);
-        doReturn(asList(dataProviderMethod)).when(underTest).findDataProviderMethods(asList(testClass), testMethodName,
+        doReturn(singletonList(testClass)).when(underTest).findDataProviderLocations(testMethod, new Class<?>[0]);
+        doReturn(singletonList((dataProviderMethod))).when(underTest).findDataProviderMethods(singletonList(testClass), testMethodName,
                 dataProviderMethodName);
 
         // When:
@@ -112,8 +113,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
     @Test
     public void testFindDataProviderLocationsShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation() {
         // Given:
-        doReturn(getMethod("testFindDataProviderLocationsShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation"))
-                .when(testMethod).getMethod();
+        when(testMethod.getMethod()).thenReturn(
+                getMethod("testFindDataProviderLocationsShouldReturnTestClassForNotSetLocationInUseDataProviderAnnotation"));
 
         // When:
         List<TestClass> result = underTest.findDataProviderLocations(testMethod, new Class<?>[0]);
@@ -159,7 +160,7 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "testMethodName";
         final String useDataProviderValue = "availableDataProviderMethodName";
 
-        doReturn(null).when(underTest).findDataProviderMethod(dataProviderLocations.get(0), testMethodName, useDataProviderValue);
+        when(underTest.findDataProviderMethod(dataProviderLocations.get(0), testMethodName, useDataProviderValue)).thenReturn(null);
 
         // When:
         List<FrameworkMethod> result = underTest.findDataProviderMethods(dataProviderLocations, testMethodName, useDataProviderValue);
@@ -178,11 +179,11 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
 
         FrameworkMethod dataProviderMethod2 = mock(FrameworkMethod.class);
 
-        doReturn(dataProviderMethod).when(underTest).findDataProviderMethod(dataProviderLocations.get(0), testMethodName,
-                useDataProviderValue);
-        doReturn(null).when(underTest).findDataProviderMethod(dataProviderLocations.get(1), testMethodName, useDataProviderValue);
-        doReturn(dataProviderMethod2).when(underTest).findDataProviderMethod(dataProviderLocations.get(2), testMethodName,
-                useDataProviderValue);
+        when(underTest.findDataProviderMethod(dataProviderLocations.get(0), testMethodName, useDataProviderValue))
+                .thenReturn(dataProviderMethod);
+        when(underTest.findDataProviderMethod(dataProviderLocations.get(1), testMethodName, useDataProviderValue)).thenReturn(null);
+        when(underTest.findDataProviderMethod(dataProviderLocations.get(2), testMethodName, useDataProviderValue))
+                .thenReturn(dataProviderMethod2);
 
         // When:
         List<FrameworkMethod> result = underTest.findDataProviderMethods(dataProviderLocations, testMethodName, useDataProviderValue);
@@ -197,8 +198,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "availableDataProviderMethodName";
 
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+        when(testClass.getAnnotatedMethods(DataProvider.class)).thenReturn(singletonList(dataProviderMethod));
+        when(dataProviderMethod.getName()).thenReturn(dataProviderMethodName);
 
         // When:
         FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, "notAvailableDataProviderMethodName");
@@ -213,8 +214,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "testMethodName";
 
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+        when(testClass.getAnnotatedMethods(DataProvider.class)).thenReturn(singletonList(dataProviderMethod));
+        when(dataProviderMethod.getName()).thenReturn(dataProviderMethodName);
 
         // When:
         FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
@@ -229,8 +230,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "dataProviderMethodName";
 
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+        when(testClass.getAnnotatedMethods(DataProvider.class)).thenReturn(singletonList(dataProviderMethod));
+        when(dataProviderMethod.getName()).thenReturn(dataProviderMethodName);
 
         // When:
         FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
@@ -245,8 +246,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "dataMethodName";
 
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+        when(testClass.getAnnotatedMethods(DataProvider.class)).thenReturn(singletonList(dataProviderMethod));
+        when(dataProviderMethod.getName()).thenReturn(dataProviderMethodName);
 
         // When:
         FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
@@ -261,8 +262,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "methodName";
         final String dataProviderMethodName = "dataProviderMethodName";
 
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+        when(testClass.getAnnotatedMethods(DataProvider.class)).thenReturn(singletonList(dataProviderMethod));
+        when(dataProviderMethod.getName()).thenReturn(dataProviderMethodName);
 
         // When:
         FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
@@ -277,8 +278,8 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
         final String testMethodName = "methodName";
         final String dataProviderMethodName = "dataMethodName";
 
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+        when(testClass.getAnnotatedMethods(DataProvider.class)).thenReturn(singletonList(dataProviderMethod));
+        when(dataProviderMethod.getName()).thenReturn(dataProviderMethodName);
 
         // When:
         FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, UseDataProvider.DEFAULT_VALUE);
@@ -288,13 +289,13 @@ public class DefaultDataProviderMethodResolverTest extends BaseTest {
     }
 
     @Test
-    public void testFindDataProviderMethodShouldReturnListContainingDataProviderMethodHavingExplicitelyGivenNameIfItExists() {
+    public void testFindDataProviderMethodShouldReturnListContainingDataProviderMethodHavingExplicitlyGivenNameIfItExists() {
         // Given:
         final String testMethodName = "testMethodName";
         final String dataProviderMethodName = "availableDataProviderMethodName";
 
-        doReturn(asList(dataProviderMethod)).when(testClass).getAnnotatedMethods(DataProvider.class);
-        doReturn(dataProviderMethodName).when(dataProviderMethod).getName();
+        when(testClass.getAnnotatedMethods(DataProvider.class)).thenReturn(singletonList(dataProviderMethod));
+        when(dataProviderMethod.getName()).thenReturn(dataProviderMethodName);
 
         // When:
         FrameworkMethod result = underTest.findDataProviderMethod(testClass, testMethodName, dataProviderMethodName);

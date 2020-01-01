@@ -2,7 +2,7 @@ package com.tngtech.java.junit.dataprovider.internal.convert;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -35,7 +35,7 @@ public class StringConverterTest extends BaseTest {
 
     @Before
     public void setup() {
-        doReturn(DataProvider.COMMA).when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(DataProvider.COMMA);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class StringConverterTest extends BaseTest {
         String data = "";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, int.class };
 
-        doReturn(",").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(",");
 
         // When:
         underTest.convert(data, false, parameterTypes, dataProvider, 2);
@@ -71,7 +71,7 @@ public class StringConverterTest extends BaseTest {
         String data = "";
         Class<?>[] parameterTypes = new Class<?>[] { long.class, boolean.class, int[].class };
 
-        doReturn(",").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(",");
 
         // When:
         underTest.convert(data, true, parameterTypes, dataProvider, 3);
@@ -86,7 +86,7 @@ public class StringConverterTest extends BaseTest {
         Class<?>[] parameterTypes = new Class<?>[] { boolean.class, byte.class, char.class, short.class, int.class,
                 long.class, float.class, double.class };
 
-        doReturn(",").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(",");
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 10);
@@ -101,7 +101,7 @@ public class StringConverterTest extends BaseTest {
         String data = "-5;2014l;-1.234567f;-901e-3";
         Class<?>[] parameterTypes = new Class<?>[] { int.class, long.class, float.class, double.class };
 
-        doReturn(";").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(";");
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 11);
@@ -116,7 +116,7 @@ public class StringConverterTest extends BaseTest {
         String data = " foo|  bar   |baz    ";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, String.class, String.class };
 
-        doReturn("\\|").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn("\\|");
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 12);
@@ -132,8 +132,8 @@ public class StringConverterTest extends BaseTest {
         Class<?>[] parameterTypes = new Class<?>[] { boolean.class, byte.class, char.class, short.class, int.class,
                 long.class, float.class, double.class };
 
-        doReturn(";").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.splitBy()).thenReturn(";");
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 13);
@@ -148,8 +148,8 @@ public class StringConverterTest extends BaseTest {
         String data = "\n-1f\n,\r-2\r,\t3.0d\t";
         Class<?>[] parameterTypes = new Class<?>[] { float.class, int.class, double.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.splitBy()).thenReturn(",");
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 20);
@@ -164,7 +164,7 @@ public class StringConverterTest extends BaseTest {
         String data = "\u00A0test\u00A0";
         Class<?>[] parameterTypes = new Class<?>[] { String.class };
 
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 21);
@@ -179,8 +179,8 @@ public class StringConverterTest extends BaseTest {
         String data = "/true";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, boolean.class };
 
-        doReturn("/").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.splitBy()).thenReturn("/");
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 30);
@@ -195,8 +195,8 @@ public class StringConverterTest extends BaseTest {
         String data = "1 ";
         Class<?>[] parameterTypes = new Class<?>[] { int.class, String.class };
 
-        doReturn(" ").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.splitBy()).thenReturn(" ");
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 31);
@@ -259,8 +259,8 @@ public class StringConverterTest extends BaseTest {
         String data = " VAL1,  VAL2 ";
         Class<?>[] parameterTypes = new Class<?>[] { TestEnum.class, TestEnum.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.splitBy()).thenReturn(",");
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 50);
@@ -287,8 +287,8 @@ public class StringConverterTest extends BaseTest {
         String data = "Val1,val2";
         Class<?>[] parameterTypes = new Class<?>[] { TestEnum.class, TestEnum.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).ignoreEnumCase();
+        when(dataProvider.splitBy()).thenReturn(",");
+        when(dataProvider.ignoreEnumCase()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 50);
@@ -315,8 +315,8 @@ public class StringConverterTest extends BaseTest {
         String data = " java.lang.Thread,  com.tngtech.java.junit.dataprovider.DataProviderRunner ";
         Class<?>[] parameterTypes = new Class<?>[] { Class.class, Class.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.splitBy()).thenReturn(",");
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 50);
@@ -344,7 +344,7 @@ public class StringConverterTest extends BaseTest {
         Class<?>[] parameterTypes = new Class<?>[] { Boolean.class, Byte.class, Character.class, Short.class,
                 Integer.class, Long.class, Float.class, Double.class };
 
-        doReturn(",").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(",");
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 60);
@@ -361,7 +361,7 @@ public class StringConverterTest extends BaseTest {
         String data = "null#null";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, String.class };
 
-        doReturn("#").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn("#");
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 70);
@@ -376,8 +376,8 @@ public class StringConverterTest extends BaseTest {
         String data = "null,null,foo";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, String.class, String.class };
 
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).convertNulls();
+        when(dataProvider.splitBy()).thenReturn(",");
+        when(dataProvider.convertNulls()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, false, parameterTypes, dataProvider, 71);
@@ -485,7 +485,7 @@ public class StringConverterTest extends BaseTest {
         String data = "test";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, int[].class };
 
-        doReturn(",").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(",");
 
         // When:
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 91);
@@ -500,7 +500,7 @@ public class StringConverterTest extends BaseTest {
         String data = "1.0";
         Class<?>[] parameterTypes = new Class<?>[] { double[].class };
 
-        doReturn(",").when(dataProvider).splitBy();
+        when(dataProvider.splitBy()).thenReturn(",");
 
         // When:
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 92);
@@ -515,8 +515,8 @@ public class StringConverterTest extends BaseTest {
         String data = "a,2,1.0,null";
         Class<?>[] parameterTypes = new Class<?>[] { char.class, byte.class, Double[].class };
 
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).convertNulls();
+        when(dataProvider.splitBy()).thenReturn(",");
+        when(dataProvider.convertNulls()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 93);
@@ -531,8 +531,8 @@ public class StringConverterTest extends BaseTest {
         String data = "1, 2, 3";
         Class<?>[] parameterTypes = new Class<?>[] { long[].class };
 
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.splitBy()).thenReturn(",");
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 94);
@@ -547,8 +547,8 @@ public class StringConverterTest extends BaseTest {
         String data = "foobar, 1, 2, 3";
         Class<?>[] parameterTypes = new Class<?>[] { String.class, long[].class };
 
-        doReturn(",").when(dataProvider).splitBy();
-        doReturn(true).when(dataProvider).trimValues();
+        when(dataProvider.splitBy()).thenReturn(",");
+        when(dataProvider.trimValues()).thenReturn(true);
 
         // When:
         Object[] result = underTest.convert(data, true, parameterTypes, dataProvider, 95);

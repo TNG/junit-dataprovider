@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -45,8 +45,8 @@ public class TestGeneratorTest extends BaseTest {
     public void setup() {
         TestGenerator.dataProviderDataCache.clear();
 
-        doReturn(anyMethod()).when(testMethod).getMethod();
-        doReturn(anyMethod()).when(dataProviderMethod).getMethod();
+        when(testMethod.getMethod()).thenReturn(anyMethod());
+        when(dataProviderMethod.getMethod()).thenReturn(anyMethod());
     }
 
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
@@ -87,8 +87,8 @@ public class TestGeneratorTest extends BaseTest {
     public void testGenerateExplodedTestMethodsForShouldCatchExceptionUsingUseDataProviderAndReThrowAsError()
             throws Throwable {
         // Given:
-        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
-        doThrow(IllegalArgumentException.class).when(dataProviderMethod).invokeExplosively(any(), any());
+        when(dataProviderMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(dataProviderMethod.invokeExplosively(any(), any())).thenThrow(IllegalArgumentException.class);
 
         // When:
         List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(testMethod, dataProviderMethod);
@@ -100,9 +100,9 @@ public class TestGeneratorTest extends BaseTest {
     @Test(expected = Error.class)
     public void testGenerateExplodedTestMethodsForShouldCatchExceptionUsingDataProviderAndReThrowAsError() {
         // Given:
-        doReturn(dataProvider).when(testMethod).getAnnotation(DataProvider.class);
-        doThrow(IllegalArgumentException.class).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
-                eq(dataProvider));
+        when(testMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(dataConverter.convert(any(), any(Boolean.class), any(Class[].class), eq(dataProvider)))
+                .thenThrow(IllegalArgumentException.class);
 
         // When:
         List<FrameworkMethod> result = underTest.generateExplodedTestMethodsFor(testMethod, null);
@@ -115,8 +115,8 @@ public class TestGeneratorTest extends BaseTest {
     public void testExplodeTestMethodsUseDataProviderShouldThrowIllegalArgumentExceptionIfDataProviderMethodThrowsException()
             throws Throwable {
         // Given:
-        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
-        doThrow(NullPointerException.class).when(dataProviderMethod).invokeExplosively(null);
+        when(dataProviderMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(dataProviderMethod.invokeExplosively(null)).thenThrow(NullPointerException.class);
 
         // When:
         underTest.explodeTestMethod(testMethod, dataProviderMethod);
@@ -127,9 +127,9 @@ public class TestGeneratorTest extends BaseTest {
     @Test(expected = IllegalArgumentException.class)
     public void testExplodeTestMethodsUseDataProviderShouldThrowIllegalArgumentExceptionIfDataConverterReturnsEmpty() {
         // Given:
-        doReturn(new ArrayList<Object[]>()).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
-                any(DataProvider.class));
-        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
+        when(dataConverter.convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class)))
+                .thenReturn(new ArrayList<Object[]>());
+        when(dataProviderMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
 
         // When:
         underTest.explodeTestMethod(testMethod, dataProviderMethod);
@@ -141,10 +141,9 @@ public class TestGeneratorTest extends BaseTest {
     public void testExplodeTestMethodsUseDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() throws Throwable {
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, 2, 3 });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
-                any(DataProvider.class));
-        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
-        doReturn("%m").when(dataProvider).format();
+        when(dataConverter.convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class))).thenReturn(dataConverterResult);
+        when(dataProviderMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(dataProvider.format()).thenReturn("%m");
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
@@ -160,10 +159,10 @@ public class TestGeneratorTest extends BaseTest {
         Object data = new Object[][] { { 1 } };
         TestGenerator.dataProviderDataCache.put(dataProviderMethod, data);
 
-        doReturn(listOfArrays(new Object[] { 1 })).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
-                any(DataProvider.class));
-        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
-        doReturn("%m").when(dataProvider).format();
+        when(dataConverter.convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class)))
+                .thenReturn(listOfArrays(new Object[] { 1 }));
+        when(dataProviderMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(dataProvider.format()).thenReturn("%m");
 
         // When:
         underTest.explodeTestMethod(testMethod, dataProviderMethod);
@@ -180,10 +179,10 @@ public class TestGeneratorTest extends BaseTest {
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 11, "22", 33L }, new Object[] { 44, "55", 66L },
                 new Object[] { 77, "88", 99L });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class));
-        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
-        doReturn("%c").when(dataProvider).format();
-        doReturn(false).when(dataProvider).cache();
+        when(dataConverter.convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class))).thenReturn(dataConverterResult);
+        when(dataProviderMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(dataProvider.format()).thenReturn("%c");
+        when(dataProvider.cache()).thenReturn(false);
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
@@ -198,13 +197,13 @@ public class TestGeneratorTest extends BaseTest {
     public void testExplodeTestMethodsUseDataProviderShouldReturnFrameworkMethodInjectedToUseDataProviderMethodIfExists() throws Throwable {
         // Given:
         final Method method = getMethod("dataProviderMethod");
-        doReturn(method).when(dataProviderMethod).getMethod();
+        when(dataProviderMethod.getMethod()).thenReturn(method);
 
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { null });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), anyBoolean(), any(Class[].class), any(DataProvider.class));
-        doReturn(dataProvider).when(dataProviderMethod).getAnnotation(DataProvider.class);
-        doReturn(DataProvider.DEFAULT_FORMAT).when(dataProvider).format();
-        doReturn(true).when(dataProvider).cache();
+        when(dataConverter.convert(any(), anyBoolean(), any(Class[].class), any(DataProvider.class))).thenReturn(dataConverterResult);
+        when(dataProviderMethod.getAnnotation(DataProvider.class)).thenReturn(dataProvider);
+        when(dataProvider.format()).thenReturn(DataProvider.DEFAULT_FORMAT);
+        when(dataProvider.cache()).thenReturn(true);
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProviderMethod);
@@ -218,8 +217,7 @@ public class TestGeneratorTest extends BaseTest {
     @Test(expected = IllegalArgumentException.class)
     public void testExplodeTestMethodsDataProviderShouldIllegalArgumentExceptionIfDataConverterReturnsAnEmptyList() {
         // Given:
-        doReturn(new ArrayList<Object[]>()).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
-                any(DataProvider.class));
+        when(dataConverter.convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class))).thenReturn(new ArrayList<Object[]>());
 
         // When:
         underTest.explodeTestMethod(testMethod, dataProvider);
@@ -231,9 +229,8 @@ public class TestGeneratorTest extends BaseTest {
     public void testExplodeTestMethodsDataProviderShouldReturnOneDataProviderFrameworkMethodIfDataConverterReturnsOneRow() {
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { 1, "test1" });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
-                any(DataProvider.class));
-        doReturn("%i").when(dataProvider).format();
+        when(dataConverter.convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class))).thenReturn(dataConverterResult);
+        when(dataProvider.format()).thenReturn("%i");
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
@@ -247,9 +244,8 @@ public class TestGeneratorTest extends BaseTest {
         // Given:
         List<Object[]> dataConverterResult = listOfArrays(new Object[] { "2a", "foo" }, new Object[] { "3b", "bar" },
                 new Object[] { "4c", "baz" });
-        doReturn(dataConverterResult).when(dataConverter).convert(any(), any(Boolean.class), any(Class[].class),
-                any(DataProvider.class));
-        doReturn("%p[0]").when(dataProvider).format();
+        when(dataConverter.convert(any(), any(Boolean.class), any(Class[].class), any(DataProvider.class))).thenReturn(dataConverterResult);
+        when(dataProvider.format()).thenReturn("%p[0]");
 
         // When:
         List<FrameworkMethod> result = underTest.explodeTestMethod(testMethod, dataProvider);
