@@ -2,6 +2,7 @@ package com.tngtech.junit.dataprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -13,6 +14,7 @@ public class PreconditionsTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
+    @SuppressFBWarnings(value = "NP_NONNULL_PARAM_VIOLATION", justification = "Test that it works properly if null ;-)")
     @Test
     public void testCheckNotNullShouldThrowNullPointerExceptionWithGivenMessageStringIfObjectIsNull() {
         // Given:
