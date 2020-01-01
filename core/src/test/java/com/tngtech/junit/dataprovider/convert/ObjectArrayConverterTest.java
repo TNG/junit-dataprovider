@@ -2,6 +2,7 @@ package com.tngtech.junit.dataprovider.convert;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -10,6 +11,7 @@ import org.mockito.junit.MockitoRule;
 
 public class ObjectArrayConverterTest {
 
+    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "Mockito rule needs no further configuration")
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 

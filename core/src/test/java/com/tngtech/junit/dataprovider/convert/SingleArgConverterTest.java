@@ -2,6 +2,7 @@ package com.tngtech.junit.dataprovider.convert;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -13,6 +14,7 @@ public class SingleArgConverterTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "Mockito rule needs no further configuration")
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 

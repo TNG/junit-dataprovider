@@ -118,6 +118,7 @@ public class TestValidatorTest extends BaseTest {
         verifyNoMoreInteractions(testMethod);
     }
 
+    @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification = "It is ok for verify calls")
     @Test
     public void testValidateTestMethodShouldCheckForPublicVoidIfDataProviderTestMethod() {
         // Given:
@@ -140,6 +141,7 @@ public class TestValidatorTest extends BaseTest {
         verifyNoMoreInteractions(testMethod);
     }
 
+    @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification = "It is ok for verify calls")
     @Test
     public void testValidateTestMethodShouldCheckForPublicVoidIfUseDataProviderTestMethod() {
         // Given:
@@ -162,6 +164,7 @@ public class TestValidatorTest extends BaseTest {
         verifyNoMoreInteractions(testMethod);
     }
 
+    @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification = "It is ok for verify calls")
     @Test
     public void testValidateTestMethodShouldAddErrorForNoArgTestMethodIfUseDataProviderTestMethodWithNoArgs() {
         // Given:

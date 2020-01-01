@@ -1,5 +1,6 @@
 package com.tngtech.junit.dataprovider.convert;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -11,6 +12,7 @@ public class AbstractObjectConverterTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "Mockito rule needs no further configuration")
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
