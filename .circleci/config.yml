@@ -1,0 +1,44 @@
+version: 2.1
+
+build-job: &build-job
+    steps:
+        - checkout
+
+        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0-RC2 -PskipSpotBugs
+        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.0     -PskipSpotBugs
+        - run: ./gradlew --build-cache --scan build
+
+        - run:
+            command: |
+                mkdir -p "/tmp/test-results"
+                find . -wholename "*/build/test-results/*/*.xml" -exec cp "{}" "/tmp/test-results" \;
+            when: always
+        - store_test_results:
+            path: /tmp/test-results
+
+jobs:
+    jdk8:
+        docker:
+            - image: circleci/openjdk:8-jdk
+        <<: *build-job
+    jdk9:
+        docker:
+            - image: circleci/openjdk:9.0.4-jdk
+        <<: *build-job
+    jdk10:
+        docker:
+            - image: circleci/openjdk:10-jdk
+        <<: *build-job
+    jdk11:
+        docker:
+            - image: circleci/openjdk:11-jdk
+        <<: *build-job
+
+workflows:
+    version: 2
+    build:
+        jobs:
+            - jdk8
+            - jdk9
+            - jdk10
+            - jdk11
