@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/TNG/junit-dataprovider.png?branch=master)](https://travis-ci.org/TNG/junit-dataprovider)
+[![Travis CI](https://travis-ci.org/TNG/junit-dataprovider.png?branch=master)](https://travis-ci.org/TNG/junit-dataprovider)
+[![Circle CI](https://circleci.com/gh/TNG/junit-dataprovider.svg?style=svg)](https://circleci.com/gh/TNG/junit-dataprovider)
 [![Coverage Status](https://coveralls.io/repos/TNG/junit-dataprovider/badge.png?branch=master)](https://coveralls.io/r/TNG/junit-dataprovider)
 [![codebeat badge](https://codebeat.co/badges/78ac5f0b-6686-4d77-a531-d562c8485474)](https://codebeat.co/projects/github-com-tng-junit-dataprovider)
 [![Maven Central](https://img.shields.io/maven-central/v/com.tngtech.junit.dataprovider/junit-dataprovider-core.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.tngtech.junit.dataprovider%22)
