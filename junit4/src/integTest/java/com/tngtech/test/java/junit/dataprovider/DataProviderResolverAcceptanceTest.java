@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +45,12 @@ public class DataProviderResolverAcceptanceTest {
                     }
                 }
             }
+            Collections.sort(result, new Comparator<FrameworkMethod>() {
+                @Override
+                public int compare(FrameworkMethod a, FrameworkMethod b) {
+                    return a.getName().compareTo(b.getName());
+                }
+            });
             return result;
         }
     }
@@ -76,7 +83,7 @@ public class DataProviderResolverAcceptanceTest {
         return Arrays.asList(
                 Collections.singleton(2),
                 Collections.singleton(Integer.valueOf(3))
-                );
+            );
         // @formatter:on
     }
 
