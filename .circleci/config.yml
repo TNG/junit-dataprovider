@@ -29,6 +29,10 @@ build-job: &build-job
             path: /tmp/spotbugs
             destination: spotbugs
 
+        - store_artifacts:
+            path: build/reports/cpd/cpdCheck.xml
+            destination: cpd
+
 jobs:
     jdk8:
         docker:
