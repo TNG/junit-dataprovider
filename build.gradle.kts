@@ -382,6 +382,7 @@ val jacocoMerge = tasks.register("jacocoMerge", JacocoMerge::class) {
         executionData = files(executionData.filter { it.exists() })
     }
     publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
+    dependsOn(publishedProjects.map { it.tasks.named("test") })
 }
 
 val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
@@ -400,7 +401,7 @@ val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
     reports {
         xml.isEnabled = true // required by coveralls
     }
-    dependsOn(publishedProjects.map { it.tasks.named("test") }, jacocoMerge)
+    dependsOn(jacocoMerge)
 }
 
 coveralls {
