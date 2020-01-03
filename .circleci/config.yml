@@ -4,10 +4,20 @@ build-job: &build-job
     steps:
         - checkout
 
+        - restore_cache:
+            keys:
+                - gradle-repo-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+                - gradle-repo-v1-
+
         - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0-RC2 -PskipSpotBugs
         - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.0     -PskipSpotBugs
         - run: ./gradlew --build-cache --scan build
         - run: COVERALLS_REPO_TOKEN=Npp4tyTSCz0wSMZTJ81vXdVe1uw6WtRrC ./gradlew --build-cache --scan jacocoRootReport coveralls
+
+        - save_cache:
+            paths:
+                - ~/.gradle
+            key: gradle-repo-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
 
         - run:
             command: |
