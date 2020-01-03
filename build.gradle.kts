@@ -353,6 +353,10 @@ subprojects {
 
         withType<com.github.spotbugs.SpotBugsTask> {
             enabled = !skipSpotBugs
+            reports {
+                html.isEnabled = true
+                xml.isEnabled = false
+            }
         }
 
         named("check") {

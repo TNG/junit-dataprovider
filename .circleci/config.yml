@@ -17,6 +17,18 @@ build-job: &build-job
         - store_test_results:
             path: /tmp/test-results
 
+        - run:
+            command: |
+                find . -wholename "*/build/reports/spotbugs/*.html" | while read file; do
+                    target="/tmp/spotbugs/${file%%/build/reports/spotbugs/*}/"
+                    mkdir -p "$target"
+                    cp "$file" "$target"
+                done
+            when: always
+        - store_artifacts:
+            path: /tmp/spotbugs
+            destination: spotbugs
+
 jobs:
     jdk8:
         docker:
