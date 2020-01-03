@@ -345,12 +345,6 @@ subprojects {
             dependsOn(touchTestResultsForJenkins)
         }
 
-        named<JacocoReport>("jacocoTestReport") {
-            reports {
-                xml.isEnabled = true // coveralls plugin depends on xml format report
-            }
-        }
-
         withType<com.github.spotbugs.SpotBugsTask> {
             enabled = !skipSpotBugs
             reports {
