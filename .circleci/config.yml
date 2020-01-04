@@ -6,8 +6,8 @@ build-job: &build-job
 
         - restore_cache:
             keys:
-                - gradle-repo-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-                - gradle-repo-v1-
+                # Restart caching for every new wrapper and add job name (= JDK version) as JDK influences Gradle's caching
+                - gradle-repo-v2-{{ .Environment.CIRCLE_JOB }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
 
         - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0 -PskipSpotBugs
         - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.1 -PskipSpotBugs
@@ -17,7 +17,7 @@ build-job: &build-job
         - save_cache:
             paths:
                 - ~/.gradle
-            key: gradle-repo-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            key: gradle-repo-v2-{{ .Environment.CIRCLE_JOB }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
 
         - run:
             command: |
