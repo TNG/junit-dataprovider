@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Test;
 
 public class DataProvidersTest extends BaseTest {
@@ -135,6 +136,7 @@ public class DataProvidersTest extends BaseTest {
         assertThat(result).isEqualTo(new Object[][] { { 'a' }, { "aa" }, { "aaa" } });
     }
 
+    @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "Local variable is required for type inference")
     @Test(expected = NullPointerException.class)
     public void testTestForEachIterableShouldThrowNullPointerExceptionForNullArg() {
         // Given:

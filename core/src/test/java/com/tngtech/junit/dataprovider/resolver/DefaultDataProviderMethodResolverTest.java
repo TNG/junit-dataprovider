@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Condition;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +32,8 @@ public class DefaultDataProviderMethodResolverTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
+    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "Mockito rule needs no further configuration")
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -85,6 +88,7 @@ public class DefaultDataProviderMethodResolverTest {
         assertThat(result).containsOnly(method2);
     }
 
+    @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification = "doReturn causes this but required due to spy")
     @Test
     public void testResolveShouldReturnListContainingOnlyConventionMatchingDataProviderMethods() {
         // Given:

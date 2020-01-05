@@ -294,7 +294,6 @@ subprojects {
 
     configure<com.github.spotbugs.SpotBugsExtension> {
         toolVersion = "3.1.12"
-        isIgnoreFailures = true
     }
 
     tasks {

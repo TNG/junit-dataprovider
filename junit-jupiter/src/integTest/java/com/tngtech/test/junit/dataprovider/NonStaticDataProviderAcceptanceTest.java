@@ -4,6 +4,7 @@ import static com.tngtech.junit.dataprovider.DataProviders.$;
 import static com.tngtech.junit.dataprovider.DataProviders.$$;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -43,6 +44,7 @@ class NonStaticDataProviderAcceptanceTest {
         assertThat(result).isEqualTo(expected);
     }
 
+    @SuppressFBWarnings(value = "SIC_INNER_SHOULD_BE_STATIC", justification = "Must be non-static for JUnit Jupiter")
     @TestInstance(Lifecycle.PER_CLASS)
     @Nested
     class NestedTests {

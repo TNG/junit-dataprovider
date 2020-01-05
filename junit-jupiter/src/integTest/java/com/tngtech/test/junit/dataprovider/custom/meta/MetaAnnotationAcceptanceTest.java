@@ -2,6 +2,7 @@ package com.tngtech.test.junit.dataprovider.custom.meta;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestTemplate;
 
@@ -30,6 +31,7 @@ class MetaAnnotationAcceptanceTest {
         assertThat(a + b).isEqualTo(expected);
     }
 
+    @SuppressFBWarnings(value = "SIC_INNER_SHOULD_BE_STATIC", justification = "Must be non-static for JUnit Jupiter")
     @Nested
     class NestedTests {
         @FixedLocationDataProviderTest

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,6 +41,7 @@ public class DataProviderMethodResolverHelperTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "Mockito rule needs no further configuration")
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 

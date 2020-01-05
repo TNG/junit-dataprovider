@@ -33,7 +33,7 @@ public class DataProviderResolverContextTest {
     @SuppressWarnings("unchecked")
     private final List<Class<?>> locations = asList(this.getClass(), DataProviderResolverContext.class);
     private final Class<? extends Annotation> dataProviderAnnotationClass = Documented.class;
-    private final String dataProviderName = "dataProviderName";
+    private final static String dataProviderName = "dataProviderName";
 
     @Test
     public void testGenerateLocationsShouldThrowNullPointerExceptionIfTestClassIsNull() throws Exception {

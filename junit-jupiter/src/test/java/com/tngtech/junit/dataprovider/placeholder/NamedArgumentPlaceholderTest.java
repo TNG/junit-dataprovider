@@ -26,8 +26,8 @@ import org.junit.platform.commons.support.ReflectionSupport;
 
 class NamedArgumentPlaceholderTest {
 
-    private static OutputStream logCapturingStream;
-    private static StreamHandler customLogHandler;
+    private OutputStream logCapturingStream;
+    private StreamHandler customLogHandler;
 
     private final NamedArgumentPlaceholder underTest = new NamedArgumentPlaceholder();
 
