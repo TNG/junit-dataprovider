@@ -40,7 +40,7 @@ build-job: &build-job
             destination: spotbugs
 
         - store_artifacts:
-            path: build/reports/cpd/cpdCheck.xml
+            path: build/reports/cpd
             destination: cpd
 
 jobs:
