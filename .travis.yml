@@ -1,12 +1,19 @@
 language: java
+
+os: linux
 dist: trusty
 sudo: false
 
-script:
-  - ./gradlew build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0-RC2 -PskipSpotBugs
-  - ./gradlew build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.0     -PskipSpotBugs
+jdk:
+  - openjdk8
+  - oraclejdk8
+  - oraclejdk9
+  - oraclejdk11
 
-  - ./gradlew build
+script:
+  - ./gradlew --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0-RC2 -PskipSpotBugs
+  - ./gradlew --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.0     -PskipSpotBugs
+  - ./gradlew --scan build
 
   - cd ${TRAVIS_BUILD_DIR}/junit4/
   - mvn test
@@ -18,12 +25,15 @@ script:
   - cd ${TRAVIS_BUILD_DIR}/junit-jupiter-params/
   - mvn test
 
-jdk:
-  - openjdk8
-  - oraclejdk8
-  - oraclejdk9
-  - oraclejdk11
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}
-  - ./gradlew jacocoRootReport coveralls
+  - ./gradlew --scan jacocoRootReport coveralls
