@@ -1,0 +1,95 @@
+version: 2.1
+
+build-job: &build-job
+    steps:
+        - checkout
+
+        - restore_cache:
+            keys:
+                # Restart caching for every new wrapper and add job name (= JDK version) as JDK influences Gradle's caching
+                - gradle-repo-v2-{{ .Environment.CIRCLE_JOB }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+
+        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0 -PskipSpotBugs
+        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.1 -PskipSpotBugs
+        - run: ./gradlew --build-cache --scan build
+        - run: COVERALLS_REPO_TOKEN=Npp4tyTSCz0wSMZTJ81vXdVe1uw6WtRrC ./gradlew --build-cache --scan jacocoRootReport coveralls
+
+        - save_cache:
+            paths:
+                - ~/.gradle
+            key: gradle-repo-v2-{{ .Environment.CIRCLE_JOB }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+
+        - run:
+            command: |
+                mkdir -p "/tmp/test-results"
+                find . -wholename "*/build/test-results/*/*.xml" -exec cp "{}" "/tmp/test-results" \;
+            when: always
+        - store_test_results:
+            path: /tmp/test-results
+
+        - run:
+            command: |
+                find . -wholename "*/build/reports/spotbugs/*.html" | while read file; do
+                    target="/tmp/spotbugs/${file%%/build/reports/spotbugs/*}/"
+                    mkdir -p "$target"
+                    cp "$file" "$target"
+                done
+            when: always
+        - store_artifacts:
+            path: /tmp/spotbugs
+            destination: spotbugs
+
+        - store_artifacts:
+            path: build/reports/cpd/cpdCheck.xml
+            destination: cpd
+
+jobs:
+    jdk8:
+        docker:
+            - image: circleci/openjdk:8-jdk
+        <<: *build-job
+    jdk9:
+        docker:
+            - image: circleci/openjdk:9.0.4-jdk
+        <<: *build-job
+    jdk10:
+        docker:
+            - image: circleci/openjdk:10-jdk
+        <<: *build-job
+    jdk11:
+        docker:
+            - image: circleci/openjdk:11-jdk
+        <<: *build-job
+    jdk12:
+        docker:
+            # No image provided by circleci yet (such as "circleci/openjdk:12-jdk")
+            - image: codeaches/openjdk:12-jdk
+        <<: *build-job
+    jdk13:
+        docker:
+            - image: circleci/openjdk:13-jdk-buster
+        <<: *build-job
+    jdk14:
+        docker:
+            - image: circleci/openjdk:14-jdk-buster
+        <<: *build-job
+    jdk15:
+        docker:
+            - image: circleci/openjdk:15-jdk-buster
+        <<: *build-job
+
+workflows:
+    version: 2
+    build:
+        jobs:
+            - jdk8
+            - jdk9
+            - jdk10
+            - jdk11
+            # JDK 12 does not support source 1.6 any more, see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8028563
+            # - jdk12
+            # JDK 13 build fails due to spotbugs, see https://github.com/spotbugs/spotbugs/issues/1012
+            # - jdk13
+            # JDK 14 and 15 do not work with Gradle / Groovy yet, see https://github.com/gradle/gradle/issues/10248
+            # - jdk14
+            # - jdk15
