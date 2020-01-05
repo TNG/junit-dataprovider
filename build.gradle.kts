@@ -382,7 +382,7 @@ val jacocoMerge = tasks.register("jacocoMerge", JacocoMerge::class) {
         executionData = files(executionData.filter { it.exists() })
     }
     publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
-    dependsOn(publishedProjects.map { it.tasks.named("test") })
+    dependsOn(publishedProjects.flatMap { it.tasks.withType(Test::class) })
 }
 
 val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
