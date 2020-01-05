@@ -87,8 +87,8 @@ abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
             int argumentCount) {
         String subscript = placeholder.substring(subscriptStartIndex, placeholder.length() - 1);
 
-        int from = Integer.MAX_VALUE;
-        int to = Integer.MIN_VALUE;
+        int from;
+        int to;
         if (subscript.contains("..")) {
             String[] split = subscript.split("\\.\\.");
 

@@ -366,7 +366,7 @@ public class DataProviderRunnerTest extends BaseTest {
     public void testComputeTestMethodsShouldCallGenerateExplodedTestMethodsAndCacheResultIfCalledTheFirstTime() {
         // Given:
         underTest.computedTestMethods = null;
-        when(underTest.generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class))).thenReturn(new ArrayList<FrameworkMethod>());
+        doReturn(new ArrayList<FrameworkMethod>()).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
 
         // When:
         List<FrameworkMethod> result = underTest.computeTestMethods();
@@ -387,7 +387,7 @@ public class DataProviderRunnerTest extends BaseTest {
 
         underTest.computedTestMethods = expected;
 
-        when(underTest.generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class))).thenReturn(expected);
+        doReturn(expected).when(underTest).generateExplodedTestMethodsFor(anyListOf(FrameworkMethod.class));
 
         // When:
         List<FrameworkMethod> result = underTest.computeTestMethods();
@@ -419,7 +419,7 @@ public class DataProviderRunnerTest extends BaseTest {
         underTest.filter(filter);
 
         // Then:
-        assertThat(underTest.getDescription().getChildren().size()).isGreaterThan(0);
+        assertThat(underTest.getDescription().getChildren()).isNotEmpty();
     }
 
     @Test
@@ -683,7 +683,7 @@ public class DataProviderRunnerTest extends BaseTest {
         DataProviderMethodResolver result = underTest.getResolverInstanceInt(PrivateDefaultConstructor.class);
 
         // Then:
-        assertThat(result).isNotNull().isInstanceOf(PrivateDefaultConstructor.class);
+        assertThat(result).isInstanceOf(PrivateDefaultConstructor.class);
     }
 
     // -- helper classes to test with ------------------------------------------------------------------------------------------------------

@@ -415,13 +415,12 @@ public class TestValidatorTest extends BaseTest {
 
     // -- helper methods -----------------------------------------------------------------------------------------------
 
-    // Methods used to test isValidDataProviderMethod
     public void testNoArg() {
-        return;
+        // Method used to mock {@code Method}
     }
 
     public void testOneArg(@SuppressWarnings("unused") String arg) {
-        return;
+        // Method used to mock {@code Method}
     }
 
     static Object[][] nonPublicDataProviderMethod() {

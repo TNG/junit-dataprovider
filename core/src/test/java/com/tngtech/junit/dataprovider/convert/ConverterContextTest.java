@@ -10,7 +10,7 @@ public class ConverterContextTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void testConverterContextShouldThrowNullPointerExceptionIfObjectArrayConverterIsNull() throws Exception {
+    public void testConverterContextShouldThrowNullPointerExceptionIfObjectArrayConverterIsNull() {
         // Given
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'objectArrayConverter' must not be null");
@@ -22,7 +22,7 @@ public class ConverterContextTest {
     }
 
     @Test
-    public void testConverterContextShouldThrowNullPointerExceptionIfSingleArgConverterIsNull() throws Exception {
+    public void testConverterContextShouldThrowNullPointerExceptionIfSingleArgConverterIsNull() {
         // Given
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'singleArgConverter' must not be null");
@@ -34,7 +34,7 @@ public class ConverterContextTest {
     }
 
     @Test
-    public void testConverterContextShouldThrowNullPointerExceptionIfStringConverterIsNull() throws Exception {
+    public void testConverterContextShouldThrowNullPointerExceptionIfStringConverterIsNull() {
         // Given
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'stringConverter' must not be null");
@@ -46,7 +46,7 @@ public class ConverterContextTest {
     }
 
     @Test
-    public void testConverterContextShouldThrowNullPointerExceptionIfSplitByIsNull() throws Exception {
+    public void testConverterContextShouldThrowNullPointerExceptionIfSplitByIsNull() {
         // Given
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("'splitBy' must not be null");

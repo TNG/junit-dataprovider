@@ -65,9 +65,9 @@ class VarargsAcceptanceTest {
     @TestTemplate
     @UseDataProvider("dataProviderIntVarargsWithLeadingCharArgument")
     void testIntVarargsWithLeadingCharArgument(char c, int... is) {
-        assertNotNull(c);
+        assertThat(c).isNotNull();
         for (int i : is) {
-            assertNotNull(i);
+            assertThat(i).isNotNegative();
         }
     }
 

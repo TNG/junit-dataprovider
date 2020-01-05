@@ -32,7 +32,7 @@ class CustomStringConverterAcceptanceTest {
     @CustomConverterDataProvider(value = {
             "2016-02-19                  | 2016 | 02 | 19 | 00 | 00 | 00 | 000 | UTC",
             "2016-02-19T20:15:22.629 GMT | 2016 | 02 | 19 | 20 | 15 | 22 | 629 | UTC",
-        }, splitBy = "\\|", trimValues = true)
+        }, splitBy = "\\|")
     // @formatter:off
     void testDateTimeDirectMetaAnnotation(Date date, int year, int month, int dayOfMonth, int hourOfDay, int minute,
             int second, int millis, String timeZone) {
@@ -40,7 +40,7 @@ class CustomStringConverterAcceptanceTest {
         assertThat(date).isEqualTo(date(year, month, dayOfMonth, hourOfDay, minute, second, millis, timeZone));
     }
 
-    @DataProvider(splitBy = "\\|", trimValues = true, stringConverter = DateTimeAwareStringConverter.class)
+    @DataProvider(splitBy = "\\|", stringConverter = DateTimeAwareStringConverter.class)
     static String[] dateTimeMetaAnnotationAndDataProviderMethodProvider() {
         // @formatter:off
         return new String[] {

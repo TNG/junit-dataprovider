@@ -16,6 +16,7 @@
 package com.tngtech.java.junit.dataprovider.internal;
 
 import static com.tngtech.java.junit.dataprovider.common.Preconditions.checkNotNull;
+import static java.util.Collections.singletonList;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -87,7 +88,7 @@ public class TestGenerator {
                         e.getMessage()), e);
             }
         }
-        return Arrays.asList(testMethod);
+        return singletonList(testMethod);
     }
 
     /**

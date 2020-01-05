@@ -22,23 +22,23 @@ import com.tngtech.junit.dataprovider.resolver.ResolveStrategy;
 @interface CustomResolverUseDataProvider {
 
     /**
-     * @see UseDataProvider#value()
+     * @see com.tngtech.junit.dataprovider.UseDataProvider#value()
      */
     String value() default DataProviderResolverContext.METHOD_NAME_TO_USE_CONVENTION;
 
     /**
-     * @see UseDataProvider#location()
+     * @see com.tngtech.junit.dataprovider.UseDataProvider#location()
      */
     Class<?>[] location() default {};
 
     /**
-     * @see UseDataProvider#resolver()
+     * @see com.tngtech.junit.dataprovider.UseDataProvider#resolver()
      */
     Class<? extends DataProviderMethodResolver>[] resolver() default {
             DataProviderStartWithTestMethodNameResolver.class };
 
     /**
-     * @see UseDataProvider#resolveStrategy()
+     * @see com.tngtech.junit.dataprovider.UseDataProvider#resolveStrategy()
      */
     ResolveStrategy resolveStrategy() default ResolveStrategy.UNTIL_FIRST_MATCH;
 }

@@ -50,7 +50,7 @@ public class DataProviderResolverContext {
         checkNotNull(testClass, "'testClass' must not be null");
         if (explicitLocations == null || explicitLocations.length == 0) {
             @SuppressWarnings({ "rawtypes", "unchecked" })
-            List<Class<?>> result = (List) Arrays.asList(testClass);
+            List<Class<?>> result = (List) Collections.singletonList(testClass);
             return result;
         }
         return Arrays.asList(explicitLocations);

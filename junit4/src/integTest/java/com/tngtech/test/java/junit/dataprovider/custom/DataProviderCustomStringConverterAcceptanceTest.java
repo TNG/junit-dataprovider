@@ -20,7 +20,7 @@ public class DataProviderCustomStringConverterAcceptanceTest {
     @DataProvider(value = {
         "2016-02-19                  | 2016 | 02 | 19 | 00 | 00 | 00 | 000 | UTC",
         "2016-02-19T20:15:22.629 GMT | 2016 | 02 | 19 | 20 | 15 | 22 | 629 | UTC",
-    }, splitBy = "\\|", trimValues = true)
+    }, splitBy = "\\|")
     // @formatter:off
     public void testDateTime(Date date, int year, int month, int dayOfMonth, int hourOfDay, int minute, int second, int millis, String timeZone) {
         // Expect:

@@ -129,7 +129,6 @@ abstract class AbstractDataProviderInvocationContextProvider<TEST_ANNOTATION ext
         checkNotNull(data, "'data' must not be null");
         checkNotNull(context, "'context' must not be null");
 
-        return dataConverter.convert(data, testMethod.isVarArgs(), testMethod.getParameterTypes(), context).stream()
-                .map(c -> Arrays.asList(c));
+        return dataConverter.convert(data, testMethod.isVarArgs(), testMethod.getParameterTypes(), context).stream().map(Arrays::asList);
     }
 }

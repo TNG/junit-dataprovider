@@ -77,7 +77,7 @@ public class AbstractObjectConverterTest extends BaseTest {
     @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldNotThrowExceptionIfSingleArgumentTypeEqualsParameterType() {
         // Given:
-        Object[] arguments = new Object[] { Character.valueOf('a') };
+        Object[] arguments = new Object[] { 'a' };
         Class<?>[] parameterTypes = new Class<?>[] { Character.class };
 
         // When:
@@ -101,7 +101,7 @@ public class AbstractObjectConverterTest extends BaseTest {
     @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldNotThrowExceptionIfArgumentsIsAreAssignableToParameterTypes() {
         // Given:
-        Object[] arguments = new Object[] { Long.valueOf(1l), Integer.valueOf(2) };
+        Object[] arguments = new Object[] { 1l, 2 };
         Class<?>[] parameterTypes = new Class<?>[] { Number.class, Number.class };
 
         // When:
@@ -113,9 +113,7 @@ public class AbstractObjectConverterTest extends BaseTest {
     @Test
     public void testCheckIfArgumentsMatchParameterTypesShouldNotThrowExceptionIfArgumentsAreWrappedPrimitivesOfParameterTypes() {
         // Given:
-        Object[] arguments = new Object[] { Boolean.FALSE, Character.valueOf('a'), Byte.valueOf((byte) 2),
-                Short.valueOf((short) 3), Integer.valueOf(4), Long.valueOf(5l), Float.valueOf(6.6f),
-                Double.valueOf(7.7) };
+        Object[] arguments = new Object[] { Boolean.FALSE, 'a', (byte) 2, (short) 3, 4, 5l, 6.6f, 7.7 };
         Class<?>[] parameterTypes = new Class<?>[] { boolean.class, char.class, byte.class, short.class, int.class,
                 long.class, float.class, double.class };
 

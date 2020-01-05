@@ -21,11 +21,11 @@ class MetaAnnotationAcceptanceTest {
     // @formatter:off
     void testStringLength(String str, int expectedLength) {
         // Expect:
-        assertThat(str.length()).isEqualTo(expectedLength);
+        assertThat(str).hasSize(expectedLength);
     }
 
     @FixedLocationDataProviderTest
-    void testAdd(int a, int b, int expected) throws Exception {
+    void testAdd(int a, int b, int expected) {
         // Expect:
         assertThat(a + b).isEqualTo(expected);
     }

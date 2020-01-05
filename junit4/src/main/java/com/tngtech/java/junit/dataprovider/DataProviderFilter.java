@@ -34,8 +34,7 @@ public class DataProviderFilter extends Filter {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final Pattern DESCRIPTION_PATTERN = Pattern.compile("([^\\[\\] ]+)" + "(\\[(\\d+):.*\\])?" + "\\((.+)\\)$",
-            Pattern.DOTALL);
+    static final Pattern DESCRIPTION_PATTERN = Pattern.compile("([^\\[\\] ]+)" + "(\\[(\\d+):.*\\])?" + "\\((.+)\\)$", Pattern.DOTALL);
 
     /**
      * <p>

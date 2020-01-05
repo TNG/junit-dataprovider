@@ -52,7 +52,7 @@ public class DataProviderJavaAcceptanceTest {
         // Given:
 
         // When:
-        boolean isEmpty = (str == null) ? true : str.isEmpty();
+        boolean isEmpty = (str == null) || str.isEmpty();
 
         // Then:
         assertThat(isEmpty).isTrue();
@@ -64,7 +64,7 @@ public class DataProviderJavaAcceptanceTest {
         // Given:
 
         // When:
-        boolean isGreaterThanTwo = (str == null) ? false : str.length() > 2;
+        boolean isGreaterThanTwo = (str != null) && str.length() > 2;
 
         // Then:
         assertThat(isGreaterThanTwo).isEqualTo(expected);
@@ -189,7 +189,7 @@ public class DataProviderJavaAcceptanceTest {
         assertThat(result).isEqualTo(cal1IsEarlierThenCal2);
     }
 
-    @DataProvider(splitBy = "\\|", trimValues = true)
+    @DataProvider(splitBy = "\\|")
     public static String[] dataProviderFileExistence() {
         // @formatter:off
         return new String[] {
@@ -264,7 +264,7 @@ public class DataProviderJavaAcceptanceTest {
     // @formatter:off
     public void testStringLength(String str, int expectedLength) {
         // Expect:
-        assertThat(str.length()).isEqualTo(expectedLength);
+        assertThat(str).hasSize(expectedLength);
     }
 
     // @formatter:off
@@ -274,11 +274,11 @@ public class DataProviderJavaAcceptanceTest {
         "a              |  1",
         "abc            |  3",
         "veryLongString | 14",
-    }, splitBy = "\\|", trimValues = true, convertNulls = true)
+    }, splitBy = "\\|")
     // @formatter:off
     public void testStringLength2(String str, int expectedLength) {
         // Expect:
-        assertThat(str.length()).isEqualTo(expectedLength);
+        assertThat(str).hasSize(expectedLength);
     }
 
     // @formatter:off
@@ -313,10 +313,10 @@ public class DataProviderJavaAcceptanceTest {
     }
 
     @Test
-    @DataProvider({ "null", "", })
+    @DataProvider({ "null", "" })
     public void testIsEmptyString2(String str) {
         // When:
-        boolean isEmpty = (str == null) ? true : str.isEmpty();
+        boolean isEmpty = (str == null) || str.isEmpty();
 
         // Then:
         assertThat(isEmpty).isTrue();
@@ -325,7 +325,7 @@ public class DataProviderJavaAcceptanceTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     public @interface ExternalFile {
-        public enum Format {
+        enum Format {
             CSV,
             XML,
             XLS;
@@ -353,8 +353,7 @@ public class DataProviderJavaAcceptanceTest {
 
     @DataProvider
     public static Object[][] dataProviderWithStringContainingTabsNewlineAndCarriageReturn() {
-        Object[][] result = { {  } };
-        return result;
+        return new Object[][] { {  } };
     }
 
     @Test

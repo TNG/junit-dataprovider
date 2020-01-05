@@ -59,7 +59,6 @@ class DataProviderGroovyAcceptanceTest {
     // @formatter:on
     void "test boolean logic for 'xor'"(boolean op1, boolean op2, boolean expected) {
         // Expect:
-        def a = [1,2] as String[]
         assert ((op1 || op2) && (op1 != op2)) == expected
     }
 }

@@ -1,12 +1,14 @@
 package com.tngtech.junit.dataprovider.convert;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -162,7 +164,7 @@ public class DataConverterTest {
     public void testConvertShouldCallObjectArrayConverterOnlyOnceForListOfListOfObjectWithOneElement() {
         // Given:
         @SuppressWarnings("unchecked")
-        List<List<Character>> data = asList(asList('a'));
+        List<List<Character>> data = singletonList(singletonList('a'));
         Class<?>[] parameterTypes = new Class<?>[] { char.class };
 
         // When:
@@ -229,7 +231,7 @@ public class DataConverterTest {
     @Test
     public void testConvertShouldCallSingleArgConverterOnlyOnceForListOfObjectWithSingleElement() {
         // Given:
-        List<Object> data = Arrays.<Object>asList(88);
+        List<Object> data = Collections.<Object>singletonList(88);
         Class<?>[] parameterTypes = new Class<?>[] { Object.class };
 
         // When:

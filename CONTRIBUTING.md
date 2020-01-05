@@ -10,7 +10,7 @@ Contributions are very welcome. The following will provide some helpful guidelin
 * You will only submit contributions to which you have the necessary rights.
 This means in particular, that if you are employed you have received the necessary permissions
 from your employer to make the contributions.
-* Whatever content you contribute will be provided under the project license(s) (see [LICENSE.md](LICENSE.md))
+* Whatever content you contribute will be provided under the project license(s) (see [LICENSE](LICENSE))
 
 
 ## Accept Developer Certificate of Origin

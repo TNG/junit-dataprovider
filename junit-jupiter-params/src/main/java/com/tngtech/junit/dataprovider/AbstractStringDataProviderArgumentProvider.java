@@ -46,7 +46,7 @@ public abstract class AbstractStringDataProviderArgumentProvider<SOURCE_ANNOTATI
     }
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
+    public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
         Method testMethod = extensionContext.getRequiredTestMethod();
         return convertData(testMethod, getData(sourceAnnotation), getConverterContext(sourceAnnotation));
     }

@@ -17,7 +17,7 @@ import com.tngtech.junit.dataprovider.UseDataProviderExtension;
 @ExtendWith(UseDataProviderExtension.class)
 class StringDataProviderAcceptanceTest {
 
-    @DataProvider(splitBy = "\\|", trimValues = true)
+    @DataProvider(splitBy = "\\|")
     static String[] dataProviderFileExistence() {
         // @formatter:off
         return new String[] {
@@ -48,7 +48,7 @@ class StringDataProviderAcceptanceTest {
     // @formatter:off
     void testStringLength(String str, int expectedLength) {
         // Expect:
-        assertThat(str.length()).isEqualTo(expectedLength);
+        assertThat(str).hasSize(expectedLength);
     }
 
     // @formatter:off
@@ -58,11 +58,11 @@ class StringDataProviderAcceptanceTest {
         "a              |  1",
         "abc            |  3",
         "veryLongString | 14",
-    }, splitBy = "\\|", trimValues = true, convertNulls = true)
+    }, splitBy = "\\|")
     // @formatter:off
     void testStringLength2(String str, int expectedLength) {
         // Expect:
-        assertThat(str.length()).isEqualTo(expectedLength);
+        assertThat(str).hasSize(expectedLength);
     }
 
     // @formatter:off
@@ -99,7 +99,7 @@ class StringDataProviderAcceptanceTest {
     @DataProvider({ "null", "", })
     void testIsEmptyString2(String str) {
         // When:
-        boolean isEmpty = (str == null) ? true : str.isEmpty();
+        boolean isEmpty = (str == null) || str.isEmpty();
 
         // Then:
         assertThat(isEmpty).isTrue();

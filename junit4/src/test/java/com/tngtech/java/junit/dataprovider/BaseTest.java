@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.runners.model.FrameworkMethod;
@@ -45,12 +46,9 @@ public class BaseTest {
 
     // -- helper methods to create arrays, lists etc. ------------------------------------------------------------------
 
-    @SafeVarargs
     protected final <T> List<T[]> listOfArrays(T[]... arrays) {
         List<T[]> result = new ArrayList<T[]>();
-        for (T[] array : arrays) {
-            result.add(array);
-        }
+        Collections.addAll(result, arrays);
         return result;
     }
 
@@ -72,11 +70,7 @@ public class BaseTest {
 
     // -- Test data ----------------------------------------------------------------------------------------------------
 
-    protected static enum TestEnum {
-        VAL1,
-        VAL2,
-        VAL3,
-
-        ;
+    protected enum TestEnum {
+        VAL1, VAL2, VAL3
     }
 }

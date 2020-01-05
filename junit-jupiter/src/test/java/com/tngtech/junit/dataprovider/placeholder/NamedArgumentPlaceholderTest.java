@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Handler;
@@ -762,9 +763,7 @@ class NamedArgumentPlaceholderTest {
     private List<Object> list(Object first, Object... remaining) {
         List<Object> result = new ArrayList<>();
         result.add(first);
-        for (Object object : remaining) {
-            result.add(object);
-        }
+        Collections.addAll(result, remaining);
         return result;
     }
 

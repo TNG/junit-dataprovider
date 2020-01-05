@@ -37,7 +37,7 @@ class NestedAcceptanceTest {
 
     @ParameterizedTest
     @UseDataProvider
-    void testAdd(int a, int b, int expected) throws Exception {
+    void testAdd(int a, int b, int expected) {
         // Expect:
         assertThat(a + b).isEqualTo(expected);
 
