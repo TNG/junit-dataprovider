@@ -28,7 +28,7 @@ Contributors must follow the Code of Conduct outlined at [CODE-OF-CONDUCT.md](CO
 
 We love pull requests. Here is a quick guide:
 
-1. You need to have a JDK (at least version 1.5) installed.
+1. You need to have a JDK (at least version 1.8) installed.
 2. Fork the repo (see https://help.github.com/articles/fork-a-repo).
 3. Create a new branch from master.
 4. Ensure that you have a clean state by running `./gradlew clean build`.
