@@ -519,6 +519,9 @@ subprojects {
     // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
     configure<SigningExtension> {
         setRequired({ isReleaseVersion && gradle.taskGraph.hasTask("publish") })
+        val signingKey: String? by project
+        val signingPassword: String? by project
+        useInMemoryPgpKeys(signingKey, signingPassword)
         sign(the<PublishingExtension>().publications["mavenJava"])
     }
 }
