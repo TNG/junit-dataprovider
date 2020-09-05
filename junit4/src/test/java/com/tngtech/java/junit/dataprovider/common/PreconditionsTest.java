@@ -9,6 +9,7 @@ import org.junit.rules.ExpectedException;
 
 public class PreconditionsTest {
 
+    @SuppressWarnings("deprecation")
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 

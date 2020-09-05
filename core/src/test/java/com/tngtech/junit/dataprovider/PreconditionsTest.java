@@ -11,6 +11,7 @@ import com.tngtech.junit.dataprovider.Preconditions;
 
 public class PreconditionsTest {
 
+    @SuppressWarnings("deprecation")
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 

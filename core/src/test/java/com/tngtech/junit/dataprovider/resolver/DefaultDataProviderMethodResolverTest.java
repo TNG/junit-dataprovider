@@ -30,6 +30,7 @@ import com.tngtech.junit.dataprovider.testutils.Methods;
 
 public class DefaultDataProviderMethodResolverTest {
 
+    @SuppressWarnings("deprecation")
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 

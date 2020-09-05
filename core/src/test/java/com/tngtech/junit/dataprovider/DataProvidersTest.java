@@ -19,6 +19,7 @@ import org.junit.rules.ExpectedException;
 
 public class DataProvidersTest {
 
+    @SuppressWarnings("deprecation")
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 

@@ -15,6 +15,7 @@ import com.tngtech.junit.dataprovider.testutils.Methods;
 
 public class ReplacementDataTest {
 
+    @SuppressWarnings("deprecation")
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 

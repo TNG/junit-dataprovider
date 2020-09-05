@@ -15,7 +15,7 @@ val skipSpotBugs by extra(hasProperty("skipSpotBugs"))
 println("Using skipSpotBugs = $skipSpotBugs for current build.")
 
 // set default junit versions if not set via command line
-val junit4Version by extra(findProperty("junit4Version")?.toString() ?: "4.12")
+val junit4Version by extra(findProperty("junit4Version")?.toString() ?: "4.13")
 println("Using JUnit4 version $junit4Version for current build.")
 val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.5.2")
 println("Using JUnit Jupiter version $junitJupiterVersion for current build.")
@@ -473,7 +473,7 @@ subprojects {
 
                                     // JUnit4
                                     if (groupId.textContent == "junit" && artifactId.textContent == "junit") {
-                                        dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,4.12]"
+                                        dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,4.13]"
                                         dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
                                     }
 
