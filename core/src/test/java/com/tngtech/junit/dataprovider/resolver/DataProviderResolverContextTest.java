@@ -22,6 +22,7 @@ import com.tngtech.junit.dataprovider.testutils.Methods;
 @RunWith(MockitoJUnitRunner.class)
 public class DataProviderResolverContextTest {
 
+    @SuppressWarnings("deprecation")
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 

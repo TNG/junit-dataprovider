@@ -6,6 +6,7 @@ import org.junit.rules.ExpectedException;
 
 public class ConverterContextTest {
 
+    @SuppressWarnings("deprecation")
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
