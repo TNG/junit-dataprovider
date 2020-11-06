@@ -460,13 +460,14 @@ subprojects {
                     }
 
                     withXml {
-                        fun org.w3c.dom.NodeList.asElementList() = (0 until length).map { this::item }.filterIsInstance<org.w3c.dom.Element>()
+                        fun org.w3c.dom.NodeList.asList(): List<org.w3c.dom.Node> = (0 until length).map { it -> this.item(it) }
                         fun org.w3c.dom.NodeList.onlyElement() = if (length == 1) item(0) else throw kotlin.IllegalStateException("Expected only one element but got $length.")
 
                         asElement()
                                 .getElementsByTagName("dependencies")
-                                .asElementList()
-                                .flatMap { it.childNodes.asElementList() }
+                                .asList()
+                                .flatMap { it.childNodes.asList() }
+                                .filterIsInstance<org.w3c.dom.Element>()
                                 .forEach { dep ->
                                     val groupId = dep.getElementsByTagName("groupId").onlyElement()
                                     val artifactId = dep.getElementsByTagName("artifactId").onlyElement()
