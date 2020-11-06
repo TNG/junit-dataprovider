@@ -474,7 +474,7 @@ subprojects {
 
                                     // JUnit4
                                     if (groupId.textContent == "junit" && artifactId.textContent == "junit") {
-                                        dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,4.13]"
+                                        dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,5.0)"
                                         dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
                                     }
 
