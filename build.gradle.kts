@@ -17,7 +17,7 @@ println("Using skipSpotBugs = $skipSpotBugs for current build.")
 // set default junit versions if not set via command line
 val junit4Version by extra(findProperty("junit4Version")?.toString() ?: "4.13")
 println("Using JUnit4 version $junit4Version for current build.")
-val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.5.2")
+val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.7.0")
 println("Using JUnit Jupiter version $junitJupiterVersion for current build.")
 
 class Dependency {
@@ -54,7 +54,7 @@ subprojects {
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
 
     group = "com.tngtech.junit.dataprovider"
-    version = "2.7-SNAPSHOT"
+    version = "2.7"
 
     dependencies {
         "compileOnly"(dependency.spotBugsAnnotations)

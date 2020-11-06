@@ -10,9 +10,8 @@ build-job: &build-job
                 - gradle-repo-v2-{{ .Environment.CIRCLE_JOB }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
 
         - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0 -PskipSpotBugs
-        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.1 -PskipSpotBugs
-        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.12  -PjunitJupiterVersion=5.5.1 -PskipSpotBugs
-        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.13  -PjunitJupiterVersion=5.5.1 -PskipSpotBugs
+        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.2 -PskipSpotBugs
+        - run: ./gradlew --build-cache --scan build -Pjunit4Version=4.12  -PjunitJupiterVersion=5.6.3 -PskipSpotBugs
         - run: ./gradlew --build-cache --scan build
         - run: COVERALLS_REPO_TOKEN=Npp4tyTSCz0wSMZTJ81vXdVe1uw6WtRrC ./gradlew --build-cache --scan jacocoRootReport coveralls
 
