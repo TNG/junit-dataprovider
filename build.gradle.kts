@@ -15,7 +15,7 @@ val skipSpotBugs by extra(hasProperty("skipSpotBugs"))
 println("Using skipSpotBugs = $skipSpotBugs for current build.")
 
 // set default junit versions if not set via command line
-val junit4Version by extra(findProperty("junit4Version")?.toString() ?: "4.13")
+val junit4Version by extra(findProperty("junit4Version")?.toString() ?: "4.13.1")
 println("Using JUnit4 version $junit4Version for current build.")
 val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.7.0")
 println("Using JUnit Jupiter version $junitJupiterVersion for current build.")
