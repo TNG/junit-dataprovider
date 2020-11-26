@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.spotbugs") version "3.0.0" apply false
+    id("com.github.spotbugs") version "4.6.0" apply false
     id("de.aaschmid.cpd") version "3.1"
 
     id("biz.aQute.bnd") version "4.3.1" apply false
@@ -50,7 +50,7 @@ allprojects {
 subprojects {
     apply<JacocoPlugin>()
     apply<JavaLibraryPlugin>()
-    apply<com.github.spotbugs.SpotBugsPlugin>()
+    apply<com.github.spotbugs.snom.SpotBugsBasePlugin>()
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
 
     group = "com.tngtech.junit.dataprovider"
@@ -292,8 +292,8 @@ subprojects {
         toolVersion = "0.8.3"
     }
 
-    configure<com.github.spotbugs.SpotBugsExtension> {
-        toolVersion = "3.1.12"
+    configure<com.github.spotbugs.snom.SpotBugsExtension> {
+        toolVersion.set("3.1.12")
     }
 
     tasks {
@@ -345,11 +345,15 @@ subprojects {
             dependsOn(touchTestResultsForJenkins)
         }
 
-        withType<com.github.spotbugs.SpotBugsTask> {
+        withType<com.github.spotbugs.snom.SpotBugsTask> {
             enabled = !skipSpotBugs
             reports {
-                html.isEnabled = true
-                xml.isEnabled = false
+                create("html") {
+                    isEnabled = true
+                }
+                create("xml") {
+                    isEnabled = false
+                }
             }
         }
 
