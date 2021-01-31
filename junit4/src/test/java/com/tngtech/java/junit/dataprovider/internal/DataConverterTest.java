@@ -113,6 +113,30 @@ public class DataConverterTest extends BaseTest {
     }
 
     @Test
+    public void testCanConvertShouldReturnTrueIfTypeIsListOfNonIterableParameterizedType() {
+        // Given:
+        Type type = getMethod("methodReturningListOfNonIterableParameterizedType").getGenericReturnType();
+
+        // When:
+        boolean result = underTest.canConvert(type);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testCanConvertShouldReturnTrueIfTypeIsListOfRawType() {
+        // Given:
+        Type type = getMethod("methodReturningListOfRawType").getGenericReturnType();
+
+        // When:
+        boolean result = underTest.canConvert(type);
+
+        // Then:
+        assertThat(result).isTrue();
+    }
+
+    @Test
     public void testCanConvertShouldReturnTrueIfTypeIsIterableOfWildcard() {
         // Given:
         Type type = getMethod("methodReturningIterableOfWildcard").getGenericReturnType();
@@ -169,7 +193,7 @@ public class DataConverterTest extends BaseTest {
         boolean result = underTest.canConvert(type);
 
         // Then:
-        assertThat(result).isFalse();
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -530,6 +554,15 @@ public class DataConverterTest extends BaseTest {
     }
 
     public static List<Object> methodReturningListOfObject() {
+        return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static List<Comparable> methodReturningListOfRawType() {
+        return null;
+    }
+
+    public static List<Comparable<Object>> methodReturningListOfNonIterableParameterizedType() {
         return null;
     }
 

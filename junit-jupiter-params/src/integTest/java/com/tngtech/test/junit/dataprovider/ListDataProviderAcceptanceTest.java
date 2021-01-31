@@ -3,7 +3,9 @@ package com.tngtech.test.junit.dataprovider;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -54,5 +56,17 @@ class ListDataProviderAcceptanceTest {
     void testIsNumber(Number number) {
         // Expect:
         assertThat(number).isInstanceOf(Number.class);
+    }
+
+    @DataProvider
+    public static List<List<UnaryOperator<String>>> listOfListOfUnaryOperator() {
+        return Collections.singletonList(Collections.singletonList((string) -> "merged-" + string));
+    }
+
+    @ParameterizedTest
+    @UseDataProvider("listOfListOfUnaryOperator")
+    public void testListOfListOfUnaryOperator(UnaryOperator<String> operator) {
+        // Expect:
+        assertThat(operator.apply("test")).isEqualTo("merged-test");
     }
 }

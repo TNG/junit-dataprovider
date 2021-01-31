@@ -3,6 +3,7 @@ package com.tngtech.test.java.junit.dataprovider;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -43,5 +44,25 @@ public class DataProviderListArgAcceptanceTest {
     public void test(List<String> strings, String expectedValue) {
         // Expected:
         assertThat(strings).contains(expectedValue);
+    }
+
+    public interface UnaryOperator<T> {
+        T apply(T arg);
+    }
+
+    @DataProvider
+    public static List<List<UnaryOperator<String>>> listOfListOfUnaryOperator() {
+        return Collections.singletonList(Collections.<UnaryOperator<String>>singletonList(new UnaryOperator<String>() {
+            @Override
+            public String apply(String arg) {
+                return "merged-" + arg;
+            }
+        }));
+    }
+
+    @Test
+    @UseDataProvider("listOfListOfUnaryOperator")
+    public void testListOfListOfUnaryOperator(UnaryOperator<String> operator) {
+        assertThat(operator.apply("test")).isEqualTo("merged-test");
     }
 }

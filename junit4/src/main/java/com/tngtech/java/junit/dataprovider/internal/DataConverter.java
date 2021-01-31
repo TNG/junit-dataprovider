@@ -57,7 +57,7 @@ public class DataConverter extends com.tngtech.junit.dataprovider.convert.DataCo
      * </ul>
      *
      * Please note, that {@link Iterable} can be replaced by any valid subtype (checked via {@link Class#isAssignableFrom(Class)}). As well
-     * as an arbitrary inner type is also accepted. Only rawtypes are not supported currently.
+     * as an arbitrary inner type is also accepted.
      *
      * @param type to be checked for convertibility (use either {@link Method#getGenericReturnType()}, {@link Method#getReturnType()}, or
      *            simple {@link Class} if possible)
@@ -70,11 +70,7 @@ public class DataConverter extends com.tngtech.junit.dataprovider.convert.DataCo
 
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
-
-            Type rawType = parameterizedType.getRawType();
-            if (Iterable.class.isAssignableFrom((Class<?>) rawType)) {
-                return canConvertIterableOf(parameterizedType);
-            }
+            return Iterable.class.isAssignableFrom((Class<?>) parameterizedType.getRawType());
         }
         return false;
     }
@@ -101,18 +97,6 @@ public class DataConverter extends com.tngtech.junit.dataprovider.convert.DataCo
                 dataProvider.splitBy(), dataProvider.convertNulls(), dataProvider.trimValues(),
                 dataProvider.ignoreEnumCase());
         return super.convert(data, isVarargs, parameterTypes, context);
-    }
-
-    private boolean canConvertIterableOf(ParameterizedType parameterizedType) {
-        if (parameterizedType.getActualTypeArguments().length == 1) {
-            Type innerType = parameterizedType.getActualTypeArguments()[0];
-            if (parameterizedType.getActualTypeArguments()[0] instanceof ParameterizedType) {
-                ParameterizedType innerType2 = (ParameterizedType) innerType;
-                return Iterable.class.isAssignableFrom((Class<?>) innerType2.getRawType());
-            }
-            return true;
-        }
-        return false;
     }
 
     public void setObjectArrayConverter(ObjectArrayConverter objectArrayConverter) {
