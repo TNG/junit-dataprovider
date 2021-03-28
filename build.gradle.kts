@@ -1,6 +1,6 @@
 plugins {
     id("com.github.spotbugs") version "4.6.0" apply false
-    id("de.aaschmid.cpd") version "3.1"
+    id("de.aaschmid.cpd") version "3.2"
 
     id("biz.aQute.bnd") version "4.3.1" apply false
 
