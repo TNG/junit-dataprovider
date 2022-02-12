@@ -2,7 +2,7 @@ plugins {
     id("com.github.spotbugs") version "4.6.0" apply false
     id("de.aaschmid.cpd") version "3.2"
 
-    id("biz.aQute.bnd") version "4.3.1" apply false
+    id("biz.aQute.bnd") version "6.1.0" apply false
 
     jacoco
     id("com.github.kt3k.coveralls") version "2.9.0"
@@ -32,7 +32,7 @@ class Dependency {
     val assertJ8 = "org.assertj:assertj-core:3.14.0"
     val mockito8 = "org.mockito:mockito-core:3.2.4"
 
-    val groovy = "org.codehaus.groovy:groovy:2.5.8"
+    val groovy = "org.codehaus.groovy:groovy:3.0.9"
 }
 val dependency = Dependency() // required because using `object` does not work using properties from outside
 
@@ -54,7 +54,7 @@ subprojects {
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
 
     group = "com.tngtech.junit.dataprovider"
-    version = "2.8"
+    version = "3.0-SNAPSHOT"
 
     dependencies {
         "compileOnly"(dependency.spotBugsAnnotations)
@@ -94,8 +94,8 @@ project(":core") {
     }
 
     configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_1_6
-        targetCompatibility = JavaVersion.VERSION_1_6
+        sourceCompatibility = JavaVersion.VERSION_1_7
+        targetCompatibility = JavaVersion.VERSION_1_7
     }
 
     dependencies {
@@ -129,8 +129,8 @@ project(":junit4") {
     }
 
     configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_1_6
-        targetCompatibility = JavaVersion.VERSION_1_6
+        sourceCompatibility = JavaVersion.VERSION_1_7
+        targetCompatibility = JavaVersion.VERSION_1_7
     }
 
     configure<SourceSetContainer> {
@@ -289,7 +289,7 @@ project(":junit-jupiter-params") {
 // configure after properties are set and integration tests are added
 subprojects {
     configure<JacocoPluginExtension> {
-        toolVersion = "0.8.3"
+        toolVersion = "0.8.7"
     }
 
     configure<com.github.spotbugs.snom.SpotBugsExtension> {
