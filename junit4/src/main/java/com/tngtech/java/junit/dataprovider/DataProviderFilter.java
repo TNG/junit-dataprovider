@@ -78,7 +78,7 @@ public class DataProviderFilter extends Filter {
         String filterDescription = filter.describe();
 
         Matcher filterDescriptionMatcher = DESCRIPTION_PATTERN.matcher(filterDescription);
-        if (filterDescription.contains(" OR ") || !filterDescriptionMatcher.find()) {
+        if (filterDescription.contains(" OR ") || filterDescription.contains("exclude ") || !filterDescriptionMatcher.find()) {
             return filter.shouldRun(description);
         }
         String methodName = filterDescriptionMatcher.group(GROUP_METHOD_NAME);

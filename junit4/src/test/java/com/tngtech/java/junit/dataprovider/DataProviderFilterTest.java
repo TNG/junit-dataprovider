@@ -87,6 +87,21 @@ public class DataProviderFilterTest extends BaseTest {
     }
 
     @Test
+    public void testShouldRunShouldCallOriginalFilterShouldRunIfGivenDescriptionContainsExclude() {
+        // Given:
+        when(filter.describe()).thenReturn("exclude Method failing1[0: 0](Test1)");
+        Description description = setupDescription(true, "failing1[0: 0](Test1)");
+
+        // When:
+        underTest.shouldRun(description);
+
+        // Then:
+        verify(filter).describe();
+        verify(filter).shouldRun(description);
+        verifyNoMoreInteractions(filter);
+    }
+
+    @Test
     public void testShouldRunShouldReturnFalseWhenDescriptionDoesNotHaveExpectedMethodName() {
         // Given:
         when(filter.describe()).thenReturn("Method testMain[1: ](com.tngtech.Clazz)");
