@@ -54,7 +54,7 @@ subprojects {
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
 
     group = "com.tngtech.junit.dataprovider"
-    version = "2.8"
+    version = "2.9"
 
     dependencies {
         "compileOnly"(dependency.spotBugsAnnotations)
