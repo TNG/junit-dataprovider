@@ -21,7 +21,9 @@ import static org.junit.jupiter.engine.extension.MutableExtensionRegistry.create
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.TestInfo;
@@ -31,7 +33,7 @@ import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
-import org.junit.jupiter.engine.execution.ExecutableInvoker;
+import org.junit.jupiter.engine.execution.InterceptingExecutableInvoker;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.platform.engine.ConfigurationParameters;
@@ -52,7 +54,7 @@ import com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext;
 public abstract class AbstractUseDataProviderArgumentProvider<SOURCE_ANNOTATION extends Annotation, DATAPROVIDER_ANNOTATION extends Annotation>
         extends AbstractDataProviderArgumentProvider<SOURCE_ANNOTATION> {
 
-    private static final ExecutableInvoker executableInvoker = new ExecutableInvoker();
+    private static final InterceptingExecutableInvoker executableInvoker = new InterceptingExecutableInvoker();
 
     protected static final Namespace NAMESPACE_USE_DATAPROVIDER = Namespace
             .create(AbstractUseDataProviderArgumentProvider.class, "dataCache");
@@ -184,6 +186,11 @@ public abstract class AbstractUseDataProviderArgumentProvider<SOURCE_ANNOTATION 
             @Override
             public Optional<String> get(String key) {
                 return Optional.empty();
+            }
+
+            @Override
+            public Set<String> keySet() {
+                return Collections.emptySet();
             }
         };
     }
