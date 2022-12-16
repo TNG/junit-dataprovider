@@ -192,6 +192,7 @@ public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION e
 
     private ConfigurationParameters emptyConfigurationParameters() {
         return new ConfigurationParameters() {
+            @SuppressWarnings("deprecation")
             @Override
             public int size() {
                 return 0;

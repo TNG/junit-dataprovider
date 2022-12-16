@@ -173,6 +173,7 @@ public abstract class AbstractUseDataProviderArgumentProvider<SOURCE_ANNOTATION 
 
     private ConfigurationParameters emptyConfigurationParameters() {
         return new ConfigurationParameters() {
+            @SuppressWarnings("deprecation")
             @Override
             public int size() {
                 return 0;
