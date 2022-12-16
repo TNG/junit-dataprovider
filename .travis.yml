@@ -11,9 +11,9 @@ jdk:
   - oraclejdk11
 
 script:
-  - ./gradlew --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.5.0 -PskipSpotBugs
-  - ./gradlew --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.5.2 -PskipSpotBugs
-  - ./gradlew --scan build -Pjunit4Version=4.12  -PjunitJupiterVersion=5.6.3 -PskipSpotBugs
+  - ./gradlew --scan build -Pjunit4Version=4.10  -PjunitJupiterVersion=5.9.0 -PskipSpotBugs
+  - ./gradlew --scan build -Pjunit4Version=4.11  -PjunitJupiterVersion=5.9.0 -PskipSpotBugs
+  - ./gradlew --scan build -Pjunit4Version=4.12  -PjunitJupiterVersion=5.9.0 -PskipSpotBugs
   - ./gradlew --scan build
 
   - cd ${TRAVIS_BUILD_DIR}/junit4/
