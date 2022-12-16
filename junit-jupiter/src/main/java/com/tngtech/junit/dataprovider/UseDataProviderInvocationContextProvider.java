@@ -33,7 +33,7 @@ import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
-import org.junit.jupiter.engine.execution.InterceptingExecutableInvoker;
+import org.junit.jupiter.engine.execution.DefaultExecutableInvoker;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 
@@ -52,8 +52,6 @@ import com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext;
  */
 public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION extends Annotation, DATAPROVIDER_ANNOTATION extends Annotation>
         extends AbstractDataProviderInvocationContextProvider<TEST_ANNOTATION> {
-
-    private static final InterceptingExecutableInvoker executableInvoker = new InterceptingExecutableInvoker();
 
     protected static final Namespace NAMESPACE_USE_DATAPROVIDER = Namespace
             .create(UseDataProviderInvocationContextProvider.class, "dataCache");
@@ -175,8 +173,7 @@ public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION e
             // TODO how to not require junit-jupiter-engine dependency and reuse already existing ExtensionRegistry?
             ExtensionRegistry extensionRegistry = createRegistryWithDefaultExtensions(
                     new DefaultJupiterConfiguration(emptyConfigurationParameters()));
-            Object data = executableInvoker.invoke(dataProviderMethod, context.getTestInstance().orElse(null), context,
-                    extensionRegistry, InvocationInterceptor::interceptTestFactoryMethod);
+            Object data = new DefaultExecutableInvoker(context, extensionRegistry).invoke(dataProviderMethod, context.getTestInstance().orElse(null));
             if (cacheDataProviderResult) {
                 store.put(dataProviderMethod, data);
             }
