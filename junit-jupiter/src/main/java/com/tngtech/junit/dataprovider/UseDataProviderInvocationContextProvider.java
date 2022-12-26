@@ -22,19 +22,20 @@ import static org.junit.jupiter.engine.extension.MutableExtensionRegistry.create
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
-import org.junit.jupiter.engine.execution.ExecutableInvoker;
+import org.junit.jupiter.engine.execution.DefaultExecutableInvoker;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 
@@ -53,8 +54,6 @@ import com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext;
  */
 public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION extends Annotation, DATAPROVIDER_ANNOTATION extends Annotation>
         extends AbstractDataProviderInvocationContextProvider<TEST_ANNOTATION> {
-
-    private static final ExecutableInvoker executableInvoker = new ExecutableInvoker();
 
     protected static final Namespace NAMESPACE_USE_DATAPROVIDER = Namespace
             .create(UseDataProviderInvocationContextProvider.class, "dataCache");
@@ -176,8 +175,7 @@ public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION e
             // TODO how to not require junit-jupiter-engine dependency and reuse already existing ExtensionRegistry?
             ExtensionRegistry extensionRegistry = createRegistryWithDefaultExtensions(
                     new DefaultJupiterConfiguration(emptyConfigurationParameters()));
-            Object data = executableInvoker.invoke(dataProviderMethod, context.getTestInstance().orElse(null), context,
-                    extensionRegistry, InvocationInterceptor::interceptTestFactoryMethod);
+            Object data = new DefaultExecutableInvoker(context, extensionRegistry).invoke(dataProviderMethod, context.getTestInstance().orElse(null));
             if (cacheDataProviderResult) {
                 store.put(dataProviderMethod, data);
             }
@@ -193,6 +191,7 @@ public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION e
 
     private ConfigurationParameters emptyConfigurationParameters() {
         return new ConfigurationParameters() {
+            @SuppressWarnings("deprecation")
             @Override
             public int size() {
                 return 0;
@@ -206,6 +205,11 @@ public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION e
             @Override
             public Optional<String> get(String key) {
                 return Optional.empty();
+            }
+
+            @Override
+            public Set<String> keySet() {
+                return Collections.emptySet();
             }
         };
     }
