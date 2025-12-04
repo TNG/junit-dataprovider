@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
 import com.tngtech.junit.dataprovider.convert.DataConverter;
@@ -62,7 +63,7 @@ public abstract class AbstractUseDataProviderArgumentProvider<SOURCE_ANNOTATION 
     }
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameterDeclarations, ExtensionContext context) {
         Method testMethod = context.getRequiredTestMethod();
 
         DataProviderResolverContext resolverContext = getDataProviderResolverContext(context, sourceAnnotation);
