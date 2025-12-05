@@ -17,8 +17,9 @@ println("Using skipSpotBugs = $skipSpotBugs for current build.")
 // set default junit versions if not set via command line
 val junit4Version by extra(findProperty("junit4Version")?.toString() ?: "4.13.1")
 println("Using JUnit4 version $junit4Version for current build.")
-val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.9.0")
-println("Using JUnit Jupiter version $junitJupiterVersion for current build.")
+val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.12.2")
+val junitJupiterPlatformVersion by extra(findProperty("junitJupiterPlatformVersion")?.toString() ?: "1.12.2")
+println("Using JUnit Jupiter version $junitJupiterVersion and JUnit Jupiter Platform version $junitJupiterPlatformVersion for current build.")
 
 class Dependency {
     val spotBugsAnnotations = "com.github.spotbugs:spotbugs-annotations:3.1.12"
@@ -26,6 +27,7 @@ class Dependency {
     val junit4 = "junit:junit:$junit4Version"
     val junitJupiterEngine = "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
     val junitJupiterParams = "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion"
+    val junitJupiterPlatformLauncher = "org.junit.platform:junit-platform-launcher:$junitJupiterPlatformVersion"
 
     val assertJ6 = "org.assertj:assertj-core:1.7.1"
     val mockito6 = "org.mockito:mockito-core:2.28.2"
@@ -54,7 +56,7 @@ subprojects {
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
 
     group = "com.tngtech.junit.dataprovider"
-    version = "2.10"
+    version = "2.11-SNAPSHOT"
 
     dependencies {
         "compileOnly"(dependency.spotBugsAnnotations)
@@ -209,6 +211,9 @@ configure(subprojects.filter { it.name.startsWith("junit-jupiter") }) {
         "integTestImplementation" {
             extendsFrom(configurations["testImplementation"])
         }
+        "integTestRuntimeOnly" {
+            extendsFrom(configurations["testRuntimeOnly"])
+        }
     }
 
     dependencies {
@@ -219,6 +224,9 @@ configure(subprojects.filter { it.name.startsWith("junit-jupiter") }) {
         "testImplementation"(dependency.mockito8)
 
         "integTestImplementation"(dependency.groovy)
+        "integTestRuntimeOnly"(dependency.junitJupiterPlatformLauncher)
+
+        "testRuntimeOnly"(dependency.junitJupiterPlatformLauncher)
     }
 
     tasks {
