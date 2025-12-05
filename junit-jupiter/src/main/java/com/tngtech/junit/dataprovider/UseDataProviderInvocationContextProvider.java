@@ -18,14 +18,10 @@ package com.tngtech.junit.dataprovider;
 import static com.tngtech.junit.dataprovider.Preconditions.checkArgument;
 import static com.tngtech.junit.dataprovider.Preconditions.checkNotNull;
 import static com.tngtech.junit.dataprovider.resolver.DataProviderMethodResolverHelper.findDataProviderMethods;
-import static org.junit.jupiter.engine.extension.MutableExtensionRegistry.createRegistryWithDefaultExtensions;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.TestInfo;
@@ -34,10 +30,6 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
-import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
-import org.junit.jupiter.engine.execution.DefaultExecutableInvoker;
-import org.junit.jupiter.engine.extension.ExtensionRegistry;
-import org.junit.platform.engine.ConfigurationParameters;
 
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
 import com.tngtech.junit.dataprovider.convert.DataConverter;
@@ -172,10 +164,7 @@ public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION e
             return cached;
         }
         try {
-            // TODO how to not require junit-jupiter-engine dependency and reuse already existing ExtensionRegistry?
-            ExtensionRegistry extensionRegistry = createRegistryWithDefaultExtensions(
-                    new DefaultJupiterConfiguration(emptyConfigurationParameters()));
-            Object data = new DefaultExecutableInvoker(context, extensionRegistry).invoke(dataProviderMethod, context.getTestInstance().orElse(null));
+            Object data = context.getExecutableInvoker().invoke(dataProviderMethod, context.getTestInstance().orElse(null));
             if (cacheDataProviderResult) {
                 store.put(dataProviderMethod, data);
             }
@@ -187,30 +176,5 @@ public abstract class UseDataProviderInvocationContextProvider<TEST_ANNOTATION e
                             e.getMessage()),
                     e);
         }
-    }
-
-    private ConfigurationParameters emptyConfigurationParameters() {
-        return new ConfigurationParameters() {
-            @SuppressWarnings("deprecation")
-            @Override
-            public int size() {
-                return 0;
-            }
-
-            @Override
-            public Optional<Boolean> getBoolean(String key) {
-                return Optional.empty();
-            }
-
-            @Override
-            public Optional<String> get(String key) {
-                return Optional.empty();
-            }
-
-            @Override
-            public Set<String> keySet() {
-                return Collections.emptySet();
-            }
-        };
     }
 }
