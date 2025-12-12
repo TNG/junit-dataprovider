@@ -46,6 +46,8 @@ public class BaseTest {
 
     // -- helper methods to create arrays, lists etc. ------------------------------------------------------------------
 
+    @SafeVarargs
+    @SuppressWarnings("varargs")
     protected final <T> List<T[]> listOfArrays(T[]... arrays) {
         List<T[]> result = new ArrayList<T[]>();
         Collections.addAll(result, arrays);

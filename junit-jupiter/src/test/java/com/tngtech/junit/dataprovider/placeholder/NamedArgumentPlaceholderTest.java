@@ -284,7 +284,7 @@ class NamedArgumentPlaceholderTest {
         // Then:
         assertThat(result).isEqualTo("arg0=x");
         assertThat(getTestCapturedLog()).containsPattern(
-                "WARNING: Parameter names on method '.*' are not available. To store formal parameter names, compile the source file with the '-parameters' option");
+                "Parameter names on method '.*' are not available. To store formal parameter names, compile the source file with the '-parameters' option.");
     }
 
     @Test
