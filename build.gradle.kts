@@ -1,8 +1,8 @@
 plugins {
-    id("com.github.spotbugs") version "4.6.0" apply false
+    id("com.github.spotbugs") version "5.2.5" apply false
     id("de.aaschmid.cpd") version "3.2"
 
-    id("biz.aQute.bnd") version "4.3.1" apply false
+    id("biz.aQute.bnd") version "6.4.0" apply false
 
     jacoco
     id("com.github.kt3k.coveralls") version "2.9.0"
@@ -94,8 +94,8 @@ project(":core") {
     }
 
     configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_1_6
-        targetCompatibility = JavaVersion.VERSION_1_6
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     dependencies {
