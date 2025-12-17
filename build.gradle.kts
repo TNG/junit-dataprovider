@@ -23,6 +23,8 @@ val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString()
 val junitJupiterPlatformVersion by extra(findProperty("junitJupiterPlatformVersion")?.toString() ?: "1.12.2")
 println("Using JUnit Jupiter version $junitJupiterVersion and JUnit Jupiter Platform version $junitJupiterPlatformVersion for current build.")
 
+val javaLanguageVersion = JavaLanguageVersion.of(project.findProperty("javaVersion")?.toString() ?: "21")
+
 val projectSettings = mapOf(
     ":core" to mapOf(
         "artifactBaseName" to "junit-dataprovider-core",
@@ -59,7 +61,7 @@ class Dependency {
     val assertJ8 = "org.assertj:assertj-core:3.14.0"
     val mockito8 = "org.mockito:mockito-core:3.2.4"
 
-    val groovy = "org.codehaus.groovy:groovy:2.5.8"
+    val groovy = "org.codehaus.groovy:groovy:3.0.25"
 }
 val dependency = Dependency() // required because using `object` does not work using properties from outside
 
@@ -94,6 +96,9 @@ subprojects {
     configure<JavaPluginExtension> {
         withJavadocJar()
         withSourcesJar()
+        toolchain {
+            languageVersion.set(javaLanguageVersion)
+        }
     }
 
     tasks {
@@ -112,7 +117,7 @@ subprojects {
         }
 
         named<Javadoc>("javadoc") {
-            if (JavaVersion.current().isJava9Compatible) {
+            if (javaLanguageVersion.canCompileOrRun(JavaLanguageVersion.of(9))) {
                 (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
             }
         }
