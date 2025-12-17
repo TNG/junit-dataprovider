@@ -104,7 +104,7 @@ subprojects {
     tasks {
         withType<JavaCompile> {
             options.encoding = "UTF-8"
-            options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+            options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-options", "-Werror"))
         }
 
         withType<Jar> {
@@ -135,12 +135,6 @@ project(":core") {
 
         "testImplementation"(dependency.assertJ6)
         "testImplementation"(dependency.mockito6)
-    }
-
-    tasks {
-        withType<JavaCompile> {
-            options.compilerArgs.addAll(listOf("-Xlint:-options"))
-        }
     }
 }
 
@@ -176,10 +170,6 @@ project(":junit4") {
     }
 
     tasks {
-        withType<JavaCompile> {
-            options.compilerArgs.addAll(listOf("-Xlint:-options"))
-        }
-
         val integTest = register<Test>("integTest") {
             group = "verification"
             description = "Runs all integration tests."
