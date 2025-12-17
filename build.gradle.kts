@@ -21,6 +21,29 @@ val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString()
 val junitJupiterPlatformVersion by extra(findProperty("junitJupiterPlatformVersion")?.toString() ?: "1.12.2")
 println("Using JUnit Jupiter version $junitJupiterVersion and JUnit Jupiter Platform version $junitJupiterPlatformVersion for current build.")
 
+val projectSettings = mapOf(
+    ":core" to mapOf(
+        "artifactBaseName" to "junit-dataprovider-core",
+        "description" to "The common core for a TestNG like dataprovider runner for JUnit.",
+        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.core"
+    ),
+    ":junit4" to mapOf(
+        "artifactBaseName" to "junit4-dataprovider",
+        "description" to "A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features.",
+        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.junit4"
+    ),
+    ":junit-jupiter" to mapOf(
+        "artifactBaseName" to "junit-jupiter-dataprovider",
+        "description" to "A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.",
+        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter"
+    ),
+    ":junit-jupiter-params" to mapOf(
+        "artifactBaseName" to "junit-jupiter-params-dataprovider",
+        "description" to "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider.",
+        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter.params"
+    )
+)
+
 class Dependency {
     val spotBugsAnnotations = "com.github.spotbugs:spotbugs-annotations:3.1.12"
 
@@ -58,6 +81,8 @@ subprojects {
     group = "com.tngtech.junit.dataprovider"
     version = "2.11-SNAPSHOT"
 
+    description = projectSettings[path]?.get("description")
+
     dependencies {
         "compileOnly"(dependency.spotBugsAnnotations)
         "testImplementation"(dependency.spotBugsAnnotations)
@@ -79,6 +104,8 @@ subprojects {
                 include("LICENSE", "NOTICE")
                 into("META-INF")
             }
+            val artifactBaseName = projectSettings[project.path]?.get("artifactBaseName")
+            archiveBaseName.set(artifactBaseName)
         }
 
         named<Javadoc>("javadoc") {
@@ -90,11 +117,6 @@ subprojects {
 }
 
 project(":core") {
-    configure<BasePluginConvention> {
-        archivesBaseName = "junit-dataprovider-core"
-        description = "The common core for a TestNG like dataprovider runner for JUnit."
-    }
-
     configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -111,24 +133,11 @@ project(":core") {
         withType<JavaCompile> {
             options.compilerArgs.addAll(listOf("-Xlint:-options"))
         }
-
-        named<Jar>("jar") {
-            manifest {
-                attributes(
-                        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.core"
-                )
-            }
-        }
     }
 }
 
 project(":junit4") {
     apply<GroovyPlugin>()
-
-    configure<BasePluginConvention> {
-        archivesBaseName = "junit4-dataprovider"
-        description = "A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features."
-    }
 
     configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -161,14 +170,6 @@ project(":junit4") {
     tasks {
         withType<JavaCompile> {
             options.compilerArgs.addAll(listOf("-Xlint:-options"))
-        }
-
-        named<Jar>("jar") {
-            manifest {
-                attributes(
-                        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.junit4"
-                )
-            }
         }
 
         val integTest = register<Test>("integTest") {
@@ -261,36 +262,11 @@ configure(subprojects.filter { it.name.startsWith("junit-jupiter") }) {
 }
 
 project(":junit-jupiter") {
-    configure<BasePluginConvention> {
-        archivesBaseName = "junit-jupiter-dataprovider"
-        description = "A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider."
-    }
-
-    tasks.named<Jar>("jar") {
-        manifest {
-            attributes(
-                    "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter"
-            )
-        }
-    }
 }
 
 project(":junit-jupiter-params") {
-    configure<BasePluginConvention> {
-        archivesBaseName = "junit-jupiter-params-dataprovider"
-        description = "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider."
-    }
-
     dependencies {
         "api"(dependency.junitJupiterParams)
-    }
-
-    tasks.named<Jar>("jar") {
-        manifest {
-            attributes(
-                    "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter.params"
-            )
-        }
     }
 }
 
@@ -309,7 +285,7 @@ subprojects {
             manifest {
                 val now = java.time.LocalDate.now()
 
-                val title = project.the<BasePluginConvention>().archivesBaseName
+                val title = projectSettings[project.path]?.get("artifactBaseName")
                 val company = "TNG Technology Consulting GmbH"
                 val today = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 val copyright = "${now.year} $company"
@@ -327,6 +303,7 @@ subprojects {
                         "Documentation-URL" to "https://github.com/TNG/junit-dataprovider/wiki",
                         "Copyright" to copyright,
                         "License" to "Apache License v2.0, January 2004",
+                        "Automatic-Module-Name" to projectSettings[project.path]?.get("Automatic-Module-Name"),
 
                         // OSGi / p2 plugin information
                         "Bundle-Copyright" to copyright,
@@ -439,13 +416,13 @@ subprojects {
     configure<PublishingExtension> {
         publications {
             register<MavenPublication>("mavenJava") {
-                val archivesBaseName = project.the<BasePluginConvention>().archivesBaseName
-                artifactId = archivesBaseName
+                val artifactBaseName = projectSettings[project.path]?.get("artifactBaseName")
+                artifactId = artifactBaseName
                 from(components["java"])
                 pom {
                     packaging = "jar"
 
-                    name.set(archivesBaseName)
+                    name.set(artifactBaseName)
                     description.set(project.description)
                     url.set("https://github.com/TNG/junit-dataprovider")
 
