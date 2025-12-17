@@ -1,6 +1,7 @@
 plugins {
     id("com.github.spotbugs") version "5.2.5" apply false
-    id("de.aaschmid.cpd") version "3.2"
+// FIXME adapt-publishing cpd fails to run in Gradle 8
+//    id("de.aaschmid.cpd") version "3.2"
 
     id("biz.aQute.bnd") version "6.4.0" apply false
 
@@ -345,26 +346,28 @@ subprojects {
             }
         }
 
-        named("check") {
-            dependsOn(rootProject.tasks["cpdCheck"])
-        }
+// FIXME adapt-publishing cpd fails to run in Gradle 8
+//        named("check") {
+//            dependsOn(rootProject.tasks["cpdCheck"])
+//        }
     }
 }
 
-configure<de.aaschmid.gradle.plugins.cpd.CpdExtension> {
-    // Use Java 8 and later to execute cpd successfully
-    toolVersion = "6.13.0"
-}
-
-tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
-    ignoreFailures = true
-    minimumTokenCount = 25
-    setSource(files(
-            // only check java source code
-            subprojects.flatMap { it.the<SourceSetContainer>()["main"].java.srcDirs },
-            subprojects.flatMap { it.the<SourceSetContainer>()["test"].java.srcDirs }
-    ))
-}
+// FIXME adapt-publishing cpd fails to run in Gradle 8
+//configure<de.aaschmid.gradle.plugins.cpd.CpdExtension> {
+//    // Use Java 8 and later to execute cpd successfully
+//    toolVersion = "6.13.0"
+//}
+//
+//tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
+//    ignoreFailures = true
+//    minimumTokenCount = 25
+//    setSource(files(
+//            // only check java source code
+//            subprojects.flatMap { it.the<SourceSetContainer>()["main"].java.srcDirs },
+//            subprojects.flatMap { it.the<SourceSetContainer>()["test"].java.srcDirs }
+//    ))
+//}
 
 // -- coveralls plugin multi-module project workaround ---------------------------------------------------------
 // FIXME adapt-publishing need replacement for deprecated JacocoMerge
