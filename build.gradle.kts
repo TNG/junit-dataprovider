@@ -334,10 +334,10 @@ subprojects {
             enabled = !skipSpotBugs
             reports {
                 create("html") {
-                    isEnabled = true
+                    required.set(true)
                 }
                 create("xml") {
-                    isEnabled = false
+                    required.set(false)
                 }
             }
         }
