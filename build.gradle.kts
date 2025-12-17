@@ -534,7 +534,8 @@ open class TouchTestResults : DefaultTask() {
     @TaskAction
     fun touch() {
         tasks.forEach { task ->
-            val testResultsDir = task.get().reports.junitXml.destination
+            // FIXME adapt-publishing needs verification in Jenkins build
+            val testResultsDir = task.get().reports.junitXml.outputLocation.get().asFile
             if (testResultsDir.exists()) {
                 val timestamp = System.currentTimeMillis()
                 testResultsDir.listFiles()?.forEach { it.setLastModified(timestamp) }
