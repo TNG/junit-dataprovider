@@ -4,7 +4,8 @@ plugins {
 
     id("biz.aQute.bnd") version "6.4.0" apply false
 
-    jacoco
+// FIXME adapt-publishing need replacement for deprecated JacocoMerge
+//    jacoco
     id("com.github.kt3k.coveralls") version "2.9.0"
 }
 
@@ -73,7 +74,8 @@ allprojects {
 }
 
 subprojects {
-    apply<JacocoPlugin>()
+// FIXME adapt-publishing need replacement for deprecated JacocoMerge
+//    apply<JacocoPlugin>()
     apply<JavaLibraryPlugin>()
     apply<com.github.spotbugs.snom.SpotBugsBasePlugin>()
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
@@ -272,9 +274,10 @@ project(":junit-jupiter-params") {
 
 // configure after properties are set and integration tests are added
 subprojects {
-    configure<JacocoPluginExtension> {
-        toolVersion = "0.8.3"
-    }
+// FIXME adapt-publishing need replacement for deprecated JacocoMerge
+//    configure<JacocoPluginExtension> {
+//        toolVersion = "0.8.3"
+//    }
 
     configure<com.github.spotbugs.snom.SpotBugsExtension> {
         toolVersion.set("3.1.12")
@@ -364,39 +367,40 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
 }
 
 // -- coveralls plugin multi-module project workaround ---------------------------------------------------------
-val publishedProjects = subprojects.filter { true }
+// FIXME adapt-publishing need replacement for deprecated JacocoMerge
+//val publishedProjects = subprojects.filter { true }
 
-val jacocoMerge = tasks.register("jacocoMerge", JacocoMerge::class) {
-    doFirst {
-        executionData = files(executionData.filter { it.exists() })
-    }
-    publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
-    dependsOn(publishedProjects.flatMap { it.tasks.withType(Test::class) })
-}
-
-val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
-    description = "Generates an aggregate report from all subprojects"
-
-    additionalSourceDirs.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
-    sourceDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
-    classDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].output.asFileTree.matching {
-        // exclude FQDN duplicates -- both are annotations and therefore mostly irrelevant for coverage
-        exclude("com/tngtech/junit/dataprovider/DataProvider.class")
-        exclude("com/tngtech/junit/dataprovider/UseDataProvider.class")
-    }})
-
-    executionData(jacocoMerge.get().destinationFile)
-
-    reports {
-        xml.isEnabled = true // required by coveralls
-    }
-    dependsOn(jacocoMerge)
-}
-
-coveralls {
-    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
-    sourceDirs = publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs }.map { it.absolutePath }
-}
+//val jacocoMerge = tasks.register("jacocoMerge", JacocoMerge::class) {
+//    doFirst {
+//        executionData = files(executionData.filter { it.exists() })
+//    }
+//    publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
+//    dependsOn(publishedProjects.flatMap { it.tasks.withType(Test::class) })
+//}
+//
+//val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
+//    description = "Generates an aggregate report from all subprojects"
+//
+//    additionalSourceDirs.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
+//    sourceDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
+//    classDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].output.asFileTree.matching {
+//        // exclude FQDN duplicates -- both are annotations and therefore mostly irrelevant for coverage
+//        exclude("com/tngtech/junit/dataprovider/DataProvider.class")
+//        exclude("com/tngtech/junit/dataprovider/UseDataProvider.class")
+//    }})
+//
+//    executionData(jacocoMerge.get().destinationFile)
+//
+//    reports {
+//        xml.isEnabled = true // required by coveralls
+//    }
+//    dependsOn(jacocoMerge)
+//}
+//
+//coveralls {
+//    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+//    sourceDirs = publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs }.map { it.absolutePath }
+//}
 
 // -- sign and publish artifacts -------------------------------------------------------------------------------------
 val isReleaseVersion by extra(!project.version.toString().endsWith("-SNAPSHOT"))
