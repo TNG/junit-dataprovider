@@ -1,3 +1,6 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+
 plugins {
     id("com.github.spotbugs") version "5.2.5" apply false
 // FIXME adapt-publishing cpd fails to run in Gradle 8
@@ -8,6 +11,8 @@ plugins {
 // FIXME adapt-publishing need replacement for deprecated JacocoMerge
 //    jacoco
     id("com.github.kt3k.coveralls") version "2.9.0"
+
+    id("com.vanniktech.maven.publish") version "0.35.0"
 }
 
 val isBuildOnJenkins by extra(System.getenv().getOrDefault("BUILD_TAG", "").startsWith("jenkins-"))
@@ -74,6 +79,9 @@ allprojects {
     repositories {
         mavenCentral()
     }
+
+    group = "com.tngtech.junit.dataprovider"
+    version = "2.11-SNAPSHOT"
 }
 
 subprojects {
@@ -83,9 +91,6 @@ subprojects {
     apply<com.github.spotbugs.snom.SpotBugsBasePlugin>()
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
 
-    group = "com.tngtech.junit.dataprovider"
-    version = "2.11-SNAPSHOT"
-
     description = projectSettings[path]?.get("description")
 
     dependencies {
@@ -94,11 +99,11 @@ subprojects {
     }
 
     configure<JavaPluginExtension> {
-        withJavadocJar()
-        withSourcesJar()
         toolchain {
             languageVersion.set(javaLanguageVersion)
         }
+        withJavadocJar()
+        withSourcesJar()
     }
 
     tasks {
@@ -402,119 +407,107 @@ subprojects {
 
 // -- sign and publish artifacts -------------------------------------------------------------------------------------
 val isReleaseVersion by extra(!project.version.toString().endsWith("-SNAPSHOT"))
+val isReleaseBuild by extra(project.hasProperty("release"))
 
-// username and password from gradle.properties otherwise empty
-val sonatypeUsername by extra(findProperty("sonatypeUsername")?.toString() ?: "")
-val sonatypePassword by extra(findProperty("sonatypePassword")?.toString() ?: "")
+if (isReleaseBuild) {
+    subprojects {
+        apply(plugin = "com.vanniktech.maven.publish")
+        apply<SigningPlugin>()
 
-subprojects {
-    apply<MavenPublishPlugin>()
-    apply<SigningPlugin>()
+        tasks.withType<GenerateModuleMetadata> {
+            enabled = isReleaseVersion // signing of these artifacts causes failure for snapshot versions
+        }
 
-    tasks.withType<GenerateModuleMetadata> {
-        enabled = isReleaseVersion // signing of these artifacts causes failure for snapshot versions
-    }
+        mavenPublishing {
+            // None -> do NOT create Javadoc jar, but publish the one created via standard 'withJavadocJar()' instead
+            // true -> publish sources jar
+            configure(JavaLibrary(javadocJar = JavadocJar.None(), sourcesJar = true))
+            val artifactBaseName = projectSettings[project.path]?.get("artifactBaseName")
 
-    configure<PublishingExtension> {
-        publications {
-            register<MavenPublication>("mavenJava") {
-                val artifactBaseName = projectSettings[project.path]?.get("artifactBaseName")
-                artifactId = artifactBaseName
-                from(components["java"])
+            publishToMavenCentral(automaticRelease = true)
+            signAllPublications()
+
+            coordinates(
+                project.group.toString(),
+                artifactBaseName,
+                project.version.toString()
+            )
+
+            pom {
+                name.set(artifactBaseName)
+                description.set(project.description)
+                url.set("https://github.com/TNG/junit-dataprovider")
+
+                developers {
+                    developer {
+                        id.set("aaschmid")
+                        name.set("Andreas Schmid")
+                        email.set("service@aaschmid.de")
+                    }
+                }
+
+                licenses {
+                    license {
+                        name.set("The Apache Software License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        distribution.set("repo")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git@github.com:TNG/junit-dataprovider.git")
+                    developerConnection.set("scm:git@github.com:TNG/junit-dataprovider.git")
+                    url.set("scm:git@github.com:TNG/junit-dataprovider.git")
+                }
+
+                withXml {
+                    fun org.w3c.dom.NodeList.asList(): List<org.w3c.dom.Node> = (0 until length).map { it -> this.item(it) }
+                    fun org.w3c.dom.NodeList.onlyElement() =
+                        if (length == 1) item(0) else throw kotlin.IllegalStateException("Expected only one element but got $length.")
+
+                    asElement()
+                        .getElementsByTagName("dependencies")
+                        .asList()
+                        .flatMap { it.childNodes.asList() }
+                        .filterIsInstance<org.w3c.dom.Element>()
+                        .forEach { dep ->
+                            val groupId = dep.getElementsByTagName("groupId").onlyElement()
+                            val artifactId = dep.getElementsByTagName("artifactId").onlyElement()
+
+                            // JUnit4
+                            if (groupId.textContent == "junit" && artifactId.textContent == "junit") {
+                                dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,5.0)"
+                                dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
+                            }
+
+                            // JUnit5
+                            if ((groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-engine") ||
+                                (groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-params")
+                            ) {
+                                dep.getElementsByTagName("version").onlyElement().textContent = "[5.5.0-M6,6.0.0)"
+                                dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
+                            }
+                        }
+                }
+            }
+            // finally call `asNode` to get rid of excessive newlines caused by use of asElement
+            // see also https://github.com/gradle/gradle/issues/7529
+            afterEvaluate {
                 pom {
-                    packaging = "jar"
-
-                    name.set(artifactBaseName)
-                    description.set(project.description)
-                    url.set("https://github.com/TNG/junit-dataprovider")
-
-                    developers {
-                        developer {
-                            id.set("aaschmid")
-                            name.set("Andreas Schmid")
-                            email.set("service@aaschmid.de")
-                        }
-                    }
-
-                    licenses {
-                        license {
-                            name.set("The Apache Software License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                            distribution.set("repo")
-                        }
-                    }
-
-                    scm {
-                        connection.set("scm:git@github.com:TNG/junit-dataprovider.git")
-                        developerConnection.set("scm:git@github.com:TNG/junit-dataprovider.git")
-                        url.set("scm:git@github.com:TNG/junit-dataprovider.git")
-                    }
-
                     withXml {
-                        fun org.w3c.dom.NodeList.asList(): List<org.w3c.dom.Node> = (0 until length).map { it -> this.item(it) }
-                        fun org.w3c.dom.NodeList.onlyElement() = if (length == 1) item(0) else throw kotlin.IllegalStateException("Expected only one element but got $length.")
-
-                        asElement()
-                                .getElementsByTagName("dependencies")
-                                .asList()
-                                .flatMap { it.childNodes.asList() }
-                                .filterIsInstance<org.w3c.dom.Element>()
-                                .forEach { dep ->
-                                    val groupId = dep.getElementsByTagName("groupId").onlyElement()
-                                    val artifactId = dep.getElementsByTagName("artifactId").onlyElement()
-
-                                    // JUnit4
-                                    if (groupId.textContent == "junit" && artifactId.textContent == "junit") {
-                                        dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,5.0)"
-                                        dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
-                                    }
-
-                                    // JUnit5
-                                    if ((groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-engine") ||
-                                            (groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-params")) {
-                                        dep.getElementsByTagName("version").onlyElement().textContent = "[5.5.0-M6,6.0.0)"
-                                        dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
-                                    }
-                                }
-                    }
-                }
-                // finally call `asNode` to get rid of excessive newlines caused by use of asElement
-                // see also https://github.com/gradle/gradle/issues/7529
-                afterEvaluate {
-                    pom {
-                        withXml {
-                            asNode()
-                        }
+                        asNode()
                     }
                 }
             }
         }
 
-        repositories {
-            maven {
-                val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                val snapshotRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-                url = if (isReleaseVersion) releasesRepoUrl else snapshotRepoUrl
-
-                credentials {
-                    username = sonatypeUsername
-                    password = sonatypePassword
-                }
-
-                metadataSources {
-                    gradleMetadata()
-                }
-            }
+        // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
+        configure<SigningExtension> {
+            isRequired = isReleaseVersion
+            val signingKey: String? by project
+            val signingPassword: String? by project
+            useInMemoryPgpKeys(signingKey, signingPassword)
         }
-    }
-
-    // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
-    configure<SigningExtension> {
-        setRequired({ isReleaseVersion && gradle.taskGraph.hasTask("publish") })
-        val signingKey: String? by project
-        val signingPassword: String? by project
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(the<PublishingExtension>().publications["mavenJava"])
     }
 }
 
