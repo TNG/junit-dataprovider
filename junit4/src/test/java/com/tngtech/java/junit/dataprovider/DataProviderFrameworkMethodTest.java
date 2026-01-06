@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Method;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -27,7 +28,12 @@ public class DataProviderFrameworkMethodTest extends BaseTest {
     @Mock
     private BasePlaceholder placeholder;
 
-    private final Method method = anyMethod();
+    private Method method;
+
+    @Before
+    public void setUp() {
+        method = anyMethod();
+    }
 
     @After
     public void tearDown() {

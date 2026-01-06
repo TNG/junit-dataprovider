@@ -9,13 +9,16 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [ 8, 11 ]
+        java-version: [ 8, 11, 17, 21, 25 ]
 
     steps:
     - uses: actions/checkout@v6
-    - name: Setup JDK 1.${{ matrix.java-version }}
-      uses: actions/setup-java@v1
+    - name: Setup JDK to run Gradle
+      uses: actions/setup-java@v5
       with:
-        java-version: ${{ matrix.java-version }}
-    - name: Build with Gradle
-      run: ./gradlew build
+        java-version: 21
+        distribution: 'temurin'
+    - name: Set up Gradle
+      uses: gradle/actions/setup-gradle@v5
+    - name: Build with Gradle, Java version ${{ matrix.java-version }}
+      run: ./gradlew build -PjavaVersion=${{ matrix.java-version }}
