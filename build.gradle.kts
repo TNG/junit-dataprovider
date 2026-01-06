@@ -8,9 +8,8 @@ plugins {
 
     id("biz.aQute.bnd") version "6.4.0" apply false
 
-// FIXME adapt-publishing need replacement for deprecated JacocoMerge
-//    jacoco
-    id("com.github.kt3k.coveralls") version "2.9.0"
+    jacoco
+    id("com.github.kt3k.coveralls") version "2.12.2"
 
     id("com.vanniktech.maven.publish") version "0.35.0"
 }
@@ -68,6 +67,7 @@ class Dependency {
 
     val groovy = "org.codehaus.groovy:groovy:3.0.25"
 }
+
 val dependency = Dependency() // required because using `object` does not work using properties from outside
 
 buildScan {
@@ -85,8 +85,7 @@ allprojects {
 }
 
 subprojects {
-// FIXME adapt-publishing need replacement for deprecated JacocoMerge
-//    apply<JacocoPlugin>()
+    apply<JacocoPlugin>()
     apply<JavaLibraryPlugin>()
     apply<com.github.spotbugs.snom.SpotBugsBasePlugin>()
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
@@ -275,10 +274,9 @@ project(":junit-jupiter-params") {
 
 // configure after properties are set and integration tests are added
 subprojects {
-// FIXME adapt-publishing need replacement for deprecated JacocoMerge
-//    configure<JacocoPluginExtension> {
-//        toolVersion = "0.8.3"
-//    }
+    configure<JacocoPluginExtension> {
+        toolVersion = "0.8.14"
+    }
 
     configure<com.github.spotbugs.snom.SpotBugsExtension> {
         toolVersion.set("3.1.12")
@@ -295,29 +293,29 @@ subprojects {
                 val copyright = "${now.year} $company"
 
                 attributes(
-                        "Built-By" to "Gradle ${gradle.gradleVersion}",
-                        "Built-Date" to today, // using now would destroy incremental build feature
-                        "Specification-Title" to title,
-                        "Specification-Version" to archiveVersion,
-                        "Specification-Vendor" to company,
-                        "Implementation-Title" to title,
-                        "Implementation-Version" to archiveVersion,
-                        "Implementation-Vendor" to company,
-                        "Issue-Tracker" to "https://github.com/TNG/junit-dataprovider/issues",
-                        "Documentation-URL" to "https://github.com/TNG/junit-dataprovider/wiki",
-                        "Copyright" to copyright,
-                        "License" to "Apache License v2.0, January 2004",
-                        "Automatic-Module-Name" to projectSettings[project.path]?.get("Automatic-Module-Name"),
+                    "Built-By" to "Gradle ${gradle.gradleVersion}",
+                    "Built-Date" to today, // using now would destroy incremental build feature
+                    "Specification-Title" to title,
+                    "Specification-Version" to archiveVersion,
+                    "Specification-Vendor" to company,
+                    "Implementation-Title" to title,
+                    "Implementation-Version" to archiveVersion,
+                    "Implementation-Vendor" to company,
+                    "Issue-Tracker" to "https://github.com/TNG/junit-dataprovider/issues",
+                    "Documentation-URL" to "https://github.com/TNG/junit-dataprovider/wiki",
+                    "Copyright" to copyright,
+                    "License" to "Apache License v2.0, January 2004",
+                    "Automatic-Module-Name" to projectSettings[project.path]?.get("Automatic-Module-Name"),
 
-                        // OSGi / p2 plugin information
-                        "Bundle-Copyright" to copyright,
-                        "Bundle-Name" to title,
-                        "Bundle-SymbolicName" to "${project.group}.$title",
-                        "Bundle-Vendor" to company,
-                        "Export-Package" to "com.tngtech.junit.dataprovider.*",
+                    // OSGi / p2 plugin information
+                    "Bundle-Copyright" to copyright,
+                    "Bundle-Name" to title,
+                    "Bundle-SymbolicName" to "${project.group}.$title",
+                    "Bundle-Vendor" to company,
+                    "Export-Package" to "com.tngtech.junit.dataprovider.*",
 
-                        // Bnd plugin instructions -- remove field because it breaks caching builds with included linux timestamp
-                        "-removeheaders" to "Bnd-LastModified"
+                    // Bnd plugin instructions -- remove field because it breaks caching builds with included linux timestamp
+                    "-removeheaders" to "Bnd-LastModified"
                 )
             }
         }
@@ -370,40 +368,32 @@ subprojects {
 //}
 
 // -- coveralls plugin multi-module project workaround ---------------------------------------------------------
-// FIXME adapt-publishing need replacement for deprecated JacocoMerge
-//val publishedProjects = subprojects.filter { true }
+val publishedProjects = subprojects.filter { true }
+val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
+    description = "Generates an aggregate report from all subprojects"
 
-//val jacocoMerge = tasks.register("jacocoMerge", JacocoMerge::class) {
-//    doFirst {
-//        executionData = files(executionData.filter { it.exists() })
-//    }
-//    publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
-//    dependsOn(publishedProjects.flatMap { it.tasks.withType(Test::class) })
-//}
-//
-//val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
-//    description = "Generates an aggregate report from all subprojects"
-//
-//    additionalSourceDirs.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
-//    sourceDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
-//    classDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].output.asFileTree.matching {
-//        // exclude FQDN duplicates -- both are annotations and therefore mostly irrelevant for coverage
-//        exclude("com/tngtech/junit/dataprovider/DataProvider.class")
-//        exclude("com/tngtech/junit/dataprovider/UseDataProvider.class")
-//    }})
-//
-//    executionData(jacocoMerge.get().destinationFile)
-//
-//    reports {
-//        xml.isEnabled = true // required by coveralls
-//    }
-//    dependsOn(jacocoMerge)
-//}
-//
-//coveralls {
-//    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
-//    sourceDirs = publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs }.map { it.absolutePath }
-//}
+    additionalSourceDirs.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
+    sourceDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
+    classDirectories.from(publishedProjects.flatMap {
+        it.the<SourceSetContainer>()["main"].output.asFileTree.matching {
+            // exclude FQDN duplicates -- both are annotations and therefore mostly irrelevant for coverage
+            exclude("com/tngtech/junit/dataprovider/DataProvider.class")
+            exclude("com/tngtech/junit/dataprovider/UseDataProvider.class")
+        }
+    })
+
+    publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
+    dependsOn(publishedProjects.flatMap { it.tasks.withType(Test::class) })
+
+    reports {
+        xml.required = true // required by coveralls
+    }
+}
+
+coveralls {
+    jacocoReportPath = "${layout.buildDirectory}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    sourceDirs = publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs }.map { it.absolutePath }
+}
 
 // -- sign and publish artifacts -------------------------------------------------------------------------------------
 val isReleaseVersion by extra(!project.version.toString().endsWith("-SNAPSHOT"))
