@@ -1,11 +1,17 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+
 plugins {
     id("com.github.spotbugs") version "5.2.5" apply false
-    id("de.aaschmid.cpd") version "3.2"
+// FIXME adapt-publishing cpd fails to run in Gradle 8
+//    id("de.aaschmid.cpd") version "3.2"
 
     id("biz.aQute.bnd") version "6.4.0" apply false
 
     jacoco
-    id("com.github.kt3k.coveralls") version "2.9.0"
+    id("com.github.kt3k.coveralls") version "2.12.2"
+
+    id("com.vanniktech.maven.publish") version "0.35.0"
 }
 
 val isBuildOnJenkins by extra(System.getenv().getOrDefault("BUILD_TAG", "").startsWith("jenkins-"))
@@ -21,6 +27,31 @@ val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString()
 val junitJupiterPlatformVersion by extra(findProperty("junitJupiterPlatformVersion")?.toString() ?: "1.12.2")
 println("Using JUnit Jupiter version $junitJupiterVersion and JUnit Jupiter Platform version $junitJupiterPlatformVersion for current build.")
 
+val javaLanguageVersion = JavaLanguageVersion.of(project.findProperty("javaVersion")?.toString() ?: "21")
+
+val projectSettings = mapOf(
+    ":core" to mapOf(
+        "artifactBaseName" to "junit-dataprovider-core",
+        "description" to "The common core for a TestNG like dataprovider runner for JUnit.",
+        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.core"
+    ),
+    ":junit4" to mapOf(
+        "artifactBaseName" to "junit4-dataprovider",
+        "description" to "A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features.",
+        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.junit4"
+    ),
+    ":junit-jupiter" to mapOf(
+        "artifactBaseName" to "junit-jupiter-dataprovider",
+        "description" to "A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider.",
+        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter"
+    ),
+    ":junit-jupiter-params" to mapOf(
+        "artifactBaseName" to "junit-jupiter-params-dataprovider",
+        "description" to "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider.",
+        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter.params"
+    )
+)
+
 class Dependency {
     val spotBugsAnnotations = "com.github.spotbugs:spotbugs-annotations:3.1.12"
 
@@ -34,8 +65,9 @@ class Dependency {
     val assertJ8 = "org.assertj:assertj-core:3.14.0"
     val mockito8 = "org.mockito:mockito-core:3.2.4"
 
-    val groovy = "org.codehaus.groovy:groovy:2.5.8"
+    val groovy = "org.codehaus.groovy:groovy:3.0.25"
 }
+
 val dependency = Dependency() // required because using `object` does not work using properties from outside
 
 buildScan {
@@ -47,6 +79,9 @@ allprojects {
     repositories {
         mavenCentral()
     }
+
+    group = "com.tngtech.junit.dataprovider"
+    version = "2.11-SNAPSHOT"
 }
 
 subprojects {
@@ -55,8 +90,7 @@ subprojects {
     apply<com.github.spotbugs.snom.SpotBugsBasePlugin>()
     apply<aQute.bnd.gradle.BndBuilderPlugin>()
 
-    group = "com.tngtech.junit.dataprovider"
-    version = "2.11-SNAPSHOT"
+    description = projectSettings[path]?.get("description")
 
     dependencies {
         "compileOnly"(dependency.spotBugsAnnotations)
@@ -64,6 +98,9 @@ subprojects {
     }
 
     configure<JavaPluginExtension> {
+        toolchain {
+            languageVersion.set(javaLanguageVersion)
+        }
         withJavadocJar()
         withSourcesJar()
     }
@@ -71,7 +108,7 @@ subprojects {
     tasks {
         withType<JavaCompile> {
             options.encoding = "UTF-8"
-            options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+            options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-options", "-Werror"))
         }
 
         withType<Jar> {
@@ -79,10 +116,12 @@ subprojects {
                 include("LICENSE", "NOTICE")
                 into("META-INF")
             }
+            val artifactBaseName = projectSettings[project.path]?.get("artifactBaseName")
+            archiveBaseName.set(artifactBaseName)
         }
 
         named<Javadoc>("javadoc") {
-            if (JavaVersion.current().isJava9Compatible) {
+            if (javaLanguageVersion.canCompileOrRun(JavaLanguageVersion.of(9))) {
                 (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
             }
         }
@@ -90,11 +129,6 @@ subprojects {
 }
 
 project(":core") {
-    configure<BasePluginConvention> {
-        archivesBaseName = "junit-dataprovider-core"
-        description = "The common core for a TestNG like dataprovider runner for JUnit."
-    }
-
     configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -106,29 +140,10 @@ project(":core") {
         "testImplementation"(dependency.assertJ6)
         "testImplementation"(dependency.mockito6)
     }
-
-    tasks {
-        withType<JavaCompile> {
-            options.compilerArgs.addAll(listOf("-Xlint:-options"))
-        }
-
-        named<Jar>("jar") {
-            manifest {
-                attributes(
-                        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.core"
-                )
-            }
-        }
-    }
 }
 
 project(":junit4") {
     apply<GroovyPlugin>()
-
-    configure<BasePluginConvention> {
-        archivesBaseName = "junit4-dataprovider"
-        description = "A TestNG like dataprovider runner for JUnit having a simplified syntax compared to all the existing JUnit4 features."
-    }
 
     configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -159,18 +174,6 @@ project(":junit4") {
     }
 
     tasks {
-        withType<JavaCompile> {
-            options.compilerArgs.addAll(listOf("-Xlint:-options"))
-        }
-
-        named<Jar>("jar") {
-            manifest {
-                attributes(
-                        "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.junit4"
-                )
-            }
-        }
-
         val integTest = register<Test>("integTest") {
             group = "verification"
             description = "Runs all integration tests."
@@ -261,43 +264,18 @@ configure(subprojects.filter { it.name.startsWith("junit-jupiter") }) {
 }
 
 project(":junit-jupiter") {
-    configure<BasePluginConvention> {
-        archivesBaseName = "junit-jupiter-dataprovider"
-        description = "A TestNG like dataprovider runner for JUnit Jupiter which is feature comparable to JUnit4 dataprovider."
-    }
-
-    tasks.named<Jar>("jar") {
-        manifest {
-            attributes(
-                    "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter"
-            )
-        }
-    }
 }
 
 project(":junit-jupiter-params") {
-    configure<BasePluginConvention> {
-        archivesBaseName = "junit-jupiter-params-dataprovider"
-        description = "A TestNG like dataprovider runner for JUnit Jupiter Parameterized Tests which is largely compatible to JUnit4 dataprovider."
-    }
-
     dependencies {
         "api"(dependency.junitJupiterParams)
-    }
-
-    tasks.named<Jar>("jar") {
-        manifest {
-            attributes(
-                    "Automatic-Module-Name" to "com.tngtech.junit.dataprovider.jupiter.params"
-            )
-        }
     }
 }
 
 // configure after properties are set and integration tests are added
 subprojects {
     configure<JacocoPluginExtension> {
-        toolVersion = "0.8.3"
+        toolVersion = "0.8.14"
     }
 
     configure<com.github.spotbugs.snom.SpotBugsExtension> {
@@ -309,34 +287,35 @@ subprojects {
             manifest {
                 val now = java.time.LocalDate.now()
 
-                val title = project.the<BasePluginConvention>().archivesBaseName
+                val title = projectSettings[project.path]?.get("artifactBaseName")
                 val company = "TNG Technology Consulting GmbH"
                 val today = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 val copyright = "${now.year} $company"
 
                 attributes(
-                        "Built-By" to "Gradle ${gradle.gradleVersion}",
-                        "Built-Date" to today, // using now would destroy incremental build feature
-                        "Specification-Title" to title,
-                        "Specification-Version" to archiveVersion,
-                        "Specification-Vendor" to company,
-                        "Implementation-Title" to title,
-                        "Implementation-Version" to archiveVersion,
-                        "Implementation-Vendor" to company,
-                        "Issue-Tracker" to "https://github.com/TNG/junit-dataprovider/issues",
-                        "Documentation-URL" to "https://github.com/TNG/junit-dataprovider/wiki",
-                        "Copyright" to copyright,
-                        "License" to "Apache License v2.0, January 2004",
+                    "Built-By" to "Gradle ${gradle.gradleVersion}",
+                    "Built-Date" to today, // using now would destroy incremental build feature
+                    "Specification-Title" to title,
+                    "Specification-Version" to archiveVersion,
+                    "Specification-Vendor" to company,
+                    "Implementation-Title" to title,
+                    "Implementation-Version" to archiveVersion,
+                    "Implementation-Vendor" to company,
+                    "Issue-Tracker" to "https://github.com/TNG/junit-dataprovider/issues",
+                    "Documentation-URL" to "https://github.com/TNG/junit-dataprovider/wiki",
+                    "Copyright" to copyright,
+                    "License" to "Apache License v2.0, January 2004",
+                    "Automatic-Module-Name" to projectSettings[project.path]?.get("Automatic-Module-Name"),
 
-                        // OSGi / p2 plugin information
-                        "Bundle-Copyright" to copyright,
-                        "Bundle-Name" to title,
-                        "Bundle-SymbolicName" to "${project.group}.$title",
-                        "Bundle-Vendor" to company,
-                        "Export-Package" to "com.tngtech.junit.dataprovider.*",
+                    // OSGi / p2 plugin information
+                    "Bundle-Copyright" to copyright,
+                    "Bundle-Name" to title,
+                    "Bundle-SymbolicName" to "${project.group}.$title",
+                    "Bundle-Vendor" to company,
+                    "Export-Package" to "com.tngtech.junit.dataprovider.*",
 
-                        // Bnd plugin instructions -- remove field because it breaks caching builds with included linux timestamp
-                        "-removeheaders" to "Bnd-LastModified"
+                    // Bnd plugin instructions -- remove field because it breaks caching builds with included linux timestamp
+                    "-removeheaders" to "Bnd-LastModified"
                 )
             }
         }
@@ -357,185 +336,168 @@ subprojects {
             enabled = !skipSpotBugs
             reports {
                 create("html") {
-                    isEnabled = true
+                    required.set(true)
                 }
                 create("xml") {
-                    isEnabled = false
+                    required.set(false)
                 }
             }
         }
 
-        named("check") {
-            dependsOn(rootProject.tasks["cpdCheck"])
-        }
+// FIXME adapt-publishing cpd fails to run in Gradle 8
+//        named("check") {
+//            dependsOn(rootProject.tasks["cpdCheck"])
+//        }
     }
 }
 
-configure<de.aaschmid.gradle.plugins.cpd.CpdExtension> {
-    // Use Java 8 and later to execute cpd successfully
-    toolVersion = "6.13.0"
-}
-
-tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
-    ignoreFailures = true
-    minimumTokenCount = 25
-    setSource(files(
-            // only check java source code
-            subprojects.flatMap { it.the<SourceSetContainer>()["main"].java.srcDirs },
-            subprojects.flatMap { it.the<SourceSetContainer>()["test"].java.srcDirs }
-    ))
-}
+// FIXME adapt-publishing cpd fails to run in Gradle 8
+//configure<de.aaschmid.gradle.plugins.cpd.CpdExtension> {
+//    // Use Java 8 and later to execute cpd successfully
+//    toolVersion = "6.13.0"
+//}
+//
+//tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
+//    ignoreFailures = true
+//    minimumTokenCount = 25
+//    setSource(files(
+//            // only check java source code
+//            subprojects.flatMap { it.the<SourceSetContainer>()["main"].java.srcDirs },
+//            subprojects.flatMap { it.the<SourceSetContainer>()["test"].java.srcDirs }
+//    ))
+//}
 
 // -- coveralls plugin multi-module project workaround ---------------------------------------------------------
 val publishedProjects = subprojects.filter { true }
-
-val jacocoMerge = tasks.register("jacocoMerge", JacocoMerge::class) {
-    doFirst {
-        executionData = files(executionData.filter { it.exists() })
-    }
-    publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
-    dependsOn(publishedProjects.flatMap { it.tasks.withType(Test::class) })
-}
-
 val jacocoRootReport = tasks.register("jacocoRootReport", JacocoReport::class) {
     description = "Generates an aggregate report from all subprojects"
 
     additionalSourceDirs.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
     sourceDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
-    classDirectories.from(publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].output.asFileTree.matching {
-        // exclude FQDN duplicates -- both are annotations and therefore mostly irrelevant for coverage
-        exclude("com/tngtech/junit/dataprovider/DataProvider.class")
-        exclude("com/tngtech/junit/dataprovider/UseDataProvider.class")
-    }})
+    classDirectories.from(publishedProjects.flatMap {
+        it.the<SourceSetContainer>()["main"].output.asFileTree.matching {
+            // exclude FQDN duplicates -- both are annotations and therefore mostly irrelevant for coverage
+            exclude("com/tngtech/junit/dataprovider/DataProvider.class")
+            exclude("com/tngtech/junit/dataprovider/UseDataProvider.class")
+        }
+    })
 
-    executionData(jacocoMerge.get().destinationFile)
+    publishedProjects.forEach { executionData(it.tasks.withType(Test::class)) }
+    dependsOn(publishedProjects.flatMap { it.tasks.withType(Test::class) })
 
     reports {
-        xml.isEnabled = true // required by coveralls
+        xml.required = true // required by coveralls
     }
-    dependsOn(jacocoMerge)
 }
 
 coveralls {
-    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    jacocoReportPath = "${layout.buildDirectory}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
     sourceDirs = publishedProjects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs }.map { it.absolutePath }
 }
 
 // -- sign and publish artifacts -------------------------------------------------------------------------------------
 val isReleaseVersion by extra(!project.version.toString().endsWith("-SNAPSHOT"))
+val isReleaseBuild by extra(project.hasProperty("release"))
 
-// username and password from gradle.properties otherwise empty
-val sonatypeUsername by extra(findProperty("sonatypeUsername")?.toString() ?: "")
-val sonatypePassword by extra(findProperty("sonatypePassword")?.toString() ?: "")
+if (isReleaseBuild) {
+    subprojects {
+        apply(plugin = "com.vanniktech.maven.publish")
+        apply<SigningPlugin>()
 
-subprojects {
-    apply<MavenPublishPlugin>()
-    apply<SigningPlugin>()
+        tasks.withType<GenerateModuleMetadata> {
+            enabled = isReleaseVersion // signing of these artifacts causes failure for snapshot versions
+        }
 
-    tasks.withType<GenerateModuleMetadata> {
-        enabled = isReleaseVersion // signing of these artifacts causes failure for snapshot versions
-    }
+        mavenPublishing {
+            // None -> do NOT create Javadoc jar, but publish the one created via standard 'withJavadocJar()' instead
+            // true -> publish sources jar
+            configure(JavaLibrary(javadocJar = JavadocJar.None(), sourcesJar = true))
+            val artifactBaseName = projectSettings[project.path]?.get("artifactBaseName")
 
-    configure<PublishingExtension> {
-        publications {
-            register<MavenPublication>("mavenJava") {
-                val archivesBaseName = project.the<BasePluginConvention>().archivesBaseName
-                artifactId = archivesBaseName
-                from(components["java"])
+            publishToMavenCentral(automaticRelease = true)
+            signAllPublications()
+
+            coordinates(
+                project.group.toString(),
+                artifactBaseName,
+                project.version.toString()
+            )
+
+            pom {
+                name.set(artifactBaseName)
+                description.set(project.description)
+                url.set("https://github.com/TNG/junit-dataprovider")
+
+                developers {
+                    developer {
+                        id.set("aaschmid")
+                        name.set("Andreas Schmid")
+                        email.set("service@aaschmid.de")
+                    }
+                }
+
+                licenses {
+                    license {
+                        name.set("The Apache Software License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        distribution.set("repo")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git@github.com:TNG/junit-dataprovider.git")
+                    developerConnection.set("scm:git@github.com:TNG/junit-dataprovider.git")
+                    url.set("scm:git@github.com:TNG/junit-dataprovider.git")
+                }
+
+                withXml {
+                    fun org.w3c.dom.NodeList.asList(): List<org.w3c.dom.Node> = (0 until length).map { it -> this.item(it) }
+                    fun org.w3c.dom.NodeList.onlyElement() =
+                        if (length == 1) item(0) else throw kotlin.IllegalStateException("Expected only one element but got $length.")
+
+                    asElement()
+                        .getElementsByTagName("dependencies")
+                        .asList()
+                        .flatMap { it.childNodes.asList() }
+                        .filterIsInstance<org.w3c.dom.Element>()
+                        .forEach { dep ->
+                            val groupId = dep.getElementsByTagName("groupId").onlyElement()
+                            val artifactId = dep.getElementsByTagName("artifactId").onlyElement()
+
+                            // JUnit4
+                            if (groupId.textContent == "junit" && artifactId.textContent == "junit") {
+                                dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,5.0)"
+                                dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
+                            }
+
+                            // JUnit5
+                            if ((groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-engine") ||
+                                (groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-params")
+                            ) {
+                                dep.getElementsByTagName("version").onlyElement().textContent = "[5.5.0-M6,6.0.0)"
+                                dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
+                            }
+                        }
+                }
+            }
+            // finally call `asNode` to get rid of excessive newlines caused by use of asElement
+            // see also https://github.com/gradle/gradle/issues/7529
+            afterEvaluate {
                 pom {
-                    packaging = "jar"
-
-                    name.set(archivesBaseName)
-                    description.set(project.description)
-                    url.set("https://github.com/TNG/junit-dataprovider")
-
-                    developers {
-                        developer {
-                            id.set("aaschmid")
-                            name.set("Andreas Schmid")
-                            email.set("service@aaschmid.de")
-                        }
-                    }
-
-                    licenses {
-                        license {
-                            name.set("The Apache Software License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                            distribution.set("repo")
-                        }
-                    }
-
-                    scm {
-                        connection.set("scm:git@github.com:TNG/junit-dataprovider.git")
-                        developerConnection.set("scm:git@github.com:TNG/junit-dataprovider.git")
-                        url.set("scm:git@github.com:TNG/junit-dataprovider.git")
-                    }
-
                     withXml {
-                        fun org.w3c.dom.NodeList.asList(): List<org.w3c.dom.Node> = (0 until length).map { it -> this.item(it) }
-                        fun org.w3c.dom.NodeList.onlyElement() = if (length == 1) item(0) else throw kotlin.IllegalStateException("Expected only one element but got $length.")
-
-                        asElement()
-                                .getElementsByTagName("dependencies")
-                                .asList()
-                                .flatMap { it.childNodes.asList() }
-                                .filterIsInstance<org.w3c.dom.Element>()
-                                .forEach { dep ->
-                                    val groupId = dep.getElementsByTagName("groupId").onlyElement()
-                                    val artifactId = dep.getElementsByTagName("artifactId").onlyElement()
-
-                                    // JUnit4
-                                    if (groupId.textContent == "junit" && artifactId.textContent == "junit") {
-                                        dep.getElementsByTagName("version").onlyElement().textContent = "[4.10,5.0)"
-                                        dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
-                                    }
-
-                                    // JUnit5
-                                    if ((groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-engine") ||
-                                            (groupId.textContent == "org.junit.jupiter" && artifactId.textContent == "junit-jupiter-params")) {
-                                        dep.getElementsByTagName("version").onlyElement().textContent = "[5.5.0-M6,6.0.0)"
-                                        dep.getElementsByTagName("scope").onlyElement().textContent = "provided"
-                                    }
-                                }
-                    }
-                }
-                // finally call `asNode` to get rid of excessive newlines caused by use of asElement
-                // see also https://github.com/gradle/gradle/issues/7529
-                afterEvaluate {
-                    pom {
-                        withXml {
-                            asNode()
-                        }
+                        asNode()
                     }
                 }
             }
         }
 
-        repositories {
-            maven {
-                val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                val snapshotRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-                url = if (isReleaseVersion) releasesRepoUrl else snapshotRepoUrl
-
-                credentials {
-                    username = sonatypeUsername
-                    password = sonatypePassword
-                }
-
-                metadataSources {
-                    gradleMetadata()
-                }
-            }
+        // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
+        configure<SigningExtension> {
+            isRequired = isReleaseVersion
+            val signingKey: String? by project
+            val signingPassword: String? by project
+            useInMemoryPgpKeys(signingKey, signingPassword)
         }
-    }
-
-    // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
-    configure<SigningExtension> {
-        setRequired({ isReleaseVersion && gradle.taskGraph.hasTask("publish") })
-        val signingKey: String? by project
-        val signingPassword: String? by project
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(the<PublishingExtension>().publications["mavenJava"])
     }
 }
 
@@ -557,7 +519,8 @@ open class TouchTestResults : DefaultTask() {
     @TaskAction
     fun touch() {
         tasks.forEach { task ->
-            val testResultsDir = task.get().reports.junitXml.destination
+            // FIXME adapt-publishing needs verification in Jenkins build
+            val testResultsDir = task.get().reports.junitXml.outputLocation.get().asFile
             if (testResultsDir.exists()) {
                 val timestamp = System.currentTimeMillis()
                 testResultsDir.listFiles()?.forEach { it.setLastModified(timestamp) }
