@@ -81,7 +81,7 @@ allprojects {
     }
 
     group = "com.tngtech.junit.dataprovider"
-    version = "2.11-SNAPSHOT"
+    version = "2.11"
 }
 
 subprojects {
