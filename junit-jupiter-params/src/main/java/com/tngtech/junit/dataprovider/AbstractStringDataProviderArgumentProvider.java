@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
 import com.tngtech.junit.dataprovider.convert.DataConverter;
@@ -46,7 +47,7 @@ public abstract class AbstractStringDataProviderArgumentProvider<SOURCE_ANNOTATI
     }
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations declarations, ExtensionContext extensionContext) {
         Method testMethod = extensionContext.getRequiredTestMethod();
         return convertData(testMethod, getData(sourceAnnotation), getConverterContext(sourceAnnotation));
     }

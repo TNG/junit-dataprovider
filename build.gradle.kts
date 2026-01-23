@@ -23,8 +23,8 @@ println("Using skipSpotBugs = $skipSpotBugs for current build.")
 // set default junit versions if not set via command line
 val junit4Version by extra(findProperty("junit4Version")?.toString() ?: "4.13.1")
 println("Using JUnit4 version $junit4Version for current build.")
-val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.12.2")
-val junitJupiterPlatformVersion by extra(findProperty("junitJupiterPlatformVersion")?.toString() ?: "1.12.2")
+val junitJupiterVersion by extra(findProperty("junitJupiterVersion")?.toString() ?: "5.14.2")
+val junitJupiterPlatformVersion by extra(findProperty("junitJupiterPlatformVersion")?.toString() ?: "1.14.2")
 println("Using JUnit Jupiter version $junitJupiterVersion and JUnit Jupiter Platform version $junitJupiterPlatformVersion for current build.")
 
 val javaLanguageVersion = JavaLanguageVersion.of(project.findProperty("javaVersion")?.toString() ?: "21")
@@ -81,7 +81,7 @@ allprojects {
     }
 
     group = "com.tngtech.junit.dataprovider"
-    version = "2.11"
+    version = "2.12-SNAPSHOT"
 }
 
 subprojects {
